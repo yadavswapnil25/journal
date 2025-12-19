@@ -80,7 +80,8 @@ class AuthorController extends Controller
     {
         if (Auth::user()) {
             $user_role_type = User::getUserRoleType(Auth::user()->id);
-            $role = $user_role_type->role_type;
+            $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+            $role = !empty($user_role_type) ? $user_role_type->role_type : '';
             if ($role == 'author') {
                 $categories_count = Category::all();
                 if ($categories_count->count() > 0) {

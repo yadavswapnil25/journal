@@ -104,7 +104,8 @@
                                                         $deleted = trans("prs.ph_delete_title");
                                                         $user_id = Auth::User()->id;
                                                         $role_type = App\Models\User::getUserRoleType($user_id);
-                                                        $role = $role_type->role_type;
+                                                        $role_type = !empty($role_type) && is_object($role_type) ? $role_type : null;
+                                                        $role = !empty($role_type) ? $role_type->role_type : '';
                                                     @endphp
                                                     @if (!empty($articles))
                                                         <a class="sj-btn sj-btnactive" href="{{{url('/dashboard/general/settings/edit-edition/'.$edition->id)}}}">

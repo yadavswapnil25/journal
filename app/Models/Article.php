@@ -383,7 +383,7 @@ class Article extends Model
                 )
                 ->where('reviewers.reviewer_id', '=', $reviewer_id)
                 ->where('reviewers.status', '=', $status)
-                ->groupBy('articles.id')
+                ->groupBy('articles.id', 'articles.title', 'articles.abstract', 'articles.excerpt', 'articles.submitted_document', 'article_category_id', 'articles.unique_code', 'articles.created_at', 'articles.corresponding_author_id', 'reviewers.status')
                 ->paginate(10);
         }
     }
@@ -401,7 +401,7 @@ class Article extends Model
         if (!empty($reviewer_id) && !empty($status) && !empty($search_key)) {
             return DB::table('articles')
                 ->join('reviewers', 'articles.id', '=', 'reviewers.article_id')
-                ->select('articles.*', 'reviewers.status')
+                ->select('articles.*', DB::raw('MAX(reviewers.status) as status'))
                 ->where('reviewers.reviewer_id', '=', $reviewer_id)
                 ->where('reviewers.status', '=', $status)
                 ->where('articles.title', 'like', $search_key . '%')

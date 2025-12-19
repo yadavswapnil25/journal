@@ -48,7 +48,8 @@ class PageController extends Controller
     {
         $editor_id = Auth::user()->id;
         $user_role_type = User::getUserRoleType($editor_id);
-        $user_role = $user_role_type->role_type;
+        $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+        $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
         if ($user_role != $role) {
             return view('errors.no-record');
         }

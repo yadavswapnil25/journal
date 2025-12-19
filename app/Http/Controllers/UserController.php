@@ -68,7 +68,8 @@ class UserController extends Controller
         if (!empty($request['role'])) {
             $role_id = $request['role'];
             $user_role = User::getRoleByRoleID($role_id);
-            $users = User::getUserByRoleFilter($user_role->role_type);
+            $user_role = !empty($user_role) && is_object($user_role) ? $user_role : null;
+            $users = !empty($user_role) ? User::getUserByRoleFilter($user_role->role_type) : User::getUsers();
         } else {
             $users = User::getUsers();
         }
@@ -135,16 +136,17 @@ class UserController extends Controller
                 $site = SiteManagement::getMetaValue('site_title');
                 $superadmin = User::getUserByRoleType('superadmin');
                 $role_type = User::getRoleByRoleID($request['roles'][0]);
+                $role_type = !empty($role_type) && is_object($role_type) ? $role_type : null;
                 $email_params = array();
                 $email_params['new_user_supper_admin_name'] = $superadmin[0]->name;
                 $email_params['site_title'] = $site[0]['site_title'];
                 $email_params['user_edit_page_link'] = url('/login?user_id=' . $user->id . '&email_type=new_user');
                 $email_params['new_user_name'] = $request['name'] . " " . $request['sur_name'];
-                $email_params['new_user_role'] = $role_type->name;
+                $email_params['new_user_role'] = !empty($role_type) ? $role_type->name : '';
                 $email_params['login_email'] = $request['email'];
                 $email_params['new_user_password'] = 'secret';
                 $user_template_data = DB::table('email_templates')->where('email_type', 'new_user')->where('role_id', null)->first();
-                if (!empty($user_template_data)) {
+                if (!empty($user_template_data) && !empty($role_type)) {
                     Mail::to($request['email'])->send(new ArticleNotificationMailable($email_params, $user_template_data, $role_type->role_type));
                 }
             }
@@ -165,6 +167,7 @@ class UserController extends Controller
             $users = User::find($id);
             if (!empty($users)) {
                 $role = User::getUserRoleType($id);
+                $role = !empty($role) && is_object($role) ? $role : null;
                 $categories = Category::getCategories()->all();
                 $categories_id = Category::getCategoryByReviewerID($users->id);
                 return view('admin.users.edit', compact('role', 'categories', 'categories_id', 'id'))
@@ -302,12 +305,13 @@ class UserController extends Controller
         if (!empty($id)) {
             $user = User::find($id);
             $user_role_type = User::getUserRoleType($id);
-            if ($user_role_type->role_type == 'reviewer') {
+            $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+            if (!empty($user_role_type) && $user_role_type->role_type == 'reviewer') {
                 DB::table('reviewers')->where('reviewer_id', $id)->delete();
                 DB::table('comments')->where('comment_author', $id)->delete();
                 DB::table('reviewers_categories')->where('reviewer_id', $id)->delete();
             }
-            if ($user_role_type->role_type == 'author') {
+            if (!empty($user_role_type) && $user_role_type->role_type == 'author') {
                 $articles = DB::table('articles')
                     ->select('id')
                     ->where('corresponding_author_id', $id)
@@ -347,7 +351,8 @@ class UserController extends Controller
     {
         $user_id = Auth::user()->id;
         $user_role_type = User::getUserRoleType($user_id);
-        $user_role = $user_role_type->role_type;
+        $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+        $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
         if ($user_role != 'superadmin') {
             abort(404);
         }
@@ -382,7 +387,8 @@ class UserController extends Controller
     {
         $user_id = Auth::user()->id;
         $user_role_type = User::getUserRoleType($user_id);
-        $user_role = $user_role_type->role_type;
+        $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+        $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
         if ($user_role != 'reader') {
             abort(404);
         }

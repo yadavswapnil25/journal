@@ -8,8 +8,9 @@
         $user = Auth::user();
         $user_image = $user->user_image;
         $user_roles_type = App\Models\User::getUserRoleType($user->id);
-        $user_role = $user_roles_type->role_type;
-        $role_name = $user_roles_type->name;
+        $user_roles_type = !empty($user_roles_type) && is_object($user_roles_type) ? $user_roles_type : null;
+        $user_role = !empty($user_roles_type) ? $user_roles_type->role_type : '';
+        $role_name = !empty($user_roles_type) ? $user_roles_type->name : '';
         $user_name = $user->name;
         if ($user_role == 'superadmin' || $user_role == 'editor') {
             $dashboard = 'dashboard';
@@ -82,13 +83,13 @@
                             </a>
                         </li>
                     @endcan
-                    @if ($user_roles_type->role_type == 'reader')
+                    @if (!empty($user_roles_type) && $user_roles_type->role_type == 'reader')
                         <li class="{{\Request::route()->getName() === 'downloads' ? 'sj-active' : ''}}">
                             <a href="{{url('/user/products/downloads')}}">
                                 <i class="lnr lnr-download"></i><span>{{trans('prs.downloads')}}</span>
                             </a>
                         </li>
-                    @elseif ($user_roles_type->role_type == 'superadmin')
+                    @elseif (!empty($user_roles_type) && $user_roles_type->role_type == 'superadmin')
                         <li class="{{\Request::route()->getName() === 'orders' ? 'sj-active' : ''}}">
                             <a href="{{url('/superadmin/downloads')}}">
                                 <i class="lnr lnr-download"></i><span>{{trans('prs.downloads')}}</span>

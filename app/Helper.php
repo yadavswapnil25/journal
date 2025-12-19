@@ -612,6 +612,7 @@ class Helper
         $user = Auth::user();
         if (!empty($user)) {
             $user_roles_type = User::getUserRoleType($user->id);
+            $user_roles_type = !empty($user_roles_type) && is_object($user_roles_type) ? $user_roles_type : null;
             if (!empty($user_roles_type) && $user_roles_type->role_type == 'superadmin') {
                 $super_admin = 'superadmin';
             }
@@ -654,6 +655,7 @@ class Helper
         $dashboard = '';
         $active_class = '';
         $user_roles_type = User::getUserRoleType(Auth::user()->id);
+        $user_roles_type = !empty($user_roles_type) && is_object($user_roles_type) ? $user_roles_type : null;
         $status = [
             "sync" => "articles-under-review",
             "spell-check" => "accepted-articles",
@@ -666,16 +668,18 @@ class Helper
         } else {
             $dashboard = 'user';
         }
-        foreach ($status as $key => $s) {
-            if (!empty($page_id)) {
-                $active_class = $page_id == $s ? 'class="sj-active"' : '';
+        if (!empty($user_roles_type)) {
+            foreach ($status as $key => $s) {
+                if (!empty($page_id)) {
+                    $active_class = $page_id == $s ? 'class="sj-active"' : '';
+                }
+                $link = url('/' . $user_roles_type->role_type . '/' . $dashboard . '/' . Auth::user()->id . '/' . $s);
+                $output .= "<li $active_class>";
+                $output .= "<a href='$link'>";
+                $output .= "<i class='lnr lnr-$key'></i><span>" . self::DashboardArticlePageTitle($s) . "</span>";
+                $output .= "</a>";
+                $output .= "</li>";
             }
-            $link = url('/' . $user_roles_type->role_type . '/' . $dashboard . '/' . Auth::user()->id . '/' . $s);
-            $output .= "<li $active_class>";
-            $output .= "<a href='$link'>";
-            $output .= "<i class='lnr lnr-$key'></i><span>" . self::DashboardArticlePageTitle($s) . "</span>";
-            $output .= "</a>";
-            $output .= "</li>";
         }
         echo $output;
     }
@@ -709,6 +713,7 @@ class Helper
     {
         $page_author = '';
         $user_roles_type = User::getUserRoleType(Auth::user()->id);
+        $user_roles_type = !empty($user_roles_type) && is_object($user_roles_type) ? $user_roles_type : null;
         if (!empty($user_roles_type) && $user_roles_type->role_type == 'superadmin') {
             $page_author = 'superadmin';
         } else {
@@ -818,6 +823,7 @@ class Helper
     {
         if (!empty($user_id) && is_numeric($user_id)) {
             $role = User::getUserRoleType($user_id);
+            $role = !empty($role) && is_object($role) ? $role : null;
             if (!empty($role)) {
                 if ($role->role_type == 'superadmin' || $role->role_type == 'editor') {
                     if (!empty($status)) {

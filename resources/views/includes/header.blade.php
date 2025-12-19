@@ -19,19 +19,22 @@
                             </ul>
                         </div>
                     @else
-                        @php $user_roles_type = App\Models\User::getUserRoleType(Auth::user()->id); @endphp
+                        @php 
+                            $user_roles_type = App\Models\User::getUserRoleType(Auth::user()->id);
+                            $user_roles_type = !empty($user_roles_type) && is_object($user_roles_type) ? $user_roles_type : null;
+                        @endphp
                         <div class="sj-userloginarea">
                             <a href="javascript:void(0);">
                                 <i class="fa fa-angle-down"></i>
                                 <img id="site_user_image_header" src="{{url(App\Helper::getUserImage(Auth::user()->id, Auth::user()->user_image, 'mini') )}}" alt="{{{trans('prs.user_img')}}}">
                                 <div class="sj-loginusername">
                                     <h3>Hi, {{{Auth::user()->name}}}</h3>
-                                    <span>{{{$user_roles_type->name}}}</span>
+                                    <span>{{{!empty($user_roles_type) ? $user_roles_type->name : ''}}}</span>
                                 </div>
                             </a>
                             <nav class="sj-usernav">
                                 <ul>
-                                    @if (!($user_roles_type->role_type == 'reader' ))
+                                    @if (!empty($user_roles_type) && !($user_roles_type->role_type == 'reader' ))
                                         {{App\Helper::displayArticleMenu()}}
                                     @endif
                                     @can ('View Categories')
@@ -72,13 +75,13 @@
                                             </a>
                                         </li>
                                     @endcan
-                                    @if ($user_roles_type->role_type == 'reader')
+                                    @if (!empty($user_roles_type) && $user_roles_type->role_type == 'reader')
                                         <li>
                                             <a href="{{url('/user/products/downloads')}}">
                                                 <i class="lnr lnr-download"></i><span>{{{trans('prs.downloads')}}}</span>
                                             </a>
                                         </li>
-                                    @elseif ($user_roles_type->role_type == 'superadmin')
+                                    @elseif (!empty($user_roles_type) && $user_roles_type->role_type == 'superadmin')
                                         <li>
                                             <a href="{{url('/superadmin/downloads')}}">
                                                 <i class="lnr lnr-download"></i><span>{{{trans('prs.downloads')}}}</span>
@@ -176,7 +179,7 @@
                         </a>
                     @endif
                     @if (Auth::user())
-                        @if ($user_roles_type->role_type == 'author')
+                        @if (!empty($user_roles_type) && $user_roles_type->role_type == 'author')
                             <a class="sj-btn sj-btnactive" href="{{route('checkAuthor')}}">
                                 {{{trans('prs.btn_submit_article')}}}
                             </a>

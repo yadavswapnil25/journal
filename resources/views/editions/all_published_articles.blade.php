@@ -87,8 +87,9 @@
                                     @php
                                         $user_id = Auth::user()->id;
                                         $user_role_type = App\Models\User::getUserRoleType($user_id);
+                                        $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
                                     @endphp
-                                    @if ($user_role_type->role_type == 'author')
+                                    @if (!empty($user_role_type) && $user_role_type->role_type == 'author')
                                         <div class="sj-uploadarticle">
                                             <figure class="sj-uploadarticleimg">
                                                 <img src="{!!url('images/upload-articlebg.jpg')!!}" alt="{!!trans('prs.img_desc')!!}">

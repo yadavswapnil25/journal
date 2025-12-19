@@ -18,3 +18,15 @@ yarn-error.log
 /.vscode
 mysql/mysql.sock
 *.sock
+
+# MySQL binary files
+mysql/#innodb_redo/
+mysql/#innodb_temp/
+mysql/#ib_*.dblwr
+mysql/binlog.*
+mysql/ibdata*
+mysql/ibtmp*
+mysql/ib_buffer_pool
+mysql/undo_*
+mysql/*.ibd
+mysql/**/*.ibd

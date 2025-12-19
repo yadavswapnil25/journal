@@ -57,7 +57,8 @@
                                     @foreach ($users as $user)
                                         @php
                                             $user_roles_type = App\Models\User::getUserRoleType($user->id);
-                                            $userRole = $user_roles_type->role_type;
+                                            $user_roles_type = !empty($user_roles_type) && is_object($user_roles_type) ? $user_roles_type : null;
+                                            $userRole = !empty($user_roles_type) ? $user_roles_type->role_type : '';
                                         @endphp
                                         <li class="sj-categorysinfo delUser-{{{$user->id}}}">
                                             <figure class="sj-assignuserimg">

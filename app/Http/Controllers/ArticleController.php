@@ -59,7 +59,8 @@ class ArticleController extends Controller
         $article_status = Helper::getMenuStatus($status);
         $user_id = Auth::user()->id;
         $user_role_type = User::getUserRoleType($user_id);
-        $user_role = $user_role_type->role_type;
+        $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+        $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
         $page_title = Helper::DashboardArticlePageTitle($status);
         $payment_mode = SiteManagement::getMetaValue('payment_mode');
         if (empty($article_status)) {
@@ -100,7 +101,8 @@ class ArticleController extends Controller
         $article_status = Helper::getMenuStatus($status);
         $user_id = Auth::user()->id;
         $user_role_type = User::getUserRoleType($user_id);
-        $user_role = $user_role_type->role_type;
+        $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+        $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
         if ($user_role != $role || $user_id != $id || !(is_numeric($id)) || !(in_array($article_status, Helper::statusStaticList()))) {
             return view('errors.401');
         }
@@ -223,7 +225,8 @@ class ArticleController extends Controller
             $status_title = Helper::setArticleMenuParameter($status);
             $user_id = Auth::user()->id;
             $user_role_type = User::getUserRoleType($user_id);
-            $userRole = $user_role_type->role_type;
+            $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+            $userRole = !empty($user_role_type) ? $user_role_type->role_type : '';
             $editor = User::getUserDataByID($user_id);
             Article::submitComments($request, $user_id, $id);
             $comment_id = DB::getPdo()->lastInsertId();
@@ -235,7 +238,8 @@ class ArticleController extends Controller
                 $corresponding_author_email = $corresponding_author[0]->email;
                 $corresponding_author_name = $corresponding_author[0]->name . " " . $corresponding_author[0]->sur_name;
                 $corresponding_author_data = User::getUserRoleType($corresponding_author[0]->id);
-                $author_template_data = EmailTemplate::getEmailTemplatesByID($corresponding_author_data->id, $status . '_editor_feedback');
+                $corresponding_author_data = !empty($corresponding_author_data) && is_object($corresponding_author_data) ? $corresponding_author_data : null;
+                $author_template_data = !empty($corresponding_author_data) ? EmailTemplate::getEmailTemplatesByID($corresponding_author_data->id, $status . '_editor_feedback') : null;
                 $author_article_link = url(
                     '/login?user_id=' . $corresponding_author[0]->id . '&email_type=' . $status . '_editor_feedback&status=' . $status
                 );

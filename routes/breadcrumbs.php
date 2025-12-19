@@ -67,7 +67,7 @@ Breadcrumbs::for(
             $breadcrumbs_title = $status;
         }
         $trail->parent('home');
-        $trail->push($status, route('reviewerArticles', ['reviewer_id' => $reviewer_id, 'status' => $status]));
+        $trail->push($status, route('reviewerArticles', ['userId' => $reviewer_id, 'status' => $status]));
     }
 );
 
@@ -76,7 +76,7 @@ Breadcrumbs::for(
     'reviewerArticleDetail',
     function ($trail, $article, $reviewer_id, $status, $id) {
         $trail->parent('reviewerArticles', $reviewer_id, $status);
-        $trail->push($article[0]->title, route('reviewerArticleDetail', ['reviewer_id' => $reviewer_id, 'status' => $status, 'id' => $id]));
+        $trail->push($article[0]->title, route('reviewerArticleDetail', ['reviewerId' => $reviewer_id, 'status' => $status, 'id' => $id]));
     }
 );
 

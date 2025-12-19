@@ -36,7 +36,7 @@
         if(!empty(Auth::user()->id)){
             $user_id = Auth::user()->id;
             $user_role_type = App\Models\User::getUserRoleType($user_id);
-            $user_role = $user_role_type->role_type;
+            $user_role = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type->role_type : "";
         }
     }
     @endphp
