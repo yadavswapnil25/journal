@@ -250,7 +250,7 @@ class Article extends Model
             ->where('comments.status', '=', $status)
             ->whereIn('roles.role_type', $roles)
             ->orderBy('comments.created_at', 'desc')
-            ->groupBy('comments.comment_author')
+            ->distinct()
             ->get()->all();
     }
 
@@ -605,7 +605,7 @@ class Article extends Model
      * @desc Get Filter Articles
      * @return array
      */
-    public static function getFilterArticles($keyword = "", $categories = [], $editions = [], $sort_by = "", $total_records)
+    public static function getFilterArticles($keyword = "", $categories = [], $editions = [], $sort_by = "", $total_records = null)
     {
         $query = DB::table('articles')
             ->join('editions', 'editions.id', '=', 'articles.edition_id')
@@ -622,7 +622,11 @@ class Article extends Model
         $query->where('articles.status', 'accepted_articles');
         $query->where('articles.edition_id', '!=', null);
         $query->where('editions.edition_status', '=', 1);
-        return $query->orderBy($sort_by, 'asc')->limit($total_records)->get()->all();
+        $query->orderBy($sort_by, 'asc');
+        if (!empty($total_records) && is_numeric($total_records)) {
+            $query->limit($total_records);
+        }
+        return $query->get()->all();
     }
 
     /**

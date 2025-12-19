@@ -1,5 +1,4 @@
 @php 
-use Illuminate\Support\Str;
 $success_data = App\Models\SiteManagement::getMetaValue('success_data'); 
 @endphp 
 @if (!empty($success_data))
@@ -14,7 +13,7 @@ $success_data = App\Models\SiteManagement::getMetaValue('success_data');
                     <li>
                         <h3>{{{$value['commenter_name']}}}</h3>
                         <div class="sj-description">
-                            <p>{{{Str::limit($value['comment'], 50)}}}</p>
+                            <p>{{{\Illuminate\Support\Str::limit($value['comment'], 50)}}}</p>
                         </div>
                     </li>
                 </ul>

@@ -103,9 +103,8 @@ class RegisterController extends Controller
     {
         $role = $data['role'];
         $id = !empty($role) && $role == 'author' ? '3' : '5';
-        $user = new User();
-        $role_r = Role::where('id', '=', $id)->firstOrFail();
-        $user->assignRole($role_r); //Assigning role to user
+        
+        // First create the user
         $user = User::create([
             'name' => $data['name'],
             'sur_name' => $data['sur_name'],
@@ -113,6 +112,10 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
             'token' => md5(uniqid(rand(), true)),
         ]);
+        
+        // Then assign the role to the created user
+        $role_r = Role::where('id', '=', $id)->firstOrFail();
+        $user->assignRole($role_r);
         if (!empty($this->email_settings)) {
             $site = SiteManagement::getMetaValue('site_title');
             $superadmin = User::getUserByRoleType('superadmin');

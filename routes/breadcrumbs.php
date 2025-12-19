@@ -54,7 +54,7 @@ Breadcrumbs::for(
             $breadcrumbs_title = $status;
         }
         $trail->parent('home');
-        $trail->push($breadcrumbs_title, route('authorArticles', ['author_id' => $author_id, 'status' => $status]));
+        $trail->push($breadcrumbs_title, route('authorArticles', ['id' => $author_id, 'status' => $status]));
     }
 );
 
@@ -240,7 +240,7 @@ Breadcrumbs::for(
     'articleDetail',
     function ($trail, $edition_slug, $edition_title, $article) {
         $trail->parent('editListing', $edition_slug, $edition_title);
-        $trail->push($article->title, route('editListing', ['edition_slug' => $edition_slug, 'edition_title' => $edition_title, 'article' => $article]));
+        $trail->push($article->title, route('articleDetail', ['slug' => $article->slug]));
     }
 );
 

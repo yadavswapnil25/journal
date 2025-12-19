@@ -207,9 +207,50 @@ class User extends Authenticatable
                 'articles.id as article_id',
                 'articles.title as article_title',
                 'articles.publish_document as article_publish_document',
-                'invoices.*'
+                'invoices.id',
+                'invoices.title',
+                'invoices.price',
+                'invoices.payer_name',
+                'invoices.payer_email',
+                'invoices.seller_email',
+                'invoices.currency_code',
+                'invoices.payer_status',
+                'invoices.transaction_id',
+                'invoices.sales_tax',
+                'invoices.invoice_id',
+                'invoices.shipping_amount',
+                'invoices.handling_amount',
+                'invoices.insurance_amount',
+                'invoices.paypal_fee',
+                'invoices.payment_mode',
+                'invoices.paid',
+                'invoices.created_at',
+                'invoices.updated_at'
             )
-            ->groupBy('invoices.id')
+            ->groupBy(
+                'articles.id',
+                'articles.title',
+                'articles.publish_document',
+                'invoices.id',
+                'invoices.title',
+                'invoices.price',
+                'invoices.payer_name',
+                'invoices.payer_email',
+                'invoices.seller_email',
+                'invoices.currency_code',
+                'invoices.payer_status',
+                'invoices.transaction_id',
+                'invoices.sales_tax',
+                'invoices.invoice_id',
+                'invoices.shipping_amount',
+                'invoices.handling_amount',
+                'invoices.insurance_amount',
+                'invoices.paypal_fee',
+                'invoices.payment_mode',
+                'invoices.paid',
+                'invoices.created_at',
+                'invoices.updated_at'
+            )
             ->orderBy('invoices.id', 'DESC')
             ->paginate(10);
     }

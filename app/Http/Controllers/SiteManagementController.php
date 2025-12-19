@@ -889,7 +889,11 @@ class SiteManagementController extends Controller
         $server_verification = Helper::journal_is_demo_site();
         if (!empty($server_verification)) {
             Session::flash('error', $server_verification);
-            return redirect()->back();
+            $user_id = Auth::user()->id;
+            $user_role_type = User::getUserRoleType($user_id);
+            $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+            $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
+            return redirect()->route('manageSite', ['userRole' => $user_role]);
         }
         $language = $request['language'];
         if (!empty($language)) {
@@ -907,14 +911,22 @@ class SiteManagementController extends Controller
                     );
                 } else {
                     Session::flash('error', 'Language not found');
-                    return redirect()->back();
+                    $user_id = Auth::user()->id;
+                    $user_role_type = User::getUserRoleType($user_id);
+                    $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+                    $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
+                    return redirect()->route('manageSite', ['userRole' => $user_role]);
                 }
                 \Illuminate\Support\Facades\Artisan::call('config:clear');
                 \Illuminate\Support\Facades\Artisan::call('cache:clear');
                 \Illuminate\Support\Facades\Artisan::call('view:clear');
             } else {
                 Session::flash('error', 'Language not found');
-                return redirect()->back();
+                $user_id = Auth::user()->id;
+                $user_role_type = User::getUserRoleType($user_id);
+                $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+                $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
+                return redirect()->route('manageSite', ['userRole' => $user_role]);
             }
             $existing_lang_data = DB::table('sitemanagements')->where('meta_key', 'language')->select('meta_value');
             if (!empty($existing_lang_data)) {
@@ -936,8 +948,12 @@ class SiteManagementController extends Controller
                     "created_at" => \Carbon\Carbon::now(), "updated_at" => \Carbon\Carbon::now()
                 ]
             );
+            $user_id = Auth::user()->id;
+            $user_role_type = User::getUserRoleType($user_id);
+            $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
+            $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
             Session::flash('success', 'Language Updated Successfully');
-            return redirect()->back();
+            return redirect()->route('manageSite', ['userRole' => $user_role]);
         }
     }
 

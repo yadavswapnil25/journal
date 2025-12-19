@@ -44,7 +44,7 @@
                                                     <h3><a href="{{{url('article/'.$pub_edit_article->slug)}}}">{{{$pub_edit_article->title}}}</a></h3>
                                                 </div>
                                                 <div class="sj-description">
-                                                    @php use Illuminate\Support\Str; echo Str::limit($pub_edit_article->excerpt, 150); @endphp
+                                                    @php echo \Illuminate\Support\Str::limit($pub_edit_article->excerpt, 150); @endphp
                                                 </div>
                                                 <a class="sj-btn" href="{{{url('article/'.$pub_edit_article->slug)}}}">
                                                     {{{trans('prs.btn_view_full_articles')}}}

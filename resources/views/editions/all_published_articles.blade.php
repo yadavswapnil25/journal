@@ -158,7 +158,7 @@
                                                         <h3><a href="{!!url('article/'.$article->slug)!!}">{!!$article->title!!}</a></h3>
                                                     </div>
                                                     <div class="sj-description">
-                                                        @php use Illuminate\Support\Str; echo Str::limit($article->excerpt, 105); @endphp
+                                                        @php echo \Illuminate\Support\Str::limit($article->excerpt, 105); @endphp
                                                     </div>
                                                     <a class="sj-btn" href="{!!url('article/'.$article->slug)!!}">
                                                         {!!trans('prs.btn_view_full_articles')!!}
@@ -186,7 +186,7 @@
                             </div>
                         </div>
                     {!! Form::close() !!}
-                    @if( method_exists($published_articles,'links') )
+                    @if( is_object($published_articles) && method_exists($published_articles,'links') )
                         {!! $published_articles->links('pagination.custom') !!}
                     @endif
                 </div>

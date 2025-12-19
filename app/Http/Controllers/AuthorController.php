@@ -49,25 +49,30 @@ class AuthorController extends Controller
         $article_status = Helper::getMenuStatus($status);
         $user_id = Auth::user()->id;
         $author_notification = Article::getAuthorNotification($user_id);
-        if (!empty($id) && !empty($article_status)) {
-            if ($user_id != $id || !(is_numeric($id)) || !(in_array($article_status, Helper::statusStaticList()))) {
-                return view('errors.401');
-            }
-            $page_title = Helper::DashboardArticlePageTitle($status);
-            if (!empty($request->get('keyword'))) {
-                $keyword = $request->get('keyword');
-                $articles = Article::getAuthorArticlesBySearchKey($article_status, $user_id, $keyword)->setPath('');
-                $pagination = $articles->appends(
-                    array(
-                        'keyword' => $request->get('keyword')
-                    )
-                );
-            } else {
-                $articles = Article::getAuthorArticlesByStatus($article_status, $user_id);
-            }
-            return view('author.index', compact('author_notification', 'articles', 'user_id', 'page_title'))
-                ->with('status', $article_status);
+        
+        if (empty($id) || empty($article_status)) {
+            return view('errors.404');
         }
+        
+        if ($user_id != $id || !(is_numeric($id)) || !(in_array($article_status, Helper::statusStaticList()))) {
+            return view('errors.401');
+        }
+        
+        $page_title = Helper::DashboardArticlePageTitle($status);
+        if (!empty($request->get('keyword'))) {
+            $keyword = $request->get('keyword');
+            $articles = Article::getAuthorArticlesBySearchKey($article_status, $user_id, $keyword)->setPath('');
+            $pagination = $articles->appends(
+                array(
+                    'keyword' => $request->get('keyword')
+                )
+            );
+        } else {
+            $articles = Article::getAuthorArticlesByStatus($article_status, $user_id);
+        }
+        
+        return view('author.index', compact('author_notification', 'articles', 'user_id', 'page_title'))
+            ->with('status', $article_status);
     }
 
     /**

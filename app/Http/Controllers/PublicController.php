@@ -93,11 +93,12 @@ class PublicController extends Controller
     {
         $categories = Category::getCategories()->all();
         $editions = Edition::getPublishedEdition();
+        $keyword = $request->get('s', '');
+        $requested_category = $request->get('category', []);
+        $requested_editions = $request->get('edition', []);
+        
         if (!empty($request['s']) || !empty($request['category']) || !empty($request['edition']) || !empty($request['sort']) || !empty($request['show'])) {
-            $keyword = $request['s'];
-            $requested_category = $request['category'];
-            $requested_editions = $request['edition'];
-            $sort_by = $request['sort'];
+            $sort_by = $request->get('sort', '');
             if (!empty($sort_by)) {
                 if ($sort_by == 'date') {
                     $sort_by = "created_at";
@@ -107,18 +108,18 @@ class PublicController extends Controller
             } else {
                 $sort_by = "created_at";
             }
-            $total_records = $request['show'];
+            $total_records = $request->get('show', 10); // Default to 10 if not provided
             $published_articles = Article::getFilterArticles($keyword, $requested_category, $requested_editions, $sort_by, $total_records);
             if (!empty($published_articles)) {
-                return view('editions.all_published_articles', compact('published_articles', 'categories', 'editions', 'requested_category', 'requested_editions'))->withInput($request->all());
+                return view('editions.all_published_articles', compact('published_articles', 'categories', 'editions', 'requested_category', 'requested_editions', 'keyword'))->withInput($request->all());
             } else {
                 $published_articles = [];
                 Session::flash('message', trans('prs.record_not_found'));
-                return view('editions.all_published_articles', compact('published_articles', 'categories', 'editions', 'requested_category', 'requested_editions'))->withInput($request->all());
+                return view('editions.all_published_articles', compact('published_articles', 'categories', 'editions', 'requested_category', 'requested_editions', 'keyword'))->withInput($request->all());
             }
         } else {
             $published_articles = Article::getPublishedArticle();
-            return view('editions.all_published_articles', compact('published_articles', 'categories', 'editions'))->withInput($request->all());
+            return view('editions.all_published_articles', compact('published_articles', 'categories', 'editions', 'keyword'))->withInput($request->all());
         }
     }
 

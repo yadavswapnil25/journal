@@ -17,7 +17,6 @@
         </div>
     @endif
     @php
-    use Illuminate\Support\Str;
     if (Schema::hasTable('users')){
         $slide_unserialize_array = App\Models\SiteManagement::getMetaValue('slides');
         $welcome_slide_unSerialize_array = App\Models\SiteManagement::getMetaValue('welcome_slides');
@@ -87,7 +86,7 @@
                                 <h2>{{{$page_data->title}}}</h2>
                             </div>
                             <div class="sj-description">
-                                @php echo Str::limit(htmlspecialchars_decode(stripslashes($welcome_desc)), 300) @endphp
+                                @php echo \Illuminate\Support\Str::limit(htmlspecialchars_decode(stripslashes($welcome_desc)), 300) @endphp
                             </div>
                             <div class="sj-btnarea">
                                 <a class="sj-btn" href="{{{url('/page/'.$page_data->slug.'/')}}}">{{{trans('prs.btn_read_more')}}}</a>
@@ -126,7 +125,7 @@
                                                         <h3><a href="{{{url('article/'.$article->slug)}}}">{{{$article->title}}}</a></h3>
                                                     </div>
                                                     <div class="sj-description">
-                                                        @php echo Str::limit($article->excerpt, 105); @endphp
+                                                        @php echo \Illuminate\Support\Str::limit($article->excerpt, 105); @endphp
                                                     </div>
                                                     <a class="sj-btn" href="{{{url('article/'.$article->slug)}}}">{{{trans('prs.btn_view_full_articles')}}}</a>
                                                 </div>

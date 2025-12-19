@@ -3,6 +3,7 @@
 /public/build
 /public/hot
 /public/storage
+/public/uploads
 /storage/*.key
 /vendor
 .env
@@ -18,6 +19,7 @@ yarn-error.log
 /.vscode
 mysql/mysql.sock
 *.sock
+/mysql
 
 # MySQL binary files
 mysql/#innodb_redo/
