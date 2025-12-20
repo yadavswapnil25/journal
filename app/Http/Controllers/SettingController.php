@@ -77,14 +77,29 @@ class SettingController extends Controller
                 $user->password = Hash::make($request->password);
                 $user->save();
                 // prepare email and send to user
-                if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                // Check email configuration - support both old and new Laravel config structure
+                $mail_username = config('mail.mailers.smtp.username') ?: config('mail.username');
+                $mail_password = config('mail.mailers.smtp.password') ?: config('mail.password');
+                $mail_configured = !empty($mail_username) && !empty($mail_password);
+                $email_settings_available = !empty(SiteManagement::getMetaValue('email_settings'));
+                $mail_driver = config('mail.default');
+                $can_send_email = $mail_configured || $email_settings_available || in_array($mail_driver, ['log', 'array']);
+                
+                if ($can_send_email) {
                     $email_params = array();
                     $role = User::getUserRoleType($user_id);
+                    $role = !empty($role) && is_object($role) ? $role : null;
                     $email_params['userName'] = $user->name;
                     $email_params['newPassword'] = $request->password;
                     $email_params['change_password_login_email'] = $user->email;
                     $template_data = DB::table('email_templates')->where('email_type', 'change_password')->first();
-                    Mail::to($user->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                    if (!empty($template_data)) {
+                        try {
+                            Mail::to($user->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                        } catch (\Exception $e) {
+                            // Log error but continue
+                        }
+                    }
                 }
                 Auth::logout();
                 return redirect()->to('/login');

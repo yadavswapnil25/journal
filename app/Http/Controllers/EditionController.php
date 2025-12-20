@@ -230,7 +230,15 @@ class EditionController extends Controller
                         DB::table('editions')->where('id', $id)->update(['edition_status' => 1]);
                         $edition = DB::table('editions')->select('title', 'slug')->where('id', $id)->first();
                         //send email
-                        if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                        // Check email configuration - support both old and new Laravel config structure
+                        $mail_username = config('mail.mailers.smtp.username') ?: config('mail.username');
+                        $mail_password = config('mail.mailers.smtp.password') ?: config('mail.password');
+                        $mail_configured = !empty($mail_username) && !empty($mail_password);
+                        $email_settings_available = !empty(SiteManagement::getMetaValue('email_settings'));
+                        $mail_driver = config('mail.default');
+                        $can_send_email = $mail_configured || $email_settings_available || in_array($mail_driver, ['log', 'array']);
+                        
+                        if ($can_send_email) {
                             $email_params = array();
                             $email_params['publish_edition_edition_title'] = $edition->title;
                             $super_admin = User::getUserByRoleType('superadmin');
@@ -246,7 +254,11 @@ class EditionController extends Controller
                                 $email_params['publish_edition_article_super_admin_name'] = $super_admin[0]->name;
                                 $author_template_data = EmailTemplate::getEmailTemplatesByID($author_role_id, 'publish_edition');
                                 if (!empty($author_template_data)) {
-                                    Mail::to($corresponding_author->email)->send(new ArticleNotificationMailable($email_params, $author_template_data, 'author'));
+                                    try {
+                                        Mail::to($corresponding_author->email)->send(new ArticleNotificationMailable($email_params, $author_template_data, 'author'));
+                                    } catch (\Exception $e) {
+                                        // Log error but continue with other authors
+                                    }
                                 }
                                 $corresponding_author_array = get_object_vars($corresponding_author);
                                 $article_list[$article->id]['author'] = $corresponding_author_array;
@@ -259,7 +271,11 @@ class EditionController extends Controller
                             }
                             $template_data = EmailTemplate::getEmailTemplatesByID($super_admin[0]->role_id, 'publish_edition');
                             if (!empty($template_data)) {
-                                Mail::to($super_admin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, 'superadmin'));
+                                try {
+                                    Mail::to($super_admin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, 'superadmin'));
+                                } catch (\Exception $e) {
+                                    // Log error but continue
+                                }
                             }
                         }
                         $jason['message'] = trans('prs.edition_success');

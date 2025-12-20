@@ -210,7 +210,15 @@ class PaymentController extends Controller
         $data['total'] = $total;
 
         // sent mail
-        if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+        // Check email configuration - support both old and new Laravel config structure
+        $mail_username = config('mail.mailers.smtp.username') ?: config('mail.username');
+        $mail_password = config('mail.mailers.smtp.password') ?: config('mail.password');
+        $mail_configured = !empty($mail_username) && !empty($mail_password);
+        $email_settings_available = !empty(SiteManagement::getMetaValue('email_settings'));
+        $mail_driver = config('mail.default');
+        $can_send_email = $mail_configured || $email_settings_available || in_array($mail_driver, ['log', 'array']);
+        
+        if ($can_send_email) {
             $email_params = array();
             $role_type = array("superadmin", "reader");
             $superadmin = User::getUserByRoleType('superadmin');
@@ -223,13 +231,21 @@ class PaymentController extends Controller
                 if ($role == "superadmin") {
                     $template_data = EmailTemplate::getEmailTemplatesByID($superadmin[0]->role_id, 'new_order');
                     if (!empty($template_data)) {
-                        Mail::to($super_admin_email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                        try {
+                            Mail::to($super_admin_email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                        } catch (\Exception $e) {
+                            // Log error but continue
+                        }
                     }
                 } elseif ($role == "reader") {
                     $role_id = User::getRoleIDByUserID($user_id);
                     $customer_template_data = EmailTemplate::getEmailTemplatesByID($role_id, 'new_order');
                     if (!empty($customer_template_data)) {
-                        Mail::to(Auth::user()->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                        try {
+                            Mail::to(Auth::user()->email)->send(new ArticleNotificationMailable($email_params, $customer_template_data, $role));
+                        } catch (\Exception $e) {
+                            // Log error but continue
+                        }
                     }
                 }
             }
@@ -305,7 +321,15 @@ class PaymentController extends Controller
                 ->update(['hits' => $final_count]);
         });
         // sent mail
-        if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+        // Check email configuration - support both old and new Laravel config structure
+        $mail_username = config('mail.mailers.smtp.username') ?: config('mail.username');
+        $mail_password = config('mail.mailers.smtp.password') ?: config('mail.password');
+        $mail_configured = !empty($mail_username) && !empty($mail_password);
+        $email_settings_available = !empty(SiteManagement::getMetaValue('email_settings'));
+        $mail_driver = config('mail.default');
+        $can_send_email = $mail_configured || $email_settings_available || in_array($mail_driver, ['log', 'array']);
+        
+        if ($can_send_email) {
             if (session()->has('product_price')) {
                 $product_price = session()->get('product_price');
             }
@@ -340,13 +364,21 @@ class PaymentController extends Controller
                 if ($role == "superadmin") {
                     $template_data = EmailTemplate::getEmailTemplatesByID($super_admin[0]->role_id, 'success_order');
                     if (!empty($template_data)) {
-                        Mail::to($super_admin_email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                        try {
+                            Mail::to($super_admin_email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                        } catch (\Exception $e) {
+                            // Log error but continue
+                        }
                     }
                 } elseif ($role == "reader") {
                     $reader_role_id = User::getRoleIDByUserID(Auth::user()->id);
                     $customer_template_data = EmailTemplate::getEmailTemplatesByID($reader_role_id, 'success_order');
                     if (!empty($customer_template_data)) {
-                        Mail::to(Auth::user()->email)->send(new ArticleNotificationMailable($email_params, $customer_template_data, $role));
+                        try {
+                            Mail::to(Auth::user()->email)->send(new ArticleNotificationMailable($email_params, $customer_template_data, $role));
+                        } catch (\Exception $e) {
+                            // Log error but continue
+                        }
                     }
                 }
             }

@@ -116,7 +116,16 @@ class RegisterController extends Controller
         // Then assign the role to the created user
         $role_r = Role::where('id', '=', $id)->firstOrFail();
         $user->assignRole($role_r);
-        if (!empty($this->email_settings)) {
+        
+        // Check email configuration - support both old and new Laravel config structure
+        $mail_username = config('mail.mailers.smtp.username') ?: config('mail.username');
+        $mail_password = config('mail.mailers.smtp.password') ?: config('mail.password');
+        $mail_configured = !empty($mail_username) && !empty($mail_password);
+        $email_settings_available = !empty($this->email_settings);
+        $mail_driver = config('mail.default');
+        $can_send_email = $mail_configured || $email_settings_available || in_array($mail_driver, ['log', 'array']);
+        
+        if ($can_send_email) {
             $site = SiteManagement::getMetaValue('site_title');
             $superadmin = User::getUserByRoleType('superadmin');
             $email_params = [];
@@ -129,11 +138,19 @@ class RegisterController extends Controller
             $email_params['new_user_password'] = $data['password'];
             $template_data = EmailTemplate::getEmailTemplatesByID($superadmin[0]->role_id, 'new_user');
             if (!empty($template_data)) {
-                Mail::to($superadmin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                try {
+                    Mail::to($superadmin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                } catch (\Exception $e) {
+                    // Log error but continue
+                }
             }
             $user_template_data = DB::table('email_templates')->where('email_type', 'new_user')->where('role_id', null)->first();
             if (!empty($user_template_data)) {
-                Mail::to($data['email'])->send(new ArticleNotificationMailable($email_params, $user_template_data, $role));
+                try {
+                    Mail::to($data['email'])->send(new ArticleNotificationMailable($email_params, $user_template_data, $role));
+                } catch (\Exception $e) {
+                    // Log error but continue
+                }
             }
         }
 

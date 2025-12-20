@@ -125,7 +125,15 @@ class ReviewerController extends Controller
                 $email_params['reviewer_feedback_email'] = $reviewer_email;
                 $email_params['reviewer_feedback_comments'] = $comments->comment;
                 $email_params['reviewer_feedback_admin_name'] = $superadmin[0]->name;
-                if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                // Check email configuration - support both old and new Laravel config structure
+                $mail_username = config('mail.mailers.smtp.username') ?: config('mail.username');
+                $mail_password = config('mail.mailers.smtp.password') ?: config('mail.password');
+                $mail_configured = !empty($mail_username) && !empty($mail_password);
+                $email_settings_available = !empty(SiteManagement::getMetaValue('email_settings'));
+                $mail_driver = config('mail.default');
+                $can_send_email = $mail_configured || $email_settings_available || in_array($mail_driver, ['log', 'array']);
+                
+                if ($can_send_email) {
                     $role_type = array("superadmin", "editor");
                     foreach ($role_type as $key => $role) {
                         if ($role == "superadmin") {
@@ -133,7 +141,11 @@ class ReviewerController extends Controller
                             $email_params['reviewer_feedback_article_link'] = $article_link;
                             $template_data = EmailTemplate::getEmailTemplatesByID($superadmin[0]->role_id, 'reviewer_feedback');
                             if (!empty($template_data)) {
-                                Mail::to($superadmin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role, $reviewer_name, $reviewer_email));
+                                try {
+                                    Mail::to($superadmin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role, $reviewer_name, $reviewer_email));
+                                } catch (\Exception $e) {
+                                    // Log error but continue with other emails
+                                }
                             }
                         } elseif ($role == "editor") {
                             $editors = User::getUserByRoleType('editor');
@@ -144,7 +156,11 @@ class ReviewerController extends Controller
                                     $email_params['editor_name'] = $editor->name . " " . $editor->sur_name;
                                     $template_data = EmailTemplate::getEmailTemplatesByID($editor->role_id, 'reviewer_feedback');
                                     if (!empty($template_data)) {
-                                        Mail::to($editor->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role, $reviewer_name, $reviewer_email));
+                                        try {
+                                            Mail::to($editor->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role, $reviewer_name, $reviewer_email));
+                                        } catch (\Exception $e) {
+                                            // Log error but continue with other emails
+                                        }
                                     }
                                 }
                             }
