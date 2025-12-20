@@ -27,6 +27,7 @@ use App\Mail\ArticleNotificationMailable;
 use App\Helper;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -118,39 +119,99 @@ class UserController extends Controller
                 'email' => 'required|email|unique:users',
                 'roles' => 'required',
             ]);
+            // Generate secure temporary password with uppercase, lowercase, numbers
+            // Mix of random string and numbers for better security
+            $temp_password = Str::upper(Str::random(4)) . Str::lower(Str::random(4)) . rand(1000, 9999);
+            
             $user = new User();
             $user->name = htmlspecialchars($request['name'], ENT_QUOTES, 'UTF-8');
             $user->sur_name = htmlspecialchars($request['sur_name'], ENT_QUOTES, 'UTF-8');
             $user->email = filter_var($request['email'], FILTER_SANITIZE_EMAIL);
-            $user->password = Hash::make("secret");
+            $user->password = Hash::make($temp_password);
             $user->save();
             $roles = $request['roles'];
+            
+            // Check if reviewer role is being assigned
+            $is_reviewer = false;
+            $reviewer_role_id = null;
+            
             //Checking if a role was selected
             if (isset($roles)) {
                 foreach ($roles as $role) {
                     $role_r = Role::where('id', '=', $role)->firstOrFail();
                     $user->assignRole($role_r); //Assigning role to user
+                    
+                    // Check if this is a reviewer role
+                    if ($role_r->role_type == 'reviewer') {
+                        $is_reviewer = true;
+                        $reviewer_role_id = $role_r->id;
+                    }
                 }
             }
-            if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+            
+            // Send email to reviewer with temporary password
+            // Check email configuration - support both old and new Laravel config structure
+            $mail_username = config('mail.mailers.smtp.username') ?: config('mail.username');
+            $mail_password = config('mail.mailers.smtp.password') ?: config('mail.password');
+            $mail_configured = !empty($mail_username) && !empty($mail_password);
+            $email_settings_available = !empty($this->email_settings);
+            
+            // Try to send email if either mail config is set OR email settings from database are available
+            // Also try to send if MAIL_MAILER is set to 'log' or 'array' for testing
+            $mail_driver = config('mail.default');
+            $can_send_email = $mail_configured || $email_settings_available || in_array($mail_driver, ['log', 'array']);
+            
+            if ($can_send_email) {
                 $site = SiteManagement::getMetaValue('site_title');
                 $superadmin = User::getUserByRoleType('superadmin');
                 $role_type = User::getRoleByRoleID($request['roles'][0]);
                 $role_type = !empty($role_type) && is_object($role_type) ? $role_type : null;
                 $email_params = array();
-                $email_params['new_user_supper_admin_name'] = $superadmin[0]->name;
-                $email_params['site_title'] = $site[0]['site_title'];
+                $email_params['new_user_supper_admin_name'] = !empty($superadmin) && !empty($superadmin[0]) ? $superadmin[0]->name : '';
+                $email_params['site_title'] = !empty($site) && !empty($site[0]) ? $site[0]['site_title'] : '';
                 $email_params['user_edit_page_link'] = url('/login?user_id=' . $user->id . '&email_type=new_user');
                 $email_params['new_user_name'] = $request['name'] . " " . $request['sur_name'];
                 $email_params['new_user_role'] = !empty($role_type) ? $role_type->name : '';
                 $email_params['login_email'] = $request['email'];
-                $email_params['new_user_password'] = 'secret';
-                $user_template_data = DB::table('email_templates')->where('email_type', 'new_user')->where('role_id', null)->first();
-                if (!empty($user_template_data) && !empty($role_type)) {
-                    Mail::to($request['email'])->send(new ArticleNotificationMailable($email_params, $user_template_data, $role_type->role_type));
+                $email_params['new_user_password'] = $temp_password; // Use generated temp password
+                $email_params['login_url'] = url('/login'); // Add login URL
+                
+                // If reviewer, send email with temp password
+                if ($is_reviewer) {
+                    $user_template_data = DB::table('email_templates')->where('email_type', 'new_user')->where('role_id', null)->first();
+                    if (!empty($user_template_data)) {
+                        try {
+                            Mail::to($request['email'])->send(new ArticleNotificationMailable($email_params, $user_template_data, 'reviewer'));
+                            Session::flash('message', trans('prs.user_created') . ' ' . trans('Email with temporary password sent to reviewer.'));
+                        } catch (\Exception $e) {
+                            Session::flash('warning', trans('prs.user_created') . ' ' . trans('Warning: Email could not be sent. Please check mail configuration.'));
+                        }
+                    } else {
+                        Session::flash('warning', trans('prs.user_created') . ' ' . trans('Warning: Email template not found. Email not sent.'));
+                    }
+                } else {
+                    // For other roles, use existing logic
+                    $user_template_data = DB::table('email_templates')->where('email_type', 'new_user')->where('role_id', null)->first();
+                    if (!empty($user_template_data) && !empty($role_type)) {
+                        try {
+                            Mail::to($request['email'])->send(new ArticleNotificationMailable($email_params, $user_template_data, $role_type->role_type));
+                        } catch (\Exception $e) {
+                            // Silent fail for non-reviewer roles
+                        }
+                    }
+                }
+            } else {
+                if ($is_reviewer) {
+                    Session::flash('warning', trans('prs.user_created') . ' ' . trans('Warning: Email configuration missing. Email with temporary password was not sent.'));
+                } else {
+                    Session::flash('message', trans('prs.user_created'));
                 }
             }
-            Session::flash('message', trans('prs.user_created'));
+            
+            // Only set success message if not already set above
+            if (!Session::has('message') && !Session::has('warning')) {
+                Session::flash('message', trans('prs.user_created'));
+            }
             return redirect()->to('superadmin/users/manage-users');
         }
     }

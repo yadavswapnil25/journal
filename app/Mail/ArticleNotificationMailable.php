@@ -163,7 +163,7 @@ class ArticleNotificationMailable extends Mailable
         </div>
         <footer style="width:100%;float:left;background: #002c49;padding: 30px 15px;text-align:center;box-sizing:border-box;border-radius: 0 0 5px 5px;">
             <p style="font-size: 13px; line-height: 13px; color: #aaaaaa; margin: 0; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;">
-                Copyright&nbsp;&copy;&nbsp;2018 | All Rights Reserved 
+                Copyright&nbsp;&copy;&nbsp;<?php echo date('Y'); ?> | All Rights Reserved 
                 <a href="<?php echo url('/') ?>" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 100%; line-height: 1.6em; color: #348eda; margin: 0; padding: 0;">
                     <?php echo e($project_title[0]['site_title']); ?>
                 </a>
@@ -977,6 +977,9 @@ class ArticleNotificationMailable extends Mailable
         $login_email = $login_email;
         $password = $new_user_password;
         $user_credentials = $this->prepare_new_user_credential($login_email, $password);
+        // Ensure login_url is always set and formatted as a link
+        $login_url_raw = isset($login_url) ? $login_url : url('/login');
+        $login_url = $this->prepare_redirect_link($login_url_raw, 'Login Here');
         $app_content = $this->template_data->body;
         $email_content_default = "  %admin_name%
                                     %site_name%
@@ -987,6 +990,8 @@ class ArticleNotificationMailable extends Mailable
                                     %login_email%
                                     %password%
                                     %user_credentials%
+                                    <br/><br/>
+                                    %login_url%
                                     <br/>
 									Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magniquae Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip exommodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia desunt mollit anim id est laborum sed ut perspiciatis unde.<br/>
 									';";
@@ -1003,6 +1008,14 @@ class ArticleNotificationMailable extends Mailable
         $app_content = str_replace("%login_email%", $login_email, $app_content); //Replace Signature
         $app_content = str_replace("%password%", $password, $app_content); //Replace Signature
         $app_content = str_replace("%user_credentials%", $user_credentials, $app_content); //Replace Signature
+        // Check if login_url placeholder exists in original template
+        $has_login_url_placeholder = strpos($this->template_data->body, '%login_url%') !== false;
+        $app_content = str_replace("%login_url%", $login_url, $app_content); //Replace Login URL
+        // If login_url placeholder doesn't exist in template, append it after user_credentials
+        if (!$has_login_url_placeholder && !empty($login_url)) {
+            // Find where user_credentials was placed and add login URL after it
+            $app_content = str_replace($user_credentials, $user_credentials . '<br/><br/>' . $login_url, $app_content);
+        }
         $body = "";
         $body .= $this->prepare_email_header();
         $body .= $app_content;
