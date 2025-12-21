@@ -161,6 +161,7 @@ class EditionController extends Controller
             $this->validate($request, [
                 'title' => 'required|string',
                 'edition_date' => 'required|date|date_format:Y-m-d',
+                'price' => 'nullable|numeric',
                 'edition_cover' => 'mimes:jpeg,png,jpg',
             ]);
             $this->editions->updateEdition($request, $id);

@@ -96,7 +96,11 @@ class Edition extends Model
             $this->title = htmlspecialchars($request->title, ENT_QUOTES, 'UTF-8');
             $this->slug = htmlspecialchars($request->title, ENT_QUOTES, 'UTF-8');
             $this->edition_date = Carbon::parse($request->edition_date)->toDateString();
-            $this->edition_price = filter_var($request->price, FILTER_SANITIZE_NUMBER_INT);
+            if (!empty($request->price)) {
+                $this->edition_price = filter_var($request->price, FILTER_SANITIZE_NUMBER_INT);
+            } else {
+                $this->edition_price = null;
+            }
             $this->save();
         }
     }
@@ -119,6 +123,8 @@ class Edition extends Model
             $edition->edition_date = Carbon::parse($request->edition_date)->toDateString();
             if (!empty($request->price)) {
                 $edition->edition_price = $request->price;
+            } else {
+                $edition->edition_price = null;
             }
             if (!empty($file)) {
                 $extension = $file->getClientOriginalExtension();
