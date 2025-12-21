@@ -84,7 +84,7 @@ class EditionController extends Controller
             $this->validate($request, [
                 'title' => 'required|string',
                 'edition_date' => 'required|date|date_format:Y-m-d',
-                'price' => 'required',
+                'price' => 'nullable|numeric',
             ]);
 
             $this->editions->saveEdition($request);
