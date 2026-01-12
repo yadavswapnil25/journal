@@ -92,7 +92,7 @@
                                             <li class="sj-categorysinfo delEdition-{{{$edition->id}}}" v-bind:id="editionID">
                                                 <div class="sj-title">
                                                     <h3>
-                                                        {{{ $edition->title }}}
+                                                        {{ html_entity_decode($edition->title, ENT_QUOTES, 'UTF-8') }}
                                                         <span> ({{{ Carbon\Carbon::parse($edition->edition_date)->format('F, j, Y') }}}) </span>
                                                         <br>
                                                     </h3>

@@ -93,8 +93,8 @@ class Edition extends Model
     public function saveEdition($request)
     {
         if (!empty($request)) {
-            $this->title = htmlspecialchars($request->title, ENT_QUOTES, 'UTF-8');
-            $this->slug = htmlspecialchars($request->title, ENT_QUOTES, 'UTF-8');
+            $this->title = $request->title;
+            $this->slug = $request->title;
             $this->edition_date = Carbon::parse($request->edition_date)->toDateString();
             if (!empty($request->price)) {
                 $this->edition_price = filter_var($request->price, FILTER_SANITIZE_NUMBER_INT);

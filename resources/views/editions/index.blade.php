@@ -24,7 +24,7 @@
                         @if(!empty($published_articles))
                             <section class="sj-haslayout sj-sectioninnerspace">
                                 <div class="sj-borderheading">
-                                    <h3>{{{ $published_articles[0]->edition_title }}}</h3>
+                                    <h3>{{ html_entity_decode($published_articles[0]->edition_title, ENT_QUOTES, 'UTF-8') }}</h3>
                                 </div>
                                 <div id="sj-editorchoiceslider" class="sj-editorchoiceslider sj-editorschoice">
                                     @foreach($published_articles as $pub_edit_article)

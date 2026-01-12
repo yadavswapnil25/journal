@@ -69,7 +69,7 @@
                                                     @endif
                                                     <span class="sj-checkbox">
                                                         <input id="checkbox-{!!$edition->id!!}{!!$edition->id!!}" type="checkbox" name="edition[]" value="{!!$edition->id!!}" {!!$checked!!}>
-                                                        <label for="checkbox-{!!$edition->id!!}{!!$edition->id!!}">{!!$edition->title!!}</label>
+                                                        <label for="checkbox-{!!$edition->id!!}{!!$edition->id!!}">{!! html_entity_decode($edition->title, ENT_QUOTES, 'UTF-8') !!}</label>
                                                     </span>
                                                 @endforeach
                                             </div>

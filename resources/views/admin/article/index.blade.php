@@ -68,7 +68,7 @@
                                         @endif
                                             <span><i class="ti-bookmark"></i>{{ trans('prs.id') }}{{{$article->unique_code}}}</span>
                                         @if(!empty($edition))
-                                            <span><i class="ti-bookmark-alt"></i>{{{ trans('prs.edition') }}}: {{{$edition->title}}}</span>
+                                            <span><i class="ti-bookmark-alt"></i>{{{ trans('prs.edition') }}}: {{ html_entity_decode($edition->title, ENT_QUOTES, 'UTF-8') }}</span>
                                         @endif
                                         <h4>{{{$article->title}}}</h4>
                                     </div>

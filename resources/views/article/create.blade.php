@@ -62,16 +62,17 @@
                             {!! Form::open(['url' => 'author/store-article', 'enctype' => 'multipart/form-data', 'multiple' => true,
                             'id'=>'article_form', 'class' => 'total-fields sj-formtheme sj-formarticle', '@submit' => 'checkForm']) !!}
                                 <fieldset class="">
-                                    <div class="form-group" id="title_input">
-                                        {!! Form::text('title', null, ['class' => 'form-control', 'placeholder' => trans('prs.ph_article_title'), 'id'=>'article_title', '@keyup' => 'autoComplete' ]) !!}
-                                    </div>
-                                    @if(($categories != ""))
+                                @if(($categories != ""))
                                         <div class="form-group">
                                             <span class="sj-select">
                                                 {!! Form::select('category', $categories, null ,array('class' => '')) !!}
                                             </span>
                                         </div>
                                     @endif
+                                    <div class="form-group" id="title_input">
+                                        {!! Form::text('title', null, ['class' => 'form-control', 'placeholder' => trans('prs.ph_article_title'), 'id'=>'article_title', '@keyup' => 'autoComplete' ]) !!}
+                                    </div>
+                                
                                     <div class="form-group sj-authorhold">
                                         {!! Form::text('authors[0][title]', null, ['class' => 'form-control author_title' ,'id'=>'first_author_name', 'placeholder' => trans('prs.ph_author_name'), '@keyup' => 'autoComplete']) !!}
                                     </div>
@@ -81,6 +82,7 @@
                                             <span class="sj-addbtn" @click="addAnother"><i class="fa fa-plus"></i></span>
                                         </div>
                                     </div>
+                                    <div><b>Abstract</b></div>
                                     <div v-for="(author, index) in authors" v-cloak>
                                         <div class="form-group sj-authorhold">
                                             <input placeholder="{{{trans('prs.ph_author_name')}}}" v-bind:name="'authors['+[author.count]+'][title]'" type="text" class="form-control" v-model="author.author_name">
@@ -95,9 +97,9 @@
                                     <div class="form-group">
                                         {!! Form::textarea('abstract', null, ['class' => 'form-control template_data page-textarea', 'id' => 'abstract', 'placeholder' => trans('prs.ph_add_abstract'), '@keyup' => 'autoComplete']) !!}
                                     </div>
-                                    <div class="form-group">
+                                    <!-- <div class="form-group">
                                         {!! Form::textarea('excerpt', null, ['class' => 'form-control excerpt', 'id' => 'excerpt', 'placeholder' => trans('prs.ph_excerpt'), '@keyup' => 'autoComplete']) !!}
-                                    </div>
+                                    </div> -->
                                     <upload-files-field
                                         :doc_id="create_article"
                                         :field_title="'{{{trans("prs.ph_upload_article")}}}'"

@@ -384,14 +384,22 @@ class ArticleController extends Controller
                     $file_name
                 );
                 $article = Article::find($article_id);
-                $article->price = filter_var($price, FILTER_SANITIZE_NUMBER_INT);
+                if (!empty($price)) {
+                    $article->price = filter_var($price, FILTER_SANITIZE_NUMBER_INT);
+                } else {
+                    $article->price = null;
+                }
                 $article->publish_document = htmlspecialchars($file_name, ENT_QUOTES, 'UTF-8');
                 $article->save();
                 Session::flash('message', trans('prs.article_updated'));
                 return redirect()->back();
-            } elseif (!empty($hidden_pdf) && !empty($price)) {
+            } elseif (!empty($hidden_pdf)) {
                 $article = Article::find($article_id);
-                $article->price = filter_var($price, FILTER_SANITIZE_NUMBER_INT);
+                if (!empty($price)) {
+                    $article->price = filter_var($price, FILTER_SANITIZE_NUMBER_INT);
+                } else {
+                    $article->price = null;
+                }
                 $article->save();
                 Session::flash('message', trans('prs.article_updated'));
                 return redirect()->back();

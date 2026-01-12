@@ -138,7 +138,7 @@
                                             @foreach ($published_editions as $edition)
                                                 <li class="@if(Request::segment(2) == e($edition->slug) ) current-menu-item @endif">
                                                     <a href="{{url('edition/'.$edition->slug)}}">
-                                                        {{{$edition->title}}}
+                                                        {{ html_entity_decode($edition->title, ENT_QUOTES, 'UTF-8') }}
                                                     </a>
                                                 </li>
                                             @endforeach

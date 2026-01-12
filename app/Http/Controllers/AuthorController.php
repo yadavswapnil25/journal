@@ -129,7 +129,7 @@ class AuthorController extends Controller
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string',
                 'abstract' => 'required',
-                'excerpt' => 'required',
+                // 'excerpt' => 'required',
                 'uploaded_new_article' => 'required|mimes:doc,docx|max:2000',
             ]);
             if ($validator->fails()) {

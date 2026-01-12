@@ -41,7 +41,7 @@
                             'class'=>'sj-categorydetails category_edit_form sj-formtheme', 'files'=>'true']) !!}
                                 <fieldset>
                                     <div class="form-category form-group">
-                                        {!! Form::text('title', $edition->title, ['class' => 'form-control', 'required' => 'required']) !!}
+                                        {!! Form::text('title', html_entity_decode($edition->title, ENT_QUOTES, 'UTF-8'), ['class' => 'form-control', 'required' => 'required']) !!}
                                     </div>
                                     <div class="form-group">
                                         <date-picker name="edition_date" value="{{{$edition->edition_date}}}" :config="config"></date-picker>
