@@ -30,10 +30,25 @@ class FileController extends Controller
      */
     public function getFile($filename)
     {
-        $file_parts = explode('-', $filename);
+        // Decode HTML entities in filename (e.g., &amp; to &) since file is stored with original name
+        $decoded_filename = html_entity_decode($filename, ENT_QUOTES, 'UTF-8');
+        $file_parts = explode('-', $decoded_filename);
         $user_id = $file_parts[0];
-        $filename = implode('-', $file_parts);
-        return Storage::download('uploads/articles/users/' . $user_id . '/' . $filename);
+        $file_path = 'uploads/articles/users/' . $user_id . '/' . $decoded_filename;
+        
+        // Check if file exists
+        if (Storage::exists($file_path)) {
+            return Storage::download($file_path);
+        } else {
+            // If decoded filename doesn't exist, try with original filename (for backward compatibility)
+            $file_parts_original = explode('-', $filename);
+            $user_id_original = $file_parts_original[0];
+            $file_path_original = 'uploads/articles/users/' . $user_id_original . '/' . $filename;
+            if (Storage::exists($file_path_original)) {
+                return Storage::download($file_path_original);
+            }
+            abort(404, 'File not found');
+        }
     }
 }
 

@@ -98,9 +98,25 @@ class UploadMedia
     public static function getArticleSize($author_id, $file_name)
     {
         if (!empty($author_id) && !empty($file_name)) {
-            $size = Storage::size('uploads/articles/users/' . $author_id . '/' . $file_name);
-            $article_file_size = UploadMedia::formatSizeUnits($size);
-            return $article_file_size;
+            // Decode HTML entities in filename (e.g., &amp; to &) since file is stored with original name
+            $decoded_file_name = html_entity_decode($file_name, ENT_QUOTES, 'UTF-8');
+            $file_path = 'uploads/articles/users/' . $author_id . '/' . $decoded_file_name;
+            
+            // Check if file exists before getting size
+            if (Storage::exists($file_path)) {
+                $size = Storage::size($file_path);
+                $article_file_size = UploadMedia::formatSizeUnits($size);
+                return $article_file_size;
+            } else {
+                // If decoded filename doesn't exist, try with original filename (for backward compatibility)
+                $file_path_original = 'uploads/articles/users/' . $author_id . '/' . $file_name;
+                if (Storage::exists($file_path_original)) {
+                    $size = Storage::size($file_path_original);
+                    $article_file_size = UploadMedia::formatSizeUnits($size);
+                    return $article_file_size;
+                }
+                return '';
+            }
         } else {
             return '';
         }

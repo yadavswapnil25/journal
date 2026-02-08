@@ -30,9 +30,25 @@ class PublicController extends Controller
     public function getPublishFile($publish_file)
     {
         if (!empty($publish_file)) {
-            $file_parts = explode('-', $publish_file);
+            // Decode HTML entities in filename (e.g., &amp; to &) since file is stored with original name
+            $decoded_publish_file = html_entity_decode($publish_file, ENT_QUOTES, 'UTF-8');
+            $file_parts = explode('-', $decoded_publish_file);
             $article_id = $file_parts[0];
-            return Storage::download('uploads/articles_pdf/' . $article_id . '/' . $publish_file);
+            $file_path = 'uploads/articles_pdf/' . $article_id . '/' . $decoded_publish_file;
+            
+            // Check if file exists
+            if (Storage::exists($file_path)) {
+                return Storage::download($file_path);
+            } else {
+                // If decoded filename doesn't exist, try with original filename (for backward compatibility)
+                $file_parts_original = explode('-', $publish_file);
+                $article_id_original = $file_parts_original[0];
+                $file_path_original = 'uploads/articles_pdf/' . $article_id_original . '/' . $publish_file;
+                if (Storage::exists($file_path_original)) {
+                    return Storage::download($file_path_original);
+                }
+                abort(404, 'File not found');
+            }
         }
     }
 

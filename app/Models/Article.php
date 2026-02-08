@@ -638,8 +638,10 @@ class Article extends Model
     public static function getArticleFullName($file_name)
     {
         if (!empty($file_name)) {
-            $file_parts = explode('-', $file_name);
-            $extension = explode('.', $file_name);
+            // Decode HTML entities in filename for proper display (e.g., &amp; to &)
+            $decoded_file_name = html_entity_decode($file_name, ENT_QUOTES, 'UTF-8');
+            $file_parts = explode('-', $decoded_file_name);
+            $extension = explode('.', $decoded_file_name);
             unset($file_parts[0]);
             array_pop($file_parts);
             return implode('-', $file_parts) . "." . $extension[1];
