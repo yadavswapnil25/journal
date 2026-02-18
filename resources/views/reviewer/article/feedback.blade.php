@@ -22,7 +22,10 @@
     @endif
 @endsection
 @section('content')
-    <div class="container" id="reviewer_feedback">
+    @include('partials.figma-header')
+    @include('partials.admin-back-button')
+    
+    <div class="container figma-admin-content-wrapper" id="reviewer_feedback">
         <div class="row">
             <div id="sj-twocolumns" class="sj-twocolumns">
                 <div class="provider-site-wrap" v-show="loading" v-cloak>
@@ -129,4 +132,6 @@
             </div>
         </div>
     </div>
+    
+    @include('partials.figma-footer')
 @endsection

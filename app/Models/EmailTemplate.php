@@ -62,8 +62,62 @@ class EmailTemplate extends Model
      */
     public static function getEmailTemplates()
     {
-        $email_templates = DB::table('email_templates')->paginate(10);
-        return $email_templates;
+        // Get role IDs for superadmin and editor
+        $superadmin_role = DB::table('roles')->where('role_type', 'superadmin')->first();
+        $editor_role = DB::table('roles')->where('role_type', 'editor')->first();
+        
+        $query = DB::table('email_templates')
+            ->where('email_type', '!=', 'resubmit_article');
+        
+        // Exclude reviewer_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'reviewer_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude reviewer_feedback for editor
+        if (!empty($editor_role)) {
+            $query->whereNot(function($q) use ($editor_role) {
+                $q->where('email_type', 'reviewer_feedback')
+                  ->where('role_id', $editor_role->id);
+            });
+        }
+        
+        // Exclude accepted_articles_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'accepted_articles_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude minor_revisions_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'minor_revisions_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude major_revisions_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'major_revisions_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude rejected_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'rejected_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        return $query->paginate(10);
     }
 
     /**
@@ -173,7 +227,61 @@ class EmailTemplate extends Model
      */
     public static function getFilterTemplate($role_id = "", $type = "")
     {
-        $query = DB::table('email_templates')->select('*');
+        // Get role IDs for superadmin and editor
+        $superadmin_role = DB::table('roles')->where('role_type', 'superadmin')->first();
+        $editor_role = DB::table('roles')->where('role_type', 'editor')->first();
+        
+        $query = DB::table('email_templates')->select('*')
+            ->where('email_type', '!=', 'resubmit_article');
+        
+        // Exclude reviewer_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'reviewer_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude reviewer_feedback for editor
+        if (!empty($editor_role)) {
+            $query->whereNot(function($q) use ($editor_role) {
+                $q->where('email_type', 'reviewer_feedback')
+                  ->where('role_id', $editor_role->id);
+            });
+        }
+        
+        // Exclude accepted_articles_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'accepted_articles_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude minor_revisions_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'minor_revisions_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude major_revisions_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'major_revisions_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude rejected_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'rejected_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
         if (!empty($role_id)) {
             $query->where('role_id', $role_id);
         }

@@ -14,6 +14,8 @@
     @endif
 @endsection
 @section('content')
+    @include('partials.figma-header')
+    @include('partials.admin-back-button')
     <div class="container">
         <div class="row">
             <div id="sj-twocolumns" class="sj-twocolumns">

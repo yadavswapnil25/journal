@@ -14,7 +14,11 @@
     @endif
 @endsection
 @section('content')
-    <div id="sj-twocolumns" class="sj-twocolumns">
+    @include('partials.figma-header')
+    @include('partials.admin-back-button')
+    <div class="container figma-admin-content-wrapper">
+        <div class="row">
+            <div id="sj-twocolumns" class="sj-twocolumns">
         @include('includes.side-menu')
         <div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-9 float-right" id="email_settings_holder">
             @if (Session::has('success'))
@@ -60,4 +64,7 @@
             </div>
         </div>
     </div>
+        </div>
+    </div>
+    @include('partials.figma-footer')
 @endsection

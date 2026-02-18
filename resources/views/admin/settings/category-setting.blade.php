@@ -14,8 +14,10 @@
     @endif
 @endsection
 @section('content') 
+    @include('partials.figma-header')
+    @include('partials.admin-back-button')
     @php $counter = 0; @endphp
-    <div class="container">
+    <div class="container figma-admin-content-wrapper">
         <div class="row">
             <div id="sj-twocolumns" class="sj-twocolumns">
                 <div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-9 float-right" id="general_setting">
@@ -167,4 +169,5 @@
             </div>
         </div>
     </div>
+    @include('partials.figma-footer')
 @endsection

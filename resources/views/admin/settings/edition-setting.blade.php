@@ -14,7 +14,9 @@
     @endif
 @endsection
 @section('content')
-    <div id="general_setting">
+    @include('partials.figma-header')
+    @include('partials.admin-back-button')
+    <div id="general_setting" class="figma-admin-content-wrapper">
         @if (Session::has('message'))
             <div class="toast-holder">
                 <flash_messages :message="'{{{ Session::get('message') }}}'" :message_class="'success'" v-cloak></flash_messages>
@@ -140,4 +142,5 @@
             </div>
         </div>
     </div>
+    @include('partials.figma-footer')
 @endsection

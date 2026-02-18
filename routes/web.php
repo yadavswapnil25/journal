@@ -175,6 +175,7 @@ Route::get('edition/{slug}', [PublicController::class, 'showPublishArticle'])->n
 Route::post('publish-edition/article/edition-id/', [EditionController::class, 'getEditionID']);
 Route::get('published/editions/articles', [PublicController::class, 'filterEdition']);
 Route::get('published/editions/filters', [PublicController::class, 'filterEdition']);
+Route::get('archives', [PublicController::class, 'archives'])->name('archives');
 
 // Account Settings Controller Route
 Route::get('dashboard/general/settings/account-settings', [SettingController::class, 'index'])->name('accountSetting');

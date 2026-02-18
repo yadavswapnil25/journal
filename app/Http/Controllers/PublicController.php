@@ -149,11 +149,127 @@ class PublicController extends Controller
     {
         $page = Page::getPageData($slug);
         if (empty($page)) {
-            abort(404);
+            // If page doesn't exist, create a default page object for specific public pages
+            $normalizedSlug = strtolower($slug);
+
+            if ($normalizedSlug === 'about' || $normalizedSlug === 'about-the-journal') {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'About',
+                    'slug'      => 'about',
+                    'sub_title' => 'About the Journal',
+                    'body'      => ''
+                ];
+            } elseif (in_array($normalizedSlug, ['aims-scope', 'aims-&-scope', 'aims-and-scope'], true)) {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'Aims & Scope',
+                    'slug'      => 'aims-scope',
+                    'sub_title' => 'Aims & Scope',
+                    'body'      => ''
+                ];
+            } elseif (in_array($normalizedSlug, ['publication-information', 'publication-info'], true)) {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'Publication Information',
+                    'slug'      => 'publication-information',
+                    'sub_title' => 'Publication Information',
+                    'body'      => ''
+                ];
+            } elseif (in_array($normalizedSlug, ['submission-guidelines', 'submissions-guidelines', 'submission-guideline'], true)) {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'Submission Guidelines',
+                    'slug'      => 'submission-guidelines',
+                    'sub_title' => 'Submission Guidelines',
+                    'body'      => ''
+                ];
+            } elseif (in_array($normalizedSlug, ['call-for-submissions', 'call-for-submission', 'call-for-papers'], true)) {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'Call for Submissions',
+                    'slug'      => 'call-for-submissions',
+                    'sub_title' => 'Call for Submissions',
+                    'body'      => ''
+                ];
+            } elseif (in_array($normalizedSlug, ['journal-policies', 'policies', 'policy'], true)) {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'Journal Policies',
+                    'slug'      => 'journal-policies',
+                    'sub_title' => 'Journal Policies',
+                    'body'      => ''
+                ];
+            } elseif (in_array($normalizedSlug, ['editor-in-chief', 'editor-in-chief-page'], true)) {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'Editor-in-Chief',
+                    'slug'      => 'editor-in-chief',
+                    'sub_title' => 'Editor-in-Chief',
+                    'body'      => ''
+                ];
+            } elseif (in_array($normalizedSlug, ['editorial-board', 'editorial-board-page'], true)) {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'Editorial Board',
+                    'slug'      => 'editorial-board',
+                    'sub_title' => 'Editorial Board',
+                    'body'      => ''
+                ];
+            } elseif (in_array($normalizedSlug, ['advisory-board', 'advisory-board-page'], true)) {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'Advisory Board',
+                    'slug'      => 'advisory-board',
+                    'sub_title' => 'Advisory Board',
+                    'body'      => ''
+                ];
+            } else {
+                abort(404);
+            }
         }
-        $meta = DB::table('sitemanagements')->where('meta_key', 'seo-desc-'.$page->id)->select('meta_value')->pluck('meta_value')->first();
+
+        $meta = DB::table('sitemanagements')
+            ->where('meta_key', 'seo-desc-'.$page->id)
+            ->select('meta_value')
+            ->pluck('meta_value')
+            ->first();
+
         $meta_desc = !empty($meta) ? $meta : '';
         return view('admin.pages.show', compact('page', 'slug', 'meta_desc'));
+    }
+
+    /**
+     * @access public
+     * @desc Display archives page with all editions grouped by year
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function archives()
+    {
+        // Get all editions (both published and unpublished) with article counts
+        $editions = DB::table('editions')
+            ->select('editions.*', DB::raw('COUNT(articles.id) as article_count'))
+            ->leftJoin('articles', 'articles.edition_id', '=', 'editions.id')
+            ->groupBy('editions.id', 'editions.title', 'editions.slug', 'editions.edition_date', 'editions.edition_price', 'editions.edition_cover', 'editions.edition_status', 'editions.created_at', 'editions.updated_at')
+            ->orderBy('editions.edition_date', 'desc')
+            ->get();
+
+        // Group editions by year
+        $archives = [];
+        foreach ($editions as $edition) {
+            $year = date('Y', strtotime($edition->edition_date));
+            
+            if (!isset($archives[$year])) {
+                $archives[$year] = [];
+            }
+
+            $archives[$year][] = $edition;
+        }
+
+        // Sort years in descending order
+        krsort($archives);
+
+        return view('archives.index', compact('archives'));
     }
 
     /**

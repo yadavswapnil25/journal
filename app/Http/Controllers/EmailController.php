@@ -52,8 +52,113 @@ class EmailController extends Controller
         }
         $template_types = Helper::emailTypeList();
         $roles = Role::select('name', 'id')->get()->pluck('name', 'id');
-        $total_templates_created = EmailTemplate::all();
-        $total_roles_templates = DB::table('role_email_types')->get();
+        
+        // Get role IDs for superadmin and editor
+        $superadmin_role = DB::table('roles')->where('role_type', 'superadmin')->first();
+        $editor_role = DB::table('roles')->where('role_type', 'editor')->first();
+        
+        // Count templates excluding resubmit_article and specific combinations
+        $total_templates_query = DB::table('email_templates')
+            ->where('email_type', '!=', 'resubmit_article');
+        
+        // Exclude reviewer_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $total_templates_query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'reviewer_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude reviewer_feedback for editor
+        if (!empty($editor_role)) {
+            $total_templates_query->whereNot(function($q) use ($editor_role) {
+                $q->where('email_type', 'reviewer_feedback')
+                  ->where('role_id', $editor_role->id);
+            });
+        }
+        
+        // Exclude accepted_articles_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $total_templates_query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'accepted_articles_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude minor_revisions_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $total_templates_query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'minor_revisions_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude major_revisions_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $total_templates_query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'major_revisions_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        // Exclude rejected_editor_feedback for superadmin
+        if (!empty($superadmin_role)) {
+            $total_templates_query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'rejected_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        $total_templates_created = $total_templates_query->get();
+        
+        // Count role_email_types excluding the same combinations
+        $total_roles_templates_query = DB::table('role_email_types')
+            ->where('email_type', '!=', 'resubmit_article');
+        
+        if (!empty($superadmin_role)) {
+            $total_roles_templates_query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'reviewer_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        if (!empty($editor_role)) {
+            $total_roles_templates_query->whereNot(function($q) use ($editor_role) {
+                $q->where('email_type', 'reviewer_feedback')
+                  ->where('role_id', $editor_role->id);
+            });
+        }
+        
+        if (!empty($superadmin_role)) {
+            $total_roles_templates_query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'accepted_articles_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        if (!empty($superadmin_role)) {
+            $total_roles_templates_query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'minor_revisions_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        if (!empty($superadmin_role)) {
+            $total_roles_templates_query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'major_revisions_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        if (!empty($superadmin_role)) {
+            $total_roles_templates_query->whereNot(function($q) use ($superadmin_role) {
+                $q->where('email_type', 'rejected_editor_feedback')
+                  ->where('role_id', $superadmin_role->id);
+            });
+        }
+        
+        $total_roles_templates = $total_roles_templates_query->get();
+        
         $create_template = $total_templates_created->count() == $total_roles_templates->count() ? true : false;
         return view('admin.email-templates.index', compact('email_templates', 'create_template', 'template_types', 'roles'));
     }

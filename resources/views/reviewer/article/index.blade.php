@@ -14,7 +14,10 @@
     @endif
 @endsection
 @section('content')
-    <div class="container" id="reviewer_feedback">
+    @include('partials.figma-header')
+    @include('partials.admin-back-button')
+    
+    <div class="container figma-admin-content-wrapper" id="reviewer_feedback">
         <div class="row">
             <div id="sj-twocolumns" class="sj-twocolumns reviewer-index">
                 @if (Session::has('message'))
@@ -158,4 +161,6 @@
             </div>
         </div>
     </div>
+    
+    @include('partials.figma-footer')
 @endsection

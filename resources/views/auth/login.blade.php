@@ -1,5 +1,8 @@
 @extends('master')
+@section('title'){{ trans('prs.login_now') }} - {{ config('app.name') }} @stop
+@section('description', 'Login to International Journal of Advanced Research in English Studies')
 @section('content')
+    
     @php
         if (!empty($_GET['user_id']) && !empty($_GET['email_type'])) {
             $user_id = $_GET['user_id'];
@@ -27,162 +30,90 @@
             }
         }
     @endphp
-    <div id="sj-twocolumns" class="sj-twocolumns">
-        <div class="container">
-            <div class="row" id="user_register">
-                @if (Session::has('message'))
-                    <div class="toast-holder">
-                        <flash_messages :message="'{{{ Session::get('message') }}}'" :message_class="'success'" v-cloak></flash_messages>
+
+    @include('partials.figma-header')
+
+    {{-- Login Section --}}
+    <section class="figma-register-section">
+        <div class="figma-register-container">
+            <div class="figma-login-wrapper">
+                {{-- Login Form --}}
+                <div class="figma-login-main">
+                    <div class="figma-register-card">
+                        <h2>{{trans('prs.login_now')}}</h2>
+                        @if (Session::has('message'))
+                            <div class="figma-alert figma-alert-success">
+                                {{ Session::get('message') }}
+                            </div>
+                        @elseif (Session::has('error'))
+                            <div class="figma-alert figma-alert-error">
+                                {{ Session::get('error') }}
+                            </div>
+                        @endif
+                        <form method="POST" action="{{$action}}" class="figma-form">
+                            @csrf
+                            <div class="figma-form-group">
+                                <input type="email" name="email" value="{{$errors->has('email') ? old('email') : ''}}" 
+                                    class="figma-form-input {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                                    placeholder="{{trans('prs.ph_email')}}" {{$login_focus}}>
+                                @if ($errors->has('email'))
+                                    <span class="figma-form-error">
+                                        {{$errors->first('email')}}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="figma-form-group">
+                                <input type="password" name="password" 
+                                    class="figma-form-input {{ $errors->has('password') ? 'is-invalid' : '' }}" 
+                                    placeholder="{{trans('prs.ph_pass')}}">
+                                @if ($errors->has('password'))
+                                    <span class="figma-form-error">
+                                        {{$errors->first('password')}}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="figma-form-group figma-form-row">
+                                <label class="figma-checkbox">
+                                    <input type="checkbox" id="remember" name="remember">
+                                    <span>{{trans('prs.keep_logged_in')}}</span>
+                                </label>
+                                <a href="{{ route('password.request') }}" class="figma-link">{{trans('prs.forgot_pass')}}</a>
+                            </div>
+                            <button type="submit" class="figma-btn figma-btn-primary figma-btn-block">{{trans('prs.btn_login')}}</button>
+                        </form>
+                        <div class="figma-login-divider">
+                            <span>Don't have an account?</span>
+                        </div>
+                        <a href="{{ route('register') }}" class="figma-btn figma-btn-secondary figma-btn-block">
+                            {{trans('prs.register')}}
+                        </a>
                     </div>
-                @elseif (Session::has('error'))
-                    <div class="toast-holder">
-                        <flash_messages :message="'{{{ Session::get('error') }}}'" :message_class="'danger'" v-cloak></flash_messages>
+                </div>
+
+                {{-- Register Sidebar (if reg_data exists) --}}
+                @if (!empty($reg_data))
+                <div class="figma-register-sidebar">
+                    <div class="figma-register-card">
+                        <h3>{{trans('prs.reg_now')}}</h3>
+                        <p>Create a new account to submit articles, review papers, and access exclusive content.</p>
+                        <a href="{{ route('register') }}" class="figma-btn figma-btn-primary figma-btn-block">
+                            {{trans('prs.register')}}
+                        </a>
+                        <div class="figma-register-info">
+                            @foreach ($reg_data as $key => $value)
+                                <h4>{{$value['title']}}</h4>
+                                <div class="figma-register-description">
+                                    @php echo htmlspecialchars_decode(stripslashes($value['desc'])); @endphp
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
+                </div>
                 @endif
-                <div class="provider-site-wrap" v-show="loading" v-cloak><div class="provider-loader"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div></div>
-                <div class="col-12 col-sm-12 col-md-12 col-lg-4">
-                    <aside id="sj-sidebarvtwo" class="sj-sidebar">
-                        <div class="sj-widget sj-widgetlogin">
-                            <div class="sj-widgetheading">
-                                <h3>{{trans('prs.login_now')}}</h3>
-                            </div>
-                            <div class="sj-widgetcontent">
-                                <form method="POST" action="{{$action}}" class="sj-formtheme sj-formlogin">
-                                    @csrf
-                                    <fieldset>
-                                        <div class="form-group">
-                                            <input type="email" name="email" value="{{$errors->has('email') ? old('email') : ''}}" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-                                            placeholder="{{trans('prs.ph_email')}}" {{$login_focus}}>
-                                            @if ($errors->has('email'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{$errors->first('email')}}</strong>
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="password" name="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" placeholder="{{trans('prs.ph_pass')}}">
-                                            @if ($errors->has('password'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{$errors->first('password')}}</strong>
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <div class="form-group sj-forgotpass">
-                                            <div class="sj-checkbox">
-                                                <input type="checkbox" id="remember" name="remember">
-                                                <label for="remember">{{trans('prs.keep_logged_in')}}</label>
-                                            </div>
-                                            <a class="sj-forgorpass" href="{{ route('password.request') }}">{{trans('prs.forgot_pass')}}</a>
-                                        </div>
-                                        <div class="sj-btnarea">
-                                            <button type="submit" class="sj-btn sj-btnactive">{{trans('prs.btn_login')}}</button>
-                                        </div>
-                                    </fieldset>
-                                </form>
-                            </div>
-                        </div>
-                    </aside>
-                </div>
-                <div class="col-12 col-sm-12 col-md-12 col-lg-8">
-                    <div id="sj-content" class="sj-content">
-                        <div class="sj-registerarea">
-                            <div class="registernow">
-                                <div class="sj-widgetheading">
-                                    <h3>{{trans('prs.reg_now')}}</h3>
-                                </div>
-                                <div class="sj-registerformholder">
-                                    <div class="row">
-                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                                            <form method="POST" action="{{ route('register') }}" class="sj-formtheme sj-formregister" id="register_form" @submit="showloading()">
-                                                @csrf
-                                                <fieldset>
-                                                    <div class="form-group">
-                                                        <input id="name" type="text" class="form-control{{ $errors->has('name') ? 'is-invalid' : '' }}" name="name" value="{{ old('name') }}"
-                                                        placeholder="{{trans('prs.ph_firstname')}}" required {{$register_focus}}>
-                                                        @if ($errors->has('name'))
-                                                            <span class="invalid-feedback" role="alert">
-                                                                <strong>{{ $errors->first('name') }}</strong>
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <input type="text" name="sur_name" value="{{ old('sur_name') }}" class="form-control{{ $errors->has('sur_name') ? 'is-invalid' : '' }}"
-                                                        placeholder="{{trans('prs.ph_surname')}}*" required>
-                                                        @if ($errors->has('sur_name'))
-                                                            <span class="invalid-feedback" role="alert">
-                                                                <strong>{{ $errors->first('sur_name') }}</strong>
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <input id="email" type="email" class="form-control {{ $errors->register->first('email') ? ' is-invalid' : '' }}"  name="email"
-                                                        value="{{$errors->register->first('email') ? old('email') : ''}}" placeholder="{{trans('prs.ph_email')}}" required>
-                                                        @if ($errors->register->first('email'))
-                                                            <span class="invalid-feedback" role="alert">
-                                                                <strong>{{$errors->register->first('email')}}</strong>
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <input id="password" type="password" class="form-control{{ $errors->register->first('password') ? ' is-invalid' : '' }}" name="password"
-                                                        placeholder="{{trans('prs.ph_pass')}}" required>
-                                                        @if ($errors->register->first('password'))
-                                                            <span class="invalid-feedback" role="alert">
-                                                                <strong>{{$errors->register->first('password')}}</strong>
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <input id="password-confirm" type="password" class="form-control" name="password_confirmation" placeholder="{{trans('prs.ph_cnfrm_pass')}}" required>
-                                                    </div>
-                                                    <div class="form-group half-width assign-role">
-                                                        <span class="sj-radio">
-                                                            <input id="author" checked="checked" name="role" type="radio" value="author">
-                                                            <label for="author">{{trans('prs.author')}}</label>
-                                                        </span>
-                                                    </div>
-                                                    <div class="form-group half-width assign-role">
-                                                        <span class="sj-radio">
-                                                            <input id="reader" name="role" type="radio" value="reader">
-                                                            <label for="reader">{{trans('prs.reader')}}</label>
-                                                        </span>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <div class="sj-checkbox">
-                                                            <input type="checkbox" id="terms_condition" name="terms_condition" class="form-control{{ $errors->register->first('terms_condition') ? ' is-invalid' : '' }}" value="registered">
-                                                            <label for="terms_condition">{{trans('prs.terms_note')}} <a href="javascript:void(0);">{{trans('prs.terms_conditions')}}</a></label>
-                                                            @if ($errors->register->first('terms_condition'))
-                                                                <span class="invalid-feedback invalid-checkbox invalid-terms" role="alert">
-                                                                    <strong>{{$errors->register->first('terms_condition')}}</strong>
-                                                                </span>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    <div class="sj-btnarea">
-                                                        <button type="submit" class="sj-btn sj-btnactive">{{trans('prs.btn_reg') }}</button>
-                                                    </div>
-                                                </fieldset>
-                                            </form>
-                                        </div>
-                                        @if (!empty($reg_data))
-                                            <div class="col-12 col-sm-12 col-md-12 col-lg-6">
-                                                <div class="sj-howtoregister">
-                                                    @foreach ($reg_data as $key => $value)
-                                                        <h3>{{$value['title']}}</h3>
-                                                        <div class="sj-description">
-                                                            @php echo htmlspecialchars_decode(stripslashes($value['desc'])); @endphp
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    @include('partials.figma-footer')
+
 @endsection

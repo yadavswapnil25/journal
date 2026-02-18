@@ -14,7 +14,9 @@
     @endif
 @endsection
 @section('content')
-<div class="container">
+    @include('partials.figma-header')
+    @include('partials.admin-back-button')
+    <div class="container figma-admin-content-wrapper">
     <div class="row">
         <div id="sj-twocolumns" class="sj-twocolumns">
             @include('includes.side-menu')
@@ -54,4 +56,5 @@
         </div>
     </div>
 </div>
+@include('partials.figma-footer')
 @endsection

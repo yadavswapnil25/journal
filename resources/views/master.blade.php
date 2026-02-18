@@ -9,28 +9,31 @@
     <title>@yield('title')</title>
 	<meta name="description" content="@yield('description')">
 	<meta name="keywords" content="@yield('keywords')">
-    <link href="{{ asset('css/print.css') }}" rel="stylesheet" media="print" type="text/css">
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/normalize.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/fontawesome/fontawesome-all.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/linearicons.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/themify-icons.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/icomoon.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/scrollbar.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/owl.carousel.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/chosen.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/main.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/dashboard.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/color.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/transitions.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/responsive.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/sweetalert.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/vue-transition.css') }}" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1">
+    
     @php
+    // Check if current page is admin/dashboard page
+    $is_admin_page = false;
+    $current_route = Request::path();
+    // Pages that should use new design (public pages + create article)
+    $new_design_pages = ['/', 'login', 'register', 'article/', 'published/', 'edition/', 'page/', 'author/create-article'];
+    $use_new_design = false;
+    foreach ($new_design_pages as $page) {
+        if ($current_route == '/' || strpos($current_route, $page) === 0 || $current_route == $page) {
+            $use_new_design = true;
+            break;
+        }
+    }
+    // Admin routes that should use old design
+    if (!$use_new_design) {
+        $admin_routes = ['dashboard', 'superadmin', 'author/user', 'reviewer', 'editor'];
+        foreach ($admin_routes as $route) {
+            if (strpos($current_route, $route) !== false) {
+                $is_admin_page = true;
+                break;
+            }
+        }
+    }
+    
     if(Schema::hasTable('users')){
         $user_role = "";
         if(!empty(Auth::user()->id)){
@@ -40,44 +43,37 @@
         }
     }
     @endphp
+    
+    {{-- Load CSS based on page type --}}
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/fontawesome/fontawesome-all.css') }}" rel="stylesheet">
+    
+    @if($is_admin_page)
+        {{-- Old admin CSS files --}}
+        <link href="{{ asset('css/main.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/dashboard.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/responsive.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/custom-theme.css') }}" rel="stylesheet">
+        {{-- Also load new CSS for header/footer --}}
+        <link href="{{ asset('css/figma-exact.css') }}?v={{ time() }}" rel="stylesheet">
+    @else
+        {{-- New public website CSS --}}
+        <link href="{{ asset('css/figma-exact.css') }}?v={{ time() }}" rel="stylesheet">
+    @endif
     <script type="text/javascript">
         var APP_URL = {!! json_encode(url('/')) !!}
         var USER_ROLE = {!! json_encode($user_role) !!}
     </script>
 </head>
 
-<body class="sj-login {{ \App\Helper::getBodyLangClass() }}">
+<body>
     {{ \App::setLocale(env('APP_LANG')) }}
-    <div id="sj-wrapper" class="sj-wrapper">
-        <div class="sj-contentwrapper">
-            <header id="sj-header" class="sj-header sj-haslayout">
-                @if(Schema::hasTable('users'))
-                @include('includes.header') @endif
-            </header>
-            <main id="sj-main" class="sj-main sj-haslayout sj-sectionspace">
-                @yield('content')
-            </main>
-            <footer id="sj-footer" class="sj-footer sj-haslayout">
-                @if(Schema::hasTable('users'))
-                @include('includes.footer') @endif
-            </footer>
-        </div>
-    </div>
-    <div id="sj-searcharea" class="sj-searcharea">
-        <button type="button" class="close">×</button>
-        {!! Form::open([
-            'url' => url('published/editions/filters'),'method'=> 'get', 'class' => 'sj-formtheme sj-formsearcmain'
-            ])
-        !!}
-            <input type="search" value="" placeholder="{{trans('prs.ph_search_here')}}" name="s" />
-            <button type="submit" class="sj-btn sj-btnactive"><span>Search</span></button>
-        {!! Form::close() !!}
-    </div>
+    
+    {{-- No wrapper divs from old theme, just the content --}}
+    @yield('content')
+    
     <script src="{{ asset('js/jquery-3.3.1.js') }}"></script>
-    <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
-    <script src="{{ asset('js/scrollbar.min.js') }}"></script>
-    <script src="{{ asset('js/sweetalert.min.js') }}"></script>
 </body>
 
 </html>

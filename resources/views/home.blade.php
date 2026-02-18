@@ -1,146 +1,170 @@
 @extends('master')
 @section('title'){{ config('app.name') }} @stop
-@section('description', 'This is description tag')
+@section('description', 'International Journal of Advanced Research in English Studies')
 @section('content')
-    @if (Session::has('payment_message'))
-        @php $response = Session::get('payment_message') @endphp
-        <div class="toast-holder">
-            <div id="toast-container">
-                <div class="alert toast-{{{$response['code']}}} alart-message alert-dismissible fade show fixed_message">
-                    <div class="toast-message">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span></button>
-                        {{{ $response['message'] }}}
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
+    
     @php
     if (Schema::hasTable('users')){
-        $slide_unserialize_array = App\Models\SiteManagement::getMetaValue('slides');
-        $welcome_slide_unSerialize_array = App\Models\SiteManagement::getMetaValue('welcome_slides');
-        $published_articles = App\Models\Article::getPublishedArticle();
+        $published_articles = collect(App\Models\Article::getPublishedArticle());
         $page_slug  = App\Models\SiteManagement::getMetaValue('pages');
-        $page_data = App\Models\Page::getPageData($page_slug[0]);
-        if(!empty($page_data)){
-        $welcome_desc = preg_replace("/<img[^>]+\>/i", " ", $page_data->body);
-        }else{
-            $welcome_desc = "";
-        }
+        $page_data = !empty($page_slug) ? App\Models\Page::getPageData($page_slug[0]) : null;
     }
     @endphp
-    @if (!empty($slide_unserialize_array))
-        <div id="sj-homebanner" class="sj-homebanner owl-carousel">
-            @foreach($slide_unserialize_array as $key => $slide)
-            <div class="item">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                            <div class="sj-postbook">
-                                <figure class="sj-featureimg">
-                                    <div class="sj-bookimg">
-                                        <div class="sj-frontcover">
-                                            <img src="{{{asset('uploads/slider/images/'.$slide['slide_image'])}}}" alt="{{{trans('prs.slide_img')}}}">
-                                        </div>
-                                    </div>
-                                </figure>
-                            </div>
-                        </div>
-                        @if (!empty($slide['slide_title']) || !empty($slide['slide_desc']) )
-                        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                            <div class="sj-bannercontent">
-                                <h1>@php echo htmlspecialchars_decode(stripslashes($slide['slide_title'])); @endphp</h1>
-                                <div class="sj-description">
-                                    <p>@php echo htmlspecialchars_decode(stripslashes($slide['slide_desc'])); @endphp</p>
+
+    @include('partials.figma-header')
+
+    {{-- Hero Slider --}}
+    <section class="figma-hero-slider">
+        <div class="figma-slider-container">
+            {{-- Slide 1 --}}
+            <div class="figma-slide active" style="background-image: url({{ asset('images/slider-1.png') }});">
+                <div class="figma-hero-content">
+                    <h1>International Journal of Advanced Research in English Studies</h1>
+                    <p>Publish high-quality research papers, review articles, and case studies with global visibility and fast review process.</p>
+                    <div class="figma-hero-buttons">
+                        <a href="{{route('checkAuthor')}}" class="figma-btn-primary">Submit Your Article</a>
+                        <a href="{{url('published/editions/articles')}}" class="figma-btn-secondary">View Current Issue</a>
+                    </div>
+                </div>
+            </div>
+            {{-- Slide 2 --}}
+            <div class="figma-slide" style="background-image: url({{ asset('images/slider-2.png') }});">
+                <div class="figma-hero-content">
+                    <h1>International Journal of Advanced Research in English Studies</h1>
+                    <p>Publish high-quality research papers, review articles, and case studies with global visibility and fast review process.</p>
+                    <div class="figma-hero-buttons">
+                        <a href="{{route('checkAuthor')}}" class="figma-btn-primary">Submit Your Article</a>
+                        <a href="{{url('published/editions/articles')}}" class="figma-btn-secondary">View Current Issue</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.figma-slide');
+            let currentSlide = 0;
+            const slideDelay = 5000; // 5 seconds
+
+            function nextSlide() {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+
+            if (slides.length > 1) {
+                setInterval(nextSlide, slideDelay);
+            }
+        });
+    </script>
+
+    {{-- Trending Publication (Below Hero Slider) --}}
+    <section class="figma-trending">
+        <h2>Trending publication</h2>
+        <p class="figma-trending-subtitle">
+            Literature Review Related to Cultural Identity Challenges of ESL Learners in African Rural Contexts
+        </p>
+        <a href="{{ url('published/editions/articles') }}" class="figma-trending-readmore">
+            Read more
+            <span class="arrow">→</span>
+        </a>
+
+        <div class="figma-trending-grid">
+            {{-- Large Featured Card --}}
+            <div class="figma-trending-card large">
+                <img src="{{ asset('images/img-01.png') }}" alt="Featured Publication">
+                <div class="content">
+                </div>
+            </div>
+
+            {{-- Aims & Scope Card --}}
+            <div class="figma-trending-card">
+                <div class="icon-circle">📚</div>
+                <h3>Aims &amp; Scope</h3>
+                <p>
+                    SHELE is primarily dedicated to the history of English language education (HELE)
+                    in India, and takes HELE in a broad sense.
+                </p>
+            </div>
+
+            {{-- Publication Information Card --}}
+            <div class="figma-trending-card blue">
+                <div class="icon-circle light">ℹ️</div>
+                <h3>Publication Information</h3>
+                <ul class="figma-trending-list">
+                    <li><strong>Format</strong>: Online and open access</li>
+                    <li><strong>Language</strong>: English</li>
+                    <li><strong>Frequency</strong>: Half-yearly</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    {{-- Issues Section --}}
+    @if (!empty($published_articles))
+    <section class="figma-issues-section">
+        <div class="figma-issues-container">
+            <div class="figma-issue-item">
+                <div class="figma-issue-header">
+                    <h3>2025 - Issues Vol. 1 No. 5 (2025)</h3>
+                    <a href="{{ route('archives') }}" class="view-all">View All</a>
+                </div>
+                <ul class="figma-article-list">
+                    @foreach ($published_articles->take(3) as $article)
+                    @php
+                        $authors = App\Models\Article::getArticleAuthors($article->id);
+                        $authorNames = !empty($authors) ? implode(', ', array_column($authors, 'name')) : App\Models\User::getUserNameByID($article->corresponding_author_id);
+                    @endphp
+                    <li class="figma-article-item">
+                        <div class="figma-article-info">
+                            <div class="figma-article-title">{{$article->title}}</div>
+                            <div class="figma-article-meta">
+                                <div class="figma-article-meta-row">
+                                    <span class="figma-article-icon">👥</span>
+                                    <span>{{$authorNames}}</span>
+                                </div>
+                                <div class="figma-article-meta-row">
+                                    <span class="figma-article-icon">👁️</span>
+                                    <span>Abstract views: {{$article->hits ?? 0}}</span>
+                                </div>
+                                <div class="figma-article-meta-row">
+                                    <span class="figma-article-icon">📄</span>
+                                    <span>1-15</span>
                                 </div>
                             </div>
                         </div>
+                        @if(!empty($article->publish_document))
+                            <a href="{{route('getPublishFile', $article->publish_document)}}" class="figma-download-btn">Download</a>
+                        @else
+                            <a href="{{url('article/'.$article->slug)}}" class="figma-download-btn">View</a>
                         @endif
-                    </div>
-                </div>
+                    </li>
+                    @endforeach
+                </ul>
             </div>
-            @endforeach
         </div>
+    </section>
     @endif
-    @if (!empty($page_data))
-    <div class="sj-haslayout sj-welcomegreetingsection sj-sectionspace">
-        <div class="container">
-            <div class="row">
-                <div class="sj-welcomegreeting">
-                    @if (!empty($welcome_slide_unSerialize_array))
-                        <div class="col-12 col-sm-12 col-md-5 col-lg-5 sj-verticalmiddle">
-                            <div id="sj-welcomeimgslider" class="sj-welcomeimgslider sj-welcomeslider owl-carousel">
-                                @foreach ($welcome_slide_unSerialize_array as $key => $slide)
-                                    <figure class="sj-welcomeimg item">
-                                        <img src="{{{asset('uploads/settings/welcome_slider/'.$slide['welcome_slide_image'])}}}" alt="{{{trans('prs.img_desc')}}}">
-                                    </figure>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-                    <div class="col-12 col-sm-12 col-md-7 col-lg-7 sj-verticalmiddle float-right">
-                        <div class="sj-welcomecontent">
-                            <div class="sj-welcomehead">
-                                <span>{{{$page_data->sub_title}}}</span>
-                                <h2>{{{$page_data->title}}}</h2>
-                            </div>
-                            <div class="sj-description">
-                                @php echo \Illuminate\Support\Str::limit(htmlspecialchars_decode(stripslashes($welcome_desc)), 300) @endphp
-                            </div>
-                            <div class="sj-btnarea">
-                                <a class="sj-btn" href="{{{url('/page/'.$page_data->slug.'/')}}}">{{{trans('prs.btn_read_more')}}}</a>
-                            </div>
-                        </div>
-                    </div>
+
+    {{-- Newsletter Section --}}
+    <section class="figma-newsletter-section">
+        <div class="figma-newsletter-content">
+            <h2>Subscribe To Our Newsletter</h2>
+            <form class="figma-newsletter-form" action="#" method="POST">
+                @csrf
+                <div class="figma-newsletter-input-wrapper">
+                    <input type="email" placeholder="Email" required>
+                    <button type="submit" class="figma-newsletter-submit-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 12L10 8L6 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
-    </div>
-    @endif
-    <div id="sj-twocolumns" class="sj-twocolumns">
-        <div class="container">
-            <div class="row">
-                @if (!empty($published_articles))
-                    <div class="col-12 col-sm-12 col-md-8 col-lg-9">
-                        <div id="sj-content" class="sj-content">
-                            <section class="sj-haslayout sj-sectioninnerspace">
-                                <div class="sj-borderheading">
-                                    <h3>{{{trans('prs.editions')}}}</h3>
-                                    <a class="sj-btnview" href="{{{url('published/editions/articles')}}}">{{{trans('prs.btn_view_all')}}}</a>
-                                </div>
-                                <div id="sj-editorchoiceslider" class="sj-editorchoiceslider sj-editorschoice">
-                                    @if (!empty($published_articles))
-                                        @foreach ($published_articles as $article)
-                                            @php $edition_image = App\Helper::getEditionImage($article->edition_id,'medium') ;@endphp
-                                            <article class="sj-post sj-editorchoice">
-                                                @if (!empty($edition_image))
-                                                    <figure class="sj-postimg">
-                                                        <img src="{{{asset($edition_image)}}}" alt="{{{trans('prs.article_img')}}}">
-                                                    </figure>
-                                                @endif
-                                                <div class="sj-postcontent">
-                                                    <div class="sj-head">
-                                                        <span class="sj-username">{{{App\Models\User::getUserNameByID($article->corresponding_author_id)}}}</span>
-                                                        <h3><a href="{{{url('article/'.$article->slug)}}}">{{{$article->title}}}</a></h3>
-                                                    </div>
-                                                    <div class="sj-description">
-                                                        @php echo \Illuminate\Support\Str::limit($article->excerpt, 105); @endphp
-                                                    </div>
-                                                    <a class="sj-btn" href="{{{url('article/'.$article->slug)}}}">{{{trans('prs.btn_view_full_articles')}}}</a>
-                                                </div>
-                                            </article>
-                                        @endforeach
-                                    @endif
-                                </div>
-                            </section>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-3">
-                        @include('includes.widgetsidebar')
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
+    </section>
+
+    @include('partials.figma-footer')
+
 @endsection

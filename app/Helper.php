@@ -766,46 +766,42 @@ class Helper
                 'value' => 'assign_reviewer',
             ],
             '2' => [
-                'title' => trans('prs.resubmit_article'),
-                'value' => 'resubmit_article',
-            ],
-            '3' => [
                 'title' => trans('prs.reviewer_feedback'),
                 'value' => 'reviewer_feedback',
             ],
-            '4' => [
+            '3' => [
                 'title' => trans('prs.accepted_editor_feedback'),
                 'value' => 'accepted_articles_editor_feedback',
             ],
-            '5' => [
+            '4' => [
                 'title' => trans('prs.rejected_editor_feedback'),
                 'value' => 'rejected_editor_feedback',
             ],
-            '6' => [
+            '5' => [
                 'title' => trans('prs.minor_editor_feedback'),
                 'value' => 'minor_revisions_editor_feedback',
             ],
-            '7' => [
+            '6' => [
                 'title' => trans('prs.major_editor_feedback'),
                 'value' => 'major_revisions_editor_feedback',
             ],
-            '8' => [
+            '7' => [
                 'title' => trans('prs.publish_edition'),
                 'value' => 'publish_edition',
             ],
-            '9' => [
+            '8' => [
                 'title' => trans('prs.new_user'),
                 'value' => 'new_user',
             ],
-            '10' => [
+            '9' => [
                 'title' => trans('prs.change_pswd'),
                 'value' => 'change_password',
             ],
-            '11' => [
+            '10' => [
                 'title' => trans('prs.new_ord_rec'),
                 'value' => 'new_order',
             ],
-            '12' => [
+            '11' => [
                 'title' => trans('prs.successful_ord'),
                 'value' => 'success_order',
             ],
