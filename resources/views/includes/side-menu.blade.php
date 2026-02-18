@@ -43,7 +43,18 @@
                 <ul>
                     @if (!($user_role == 'reader'))
                         @php $page_id = Request::segment(4); @endphp
+                        {{-- Author/Editor article status menu --}}
                         {{App\Helper::displayArticleMenu($page_id)}}
+
+                        {{-- Submit New Article (authors only) --}}
+                        @if (!empty($user_roles_type) && $user_roles_type->role_type == 'author')
+                            <li class="{{ \Request::route()->getName() === 'checkAuthor' ? 'sj-active' : '' }}">
+                                <a href="{{ route('checkAuthor') }}">
+                                    <i class="lnr lnr-pencil"></i>
+                                    <span>{{ trans('prs.add_article') }}</span>
+                                </a>
+                            </li>
+                        @endif
                     @endif
                     @can ('View Categories')
                         <li class="{{\Request::route()->getName() === 'editionSetting' ? 'sj-active' : ''}}">

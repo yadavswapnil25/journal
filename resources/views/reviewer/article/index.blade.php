@@ -94,18 +94,34 @@
                                             <div class="sj-downloadheader">
                                                 <div class="sj-title">
                                                     <h3>{{{trans('prs.attached_doc')}}}</h3>
-                                                    <a href="{{{route('getfile', $article->submitted_document)}}}"><i class="lnr lnr-download"></i>{{{trans('prs.btn_download')}}}</a>
+                                                    @php
+                                                        $file_to_download = !empty($article->editor_file) ? $article->editor_file : $article->submitted_document;
+                                                        $file_route = !empty($article->editor_file) ? route('getEditorFile', $article->editor_file) : route('getfile', $article->submitted_document);
+                                                        $file_name = !empty($article->editor_file) ? $article->editor_file : $article->submitted_document;
+                                                    @endphp
+                                                    <a href="{{{$file_route}}}"><i class="lnr lnr-download"></i>{{{trans('prs.btn_download')}}}</a>
                                                 </div>
                                                 <div class="sj-docdetails">
                                                     <figure class="sj-docimg">
                                                         <img src="{{{asset('images/thumbnails/doc-img.jpg')}}}" alt="{{{trans('prs.doc_img')}}}">
                                                     </figure>
                                                     <div class="sj-docdescription">
-                                                        <h4>{{{ App\Models\Article::getArticleFullName($article->submitted_document) }}}</h4>
+                                                        <h4>{{{ App\Models\Article::getArticleFullName($file_name) }}}</h4>
                                                         <span>
                                                             {{{ trans('prs.file_size') }}}
-                                                            {{{ App\UploadMedia::getArticleSize($article->corresponding_author_id,$article->submitted_document) }}}
+                                                            @if (!empty($article->editor_file))
+                                                                @php
+                                                                    $editor_file_path = storage_path('app/uploads/articles_editor/' . $article->id . '/' . $article->editor_file);
+                                                                    $file_size = file_exists($editor_file_path) ? number_format(filesize($editor_file_path) / 1024, 2) . ' KB' : 'N/A';
+                                                                @endphp
+                                                                {{{ $file_size }}}
+                                                            @else
+                                                                {{{ App\UploadMedia::getArticleSize($article->corresponding_author_id,$article->submitted_document) }}}
+                                                            @endif
                                                         </span>
+                                                        @if (!empty($article->editor_file))
+                                                            <br><small class="text-muted">{{{trans('prs.editor_uploaded_file')}}}</small>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
@@ -141,7 +157,7 @@
                                                     <div id="subcollapseOne-{{{$comment->id}}}" class="sj-statusdescription collapse sj-active"
                                                         aria-labelledby="subheadingOne-{{{$comment->id}}}" data-parent="#subaccordion">
                                                         <div class="sj-description">
-                                                            {{{ $comment->comment }}}
+                                                            {!! App\Helper::formatReviewerComment($comment->comment) !!}
                                                         </div>
                                                     </div>
                                                 @endforeach

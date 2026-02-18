@@ -29,6 +29,7 @@ use App\Helper;
 use App\Models\SiteManagement;
 use App\Models\EmailTemplate;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 /**
  * Class ArticleController
@@ -140,6 +141,30 @@ class ArticleController extends Controller
         }
         $reviewers = $request['reviewers'];
         $article_id = $request['reviewer_article'];
+        $editor_file_path = null;
+        
+        // Handle file upload if provided
+        if ($request->hasFile('editor_file')) {
+            $this->validate($request, [
+                'editor_file' => 'mimes:pdf,doc,docx|max:10000',
+            ]);
+            
+            $uploaded_file = $request->file('editor_file');
+            $file_original_name = $uploaded_file->getClientOriginalName();
+            $file_name_without_extension = pathinfo($file_original_name, PATHINFO_FILENAME);
+            $file_path = 'uploads/articles_editor/' . $article_id . '/';
+            $extension = $uploaded_file->getClientOriginalExtension();
+            $file_name = $article_id . '-editor-' . $file_name_without_extension . '-' . time() . '.' . $extension;
+            
+            Storage::disk('local')->putFileAs(
+                $file_path,
+                $uploaded_file,
+                $file_name
+            );
+            
+            $editor_file_path = htmlspecialchars($file_name, ENT_QUOTES, 'UTF-8');
+        }
+        
         if (!empty($reviewers)) {
             $submitted_article = Article::getArticleNotificationData($article_id);
             if (!empty($submitted_article)) {
@@ -179,7 +204,7 @@ class ArticleController extends Controller
                 }
             }
             DB::table('reviewers')->where('article_id', $article_id)->delete();
-            Article::SaveArticleReviewers('articles_under_review', $article_id, $reviewers);
+            Article::SaveArticleReviewers('articles_under_review', $article_id, $reviewers, $editor_file_path);
             $message = trans('prs.article_assigned');
             return response()->json(['message' => $message]);
         } else {
@@ -408,6 +433,85 @@ class ArticleController extends Controller
                 return redirect()->back();
             }
         }
+    }
+
+    /**
+     * @access public
+     * @desc Download reviewer feedback as PDF
+     * @param string $role
+     * @param int $article_id
+     * @param int $comment_id
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadReviewerFeedbackPDF($role, $article_id, $comment_id)
+    {
+        $article = Article::find($article_id);
+        if (empty($article)) {
+            abort(404, 'Article not found');
+        }
+
+        // Get the specific comment
+        $comment = DB::table('comments')
+            ->join('users', 'users.id', '=', 'comments.comment_author')
+            ->select('comments.*', 'users.name', 'users.sur_name', 'users.email')
+            ->where('comments.id', '=', $comment_id)
+            ->where('comments.article_id', '=', $article_id)
+            ->first();
+
+        if (empty($comment)) {
+            abort(404, 'Reviewer feedback not found');
+        }
+
+        // Parse the comment into structured format
+        $questions = [];
+        $lines = explode("\n", $comment->comment);
+        $currentQuestion = '';
+        $currentAnswer = '';
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            
+            if (preg_match('/^(\d+)\.\s(.+)$/', $line, $matches)) {
+                if (!empty($currentQuestion)) {
+                    $questions[] = [
+                        'question' => $currentQuestion,
+                        'answer' => $currentAnswer
+                    ];
+                }
+                
+                if (preg_match('/^(\d+)\.\s(.+?)[:\?]\s*(.+)$/', $line, $sameLineMatches)) {
+                    $currentQuestion = trim($sameLineMatches[2]);
+                    $currentAnswer = trim($sameLineMatches[3]);
+                } else {
+                    $currentQuestion = trim($matches[2]);
+                    $currentAnswer = '';
+                }
+            } else if (!empty($line)) {
+                if (!empty($currentAnswer)) {
+                    $currentAnswer .= "\n" . $line;
+                } else {
+                    $currentAnswer = $line;
+                }
+            }
+        }
+
+        if (!empty($currentQuestion)) {
+            $questions[] = [
+                'question' => $currentQuestion,
+                'answer' => $currentAnswer
+            ];
+        }
+
+        $data = [
+            'article' => $article,
+            'comment' => $comment,
+            'questions' => $questions,
+        ];
+
+        $pdf = Pdf::loadView('admin.article.reviewer-feedback-pdf', $data);
+        $filename = 'Reviewer_Feedback_' . $comment->name . '_' . $article->unique_code . '_' . date('Y-m-d') . '.pdf';
+        
+        return $pdf->download($filename);
     }
 }
 

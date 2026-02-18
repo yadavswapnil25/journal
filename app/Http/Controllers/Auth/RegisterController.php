@@ -86,12 +86,27 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
+        $validator = Validator::make($data, [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'mobile_number' => 'required|string|max:20',
+            'institutional_affiliation' => 'nullable|string|max:255',
+            'author_bio' => [
+                'required',
+                'string',
+                'max:500',
+                function ($attribute, $value, $fail) {
+                    $wordCount = str_word_count($value);
+                    if ($wordCount > 50) {
+                        $fail('The author bio must not exceed 50 words. Current word count: ' . $wordCount);
+                    }
+                },
+            ],
             'terms_condition' => 'required',
         ]);
+
+        return $validator;
     }
 
     /**
@@ -110,6 +125,9 @@ class RegisterController extends Controller
             'sur_name' => $data['sur_name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'mobile_number' => $data['mobile_number'],
+            'institutional_affiliation' => $data['institutional_affiliation'] ?? null,
+            'author_bio' => $data['author_bio'],
             'token' => md5(uniqid(rand(), true)),
         ]);
         

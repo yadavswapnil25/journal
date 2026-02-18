@@ -147,6 +147,16 @@ class PublicController extends Controller
      */
     public function showDetailPage($slug)
     {
+        // Static Terms & Conditions page (does not require a database record)
+        if (strtolower($slug) === 'terms-and-conditions') {
+            return view('pages.terms-and-conditions');
+        }
+
+        // Static Privacy Policy page (does not require a database record)
+        if (strtolower($slug) === 'privacy-policy') {
+            return view('pages.privacy-policy');
+        }
+
         $page = Page::getPageData($slug);
         if (empty($page)) {
             // If page doesn't exist, create a default page object for specific public pages

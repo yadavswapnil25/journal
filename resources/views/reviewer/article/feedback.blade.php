@@ -100,7 +100,7 @@
                                             <div id="subcollapseOne-{{{$comment->id}}}" class="sj-statusdescription collapse sj-active"
                                                 aria-labelledby="subheadingOne-{{{$comment->id}}}" data-parent="#subaccordion">
                                                 <div class="sj-description">
-                                                    {{{$comment->comment}}}
+                                                    {!! App\Helper::formatReviewerComment($comment->comment) !!}
                                                 </div>
                                             </div>
                                         @endforeach
@@ -113,12 +113,56 @@
                                         </div>
                                         <div class="form-group sj-firstformgroup">
                                             <span class="sj-select">
-                                                {!! Form::select('status', array('accepted_articles' => 'Accept Article', 'minor_revisions' => 'Minor Rivision','major_revisions'=>'Major Rivision','rejected' => 'Reject Article'), null ,array('class' => '')) !!}
+                                                {!! Form::select('status', [
+                                                    'accepted_articles' => trans('prs.publish_as_it_is'),
+                                                    'minor_revisions' => trans('prs.publish_with_minor_revisions'),
+                                                    'major_revisions' => trans('prs.publish_after_substantial_revisions'),
+                                                    'rejected' => trans('prs.not_recommended_for_publishing'),
+                                                    null
+                                                ], null, ['class' => 'form-control']) !!}
                                             </span>
                                         </div>
+
+                                        {{-- Detailed reviewer comments --}}
                                         <div class="form-group">
-                                            {!! Form::textarea('comments', null, ['class' => 'form-control', 'placeholder' => trans('prs.ph_add_feedback')]) !!}
+                                            <label><strong>1. Please comment on the quality of the language of the article.</strong></label>
+                                            {!! Form::textarea('q_language', null, ['class' => 'form-control', 'rows' => 3]) !!}
                                         </div>
+
+                                        <div class="form-group">
+                                            <label><strong>2. Please comment on the originality and overall quality of the content of the article.</strong></label>
+                                            {!! Form::textarea('q_originality', null, ['class' => 'form-control', 'rows' => 3]) !!}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label><strong>3. Does the article follow appropriate norms of referencing, citation and presentation?</strong></label>
+                                            {!! Form::textarea('q_norms', null, ['class' => 'form-control', 'rows' => 3]) !!}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label><strong>4. Any comments for the editors? (These will not be shared with the author/s)</strong></label>
+                                            {!! Form::textarea('q_editors', null, ['class' => 'form-control', 'rows' => 3]) !!}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label><strong>5. Comments for the author/s.</strong></label>
+                                            {!! Form::textarea('q_authors', null, ['class' => 'form-control', 'rows' => 3]) !!}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label><strong>6. Will you be willing to review a revised manuscript of this article (where revision is required)?</strong></label>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    {!! Form::radio('willing_to_review', 'yes', false, ['class' => 'form-check-input']) !!} YES
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    {!! Form::radio('willing_to_review', 'no', false, ['class' => 'form-check-input']) !!} NO
+                                                </label>
+                                            </div>
+                                        </div>
+
                                         {!! Form::hidden('article', $article[0]->id) !!}
                                     </fieldset>
                                     <div class="sj-popupbtn sj-popupbtnvtwo">

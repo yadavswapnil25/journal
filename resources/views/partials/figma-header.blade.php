@@ -41,7 +41,24 @@
                 <a href="{{ route('login') }}" class="figma-login-btn">Log in</a>
                 <a href="{{ route('register') }}" class="figma-signup-btn">Sign up</a>
             @else
-                <a href="{{url('/dashboard')}}" class="figma-signup-btn">Dashboard</a>
+                @php
+                    $dashboardUrl = url('/');
+                    if (!empty(Auth::user()->id)) {
+                        $userId = Auth::user()->id;
+                        $userRoleType = App\Models\User::getUserRoleType($userId);
+                        $userRoleType = !empty($userRoleType) && is_object($userRoleType) ? $userRoleType : null;
+                        $roleType = !empty($userRoleType) ? $userRoleType->role_type : '';
+
+                        if ($roleType === 'author') {
+                            $dashboardUrl = url('author/user/' . $userId . '/articles-under-review');
+                        } elseif ($roleType === 'reviewer') {
+                            $dashboardUrl = url('reviewer/user/' . $userId . '/articles-under-review');
+                        } elseif ($roleType === 'superadmin' || $roleType === 'editor') {
+                            $dashboardUrl = url($roleType . '/dashboard/' . $userId . '/articles-under-review');
+                        }
+                    }
+                @endphp
+                <a href="{{ $dashboardUrl }}" class="figma-signup-btn">Dashboard</a>
             @endguest
         </div>
     </div>

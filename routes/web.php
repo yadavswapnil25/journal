@@ -86,6 +86,7 @@ Route::get(
     }
 )->name('home');
 
+Route::get('{role}/dashboard/{article_id}/reviewer-feedback-pdf/{comment_id}', [ArticleController::class, 'downloadReviewerFeedbackPDF'])->name('downloadReviewerFeedbackPDF');
 Route::get('{role}/dashboard/{id}/{status}', [ArticleController::class, 'index'])->name('editorArticles');
 Route::get('{role}/dashboard/{id}/{status}/article-search', [ArticleController::class, 'index']);
 Route::get('{role}/dashboard/{id}/{status}/{slug}', [ArticleController::class, 'show'])->name('editorArticleDetail');
@@ -183,6 +184,8 @@ Route::post('/dashboard/general/settings/account-settings/request-new-password',
 Route::post('/dashboard/general/settings/account-settings/upload-image', [SettingController::class, 'uploadImage']);
 Route::get('/dashboard/general/settings/account-settings/get-image', [SettingController::class, 'getImage']);
 Route::post('/dashboard/general/settings/account-settings/delete-image', [SettingController::class, 'deleteImage']);
+Route::post('/dashboard/general/settings/account-settings/update-author-info', [SettingController::class, 'updateAuthorInfo']);
+Route::post('/dashboard/general/settings/account-settings/delete-author-info', [SettingController::class, 'deleteAuthorInfo']);
 
 //  Reviewer controller routes
 Route::get('reviewer/user/{userId}/{status}', [ReviewerController::class, 'index'])->name('reviewerArticles');
@@ -192,6 +195,7 @@ Route::post('reviewer/user/submit-feedback/{id}', [ReviewerController::class, 's
 
 //  File controller routes
 Route::get('get/{filename}', [FileController::class, 'getFile'])->name('getfile');
+Route::get('get-editor-file/{filename}', [FileController::class, 'getEditorFile'])->name('getEditorFile');
 Route::get('get-publish-file/{PublishFile}', [PublicController::class, 'getPublishFile'])->name('getPublishFile');
 
 //  Payment controller routes

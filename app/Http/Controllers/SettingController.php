@@ -240,5 +240,91 @@ class SettingController extends Controller
             return $json;
         }
     }
+
+    /**
+     * @access public
+     * @desc Update author information
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateAuthorInfo(Request $request)
+    {
+        $server_verification = Helper::journal_is_demo_site();
+        if (!empty($server_verification)) {
+            Session::flash('error', $server_verification);
+            return redirect()->back();
+        }
+        
+        $user_id = Auth::user()->id;
+        $user_role_type = User::getUserRoleType($user_id);
+        $is_author = !empty($user_role_type) && is_object($user_role_type) && $user_role_type->role_type == 'author';
+        
+        if (!$is_author) {
+            Session::flash('error', 'Unauthorized access');
+            return redirect()->back();
+        }
+        
+        $validator = Validator::make($request->all(), [
+            'mobile_number' => 'required|string|max:20',
+            'institutional_affiliation' => 'nullable|string|max:255',
+            'author_bio' => [
+                'required',
+                'string',
+                'max:500',
+                function ($attribute, $value, $fail) {
+                    $wordCount = str_word_count($value);
+                    if ($wordCount > 50) {
+                        $fail('The author bio must not exceed 50 words. Current word count: ' . $wordCount);
+                    }
+                },
+            ],
+        ]);
+        
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        
+        $user = User::find($user_id);
+        $user->mobile_number = $request->mobile_number;
+        $user->institutional_affiliation = $request->institutional_affiliation ?? null;
+        $user->author_bio = $request->author_bio;
+        $user->save();
+        
+        Session::flash('message', 'Author information updated successfully');
+        return redirect()->back();
+    }
+
+    /**
+     * @access public
+     * @desc Delete author information
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteAuthorInfo(Request $request)
+    {
+        $server_verification = Helper::journal_is_demo_site();
+        if (!empty($server_verification)) {
+            Session::flash('error', $server_verification);
+            return redirect()->back();
+        }
+        
+        $user_id = Auth::user()->id;
+        $user_role_type = User::getUserRoleType($user_id);
+        $is_author = !empty($user_role_type) && is_object($user_role_type) && $user_role_type->role_type == 'author';
+        
+        if (!$is_author) {
+            Session::flash('error', 'Unauthorized access');
+            return redirect()->back();
+        }
+        
+        $user = User::find($user_id);
+        $user->mobile_number = null;
+        $user->institutional_affiliation = null;
+        $user->author_bio = null;
+        $user->save();
+        
+        Session::flash('message', 'Author information deleted successfully');
+        return redirect()->back();
+    }
 }
 

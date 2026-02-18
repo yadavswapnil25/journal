@@ -303,10 +303,11 @@ class Article extends Model
      * @param string $status
      * @param int $article_id
      * @param array $reviewers
+     * @param string|null $editor_file
      * @desc Assign article to reviewer
      * @return bool
      */
-    public static function SaveArticleReviewers($status, $article_id, $reviewers = [])
+    public static function SaveArticleReviewers($status, $article_id, $reviewers = [], $editor_file = null)
     {
         if (!empty($status) && !empty($article_id) && !empty($reviewers)) {
             foreach ($reviewers as $reviewer_id) {
@@ -315,6 +316,7 @@ class Article extends Model
                         'status' => $status, 
                         'reviewer_id' => $reviewer_id, 
                         'article_id' => $article_id,
+                        'editor_file' => $editor_file,
                         'created_at' => \Carbon\Carbon::now(), 
                         'updated_at' => \Carbon\Carbon::now()
                     ]
@@ -379,11 +381,12 @@ class Article extends Model
                     'articles.unique_code',
                     'articles.created_at',
                     'articles.corresponding_author_id',
-                    'reviewers.status'
+                    'reviewers.status',
+                    'reviewers.editor_file'
                 )
                 ->where('reviewers.reviewer_id', '=', $reviewer_id)
                 ->where('reviewers.status', '=', $status)
-                ->groupBy('articles.id', 'articles.title', 'articles.abstract', 'articles.excerpt', 'articles.submitted_document', 'article_category_id', 'articles.unique_code', 'articles.created_at', 'articles.corresponding_author_id', 'reviewers.status')
+                ->groupBy('articles.id', 'articles.title', 'articles.abstract', 'articles.excerpt', 'articles.submitted_document', 'article_category_id', 'articles.unique_code', 'articles.created_at', 'articles.corresponding_author_id', 'reviewers.status', 'reviewers.editor_file')
                 ->paginate(10);
         }
     }
@@ -401,7 +404,7 @@ class Article extends Model
         if (!empty($reviewer_id) && !empty($status) && !empty($search_key)) {
             return DB::table('articles')
                 ->join('reviewers', 'articles.id', '=', 'reviewers.article_id')
-                ->select('articles.*', DB::raw('MAX(reviewers.status) as status'))
+                ->select('articles.*', DB::raw('MAX(reviewers.status) as status'), DB::raw('MAX(reviewers.editor_file) as editor_file'))
                 ->where('reviewers.reviewer_id', '=', $reviewer_id)
                 ->where('reviewers.status', '=', $status)
                 ->where('articles.title', 'like', $search_key . '%')
@@ -432,6 +435,7 @@ class Article extends Model
                     'articles.unique_code',
                     'articles.created_at',
                     'reviewers.status',
+                    'reviewers.editor_file',
                     'articles.corresponding_author_id'
                 )
                 ->where('reviewers.reviewer_id', '=', $reviewer_id)
@@ -451,9 +455,91 @@ class Article extends Model
     public static function getAuthorArticlesByStatus($status, $author_id)
     {
         if (!empty($status) && !empty($author_id)) {
+            // For "articles_under_review" status, also include minor_revisions and major_revisions
+            if ($status === 'articles_under_review') {
+                return DB::table('articles')
+                    ->whereIn('status', ['articles_under_review', 'minor_revisions', 'major_revisions'])
+                    ->where('corresponding_author_id', $author_id)
+                    ->orderBy('updated_at', 'desc')
+                    ->paginate(10);
+            }
             return DB::table('articles')
                 ->where('status', $status)
                 ->where('corresponding_author_id', $author_id)
+                ->orderBy('updated_at', 'desc')
+                ->paginate(10);
+        }
+    }
+
+    /**
+     * @access public
+     * @param int $author_id
+     * @desc Get author's past articles (accepted/rejected)
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public static function getAuthorPastArticles($author_id)
+    {
+        if (!empty($author_id)) {
+            return DB::table('articles')
+                ->whereIn('status', ['accepted_articles', 'rejected'])
+                ->where('corresponding_author_id', $author_id)
+                ->orderBy('updated_at', 'desc')
+                ->paginate(10);
+        }
+    }
+
+    /**
+     * @access public
+     * @param int $author_id
+     * @param string $search_key
+     * @desc Get author's past articles by search
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public static function getAuthorPastArticlesBySearchKey($author_id, $search_key)
+    {
+        if (!empty($author_id) && !empty($search_key)) {
+            return DB::table('articles')
+                ->whereIn('status', ['accepted_articles', 'rejected'])
+                ->where('corresponding_author_id', $author_id)
+                ->where('title', 'like', '%' . $search_key . '%')
+                ->orderBy('updated_at', 'desc')
+                ->paginate(10);
+        }
+    }
+
+    /**
+     * @access public
+     * @param int $author_id
+     * @desc Get author's published articles (accepted & linked to an edition)
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public static function getAuthorPublishedArticles($author_id)
+    {
+        if (!empty($author_id)) {
+            return DB::table('articles')
+                ->where('status', 'accepted_articles')
+                ->whereNotNull('edition_id')
+                ->where('corresponding_author_id', $author_id)
+                ->orderBy('updated_at', 'desc')
+                ->paginate(10);
+        }
+    }
+
+    /**
+     * @access public
+     * @param int $author_id
+     * @param string $search_key
+     * @desc Get author's published articles by search
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public static function getAuthorPublishedArticlesBySearchKey($author_id, $search_key)
+    {
+        if (!empty($author_id) && !empty($search_key)) {
+            return DB::table('articles')
+                ->where('status', 'accepted_articles')
+                ->whereNotNull('edition_id')
+                ->where('corresponding_author_id', $author_id)
+                ->where('title', 'like', '%' . $search_key . '%')
                 ->orderBy('updated_at', 'desc')
                 ->paginate(10);
         }
@@ -470,10 +556,20 @@ class Article extends Model
     public static function getAuthorArticlesBySearchKey($status, $author_id, $search_key)
     {
         if (!empty($status) && !empty($author_id) && !empty($search_key)) {
+            // For "articles_under_review" status, also include minor_revisions and major_revisions
+            if ($status === 'articles_under_review') {
+                return DB::table('articles')
+                    ->whereIn('status', ['articles_under_review', 'minor_revisions', 'major_revisions'])
+                    ->where('corresponding_author_id', $author_id)
+                    ->where('title', 'like', '%' . $search_key . '%')
+                    ->orderBy('updated_at', 'desc')
+                    ->paginate(10);
+            }
             return DB::table('articles')
                 ->where('status', $status)
                 ->where('corresponding_author_id', $author_id)
                 ->where('title', 'like', '%' . $search_key . '%')
+                ->orderBy('updated_at', 'desc')
                 ->paginate(10);
         }
     }

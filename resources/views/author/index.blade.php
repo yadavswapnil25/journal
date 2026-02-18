@@ -65,6 +65,15 @@
                                         <span><i class="ti-calendar"></i>{{{ Carbon\Carbon::parse($article->created_at)->format('d-m-Y') }}}</span>                                @if(!empty($category->title))
                                         <span><i class="ti-layers"></i>{{{$category->title}}}</span> @endif
                                         <span><i class="ti-bookmark"></i>ID: {{{$article->unique_code}}}</span>
+                                        @if($status === 'past_articles')
+                                            <span>
+                                                <i class="ti-check-box"></i>{{ App\Helper::displayReviewerCommentStatus($article->status) }}
+                                            </span>
+                                        @elseif($status === 'published_articles')
+                                            <span>
+                                                <i class="ti-check-box"></i>{{ trans('prs.published_label') }}
+                                            </span>
+                                        @endif
                                         <h4>{{{$article->title}}}</h4>
                                     </div>
                                     <div class="sj-nameandmail">
@@ -85,19 +94,37 @@
                                             <h3>{{{$article->title}}}</h3>
                                         </div>
                                         @if($article->status == "minor_revisions" || $article->status == "major_revisions")
+                                            <div class="sj-revision-notice" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 5px; padding: 15px; margin-bottom: 20px;">
+                                                <h4 style="color: #856404; margin-bottom: 10px;">
+                                                    <i class="fa fa-exclamation-triangle"></i> 
+                                                    @if($article->status == "minor_revisions")
+                                                        Minor Revisions Required
+                                                    @else
+                                                        Major Revisions Required
+                                                    @endif
+                                                </h4>
+                                                <p style="color: #856404; margin-bottom: 15px;">
+                                                    Please review the feedback below and submit your revised article.
+                                                </p>
+                                            </div>
                                             @php $article_input_id = 'article_input_'.$article->id @endphp
                                             {!! Form::open(['url' => 'author/resubmit-article', 'enctype' => 'multipart/form-data',
                                             'multiple' => true, 'class' => 'total-fields sj-formtheme sj-formarticle']) !!}
-                                                <upload-files-field
-                                                    :doc_id="'{{{$article_input_id}}}'"
-                                                    :file_name="this.file_input_name"
-                                                    :file_placeholder="'{{{trans("prs.ph_upload_file_label")}}}'"
-                                                    :file_size_label="'{{{trans("prs.ph_article_file_size")}}}'"
-                                                    :file_uploaded_label="'{{{trans("prs.ph_file_uploaded")}}}'"
-                                                    :file_not_uploaded_label="'{{{trans("prs.ph_file_not_uploaded")}}}'" >
-                                                </upload-files-field>
+                                                <div class="form-group">
+                                                    <label style="font-weight: 600; margin-bottom: 10px; display: block;">Upload Revised Article Document</label>
+                                                    <upload-files-field
+                                                        :doc_id="'{{{$article_input_id}}}'"
+                                                        :file_name="this.file_input_name"
+                                                        :file_placeholder="'{{{trans("prs.ph_upload_file_label")}}}'"
+                                                        :file_size_label="'{{{trans("prs.ph_article_file_size")}}}'"
+                                                        :file_uploaded_label="'{{{trans("prs.ph_file_uploaded")}}}'"
+                                                        :file_not_uploaded_label="'{{{trans("prs.ph_file_not_uploaded")}}}'" >
+                                                    </upload-files-field>
+                                                </div>
                                                 {!! Form::hidden('article_id', $article->id) !!}
-                                                {!! Form::submit(trans('prs.btn_submit'), ['class' => 'sj-btn sj-btnactive']) !!}
+                                                <div class="sj-btnarea sj-updatebtns" style="margin-top: 15px;">
+                                                    {!! Form::submit(trans('prs.submit_revised_article'), ['class' => 'sj-btn sj-btnactive', 'style' => 'background: #0066FF; color: #fff; padding: 10px 30px; font-weight: 600;']) !!}
+                                                </div>
                                             {!! Form::close() !!}
                                         @endif
                                         <div class="sj-description">
@@ -151,7 +178,7 @@
                                                 </div>
                                                 <div id="subcollapseOne-{{$comment->id}}" class="sj-statusdescription collapse sj-active" aria-labelledby="subheadingOne-{{$comment->id}}" data-parent="#subaccordion">
                                                     <div class="sj-description">
-                                                        {{$comment->comment}}
+                                                        {!! App\Helper::formatReviewerComment($comment->comment) !!}
                                                     </div>
                                                 </div>
                                             @endforeach

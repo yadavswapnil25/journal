@@ -174,7 +174,7 @@
                                                 </div>
                                                 <div id="subcollapseOne-{{{$comment->id}}}" class="sj-statusdescription collapse sj-active" aria-labelledby="subheadingOne-{{{$comment->id}}}" data-parent="#subaccordion">
                                                     <div class="sj-description">
-                                                        {{{$comment->comment}}}
+                                                        {!! App\Helper::formatReviewerComment($comment->comment) !!}
                                                     </div>
                                                 </div>
                                             @endforeach

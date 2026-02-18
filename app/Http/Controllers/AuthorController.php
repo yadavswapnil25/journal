@@ -59,16 +59,32 @@ class AuthorController extends Controller
         }
         
         $page_title = Helper::DashboardArticlePageTitle($status);
-        if (!empty($request->get('keyword'))) {
-            $keyword = $request->get('keyword');
-            $articles = Article::getAuthorArticlesBySearchKey($article_status, $user_id, $keyword)->setPath('');
-            $pagination = $articles->appends(
-                array(
-                    'keyword' => $request->get('keyword')
-                )
-            );
+        $keyword = $request->get('keyword');
+
+        if ($article_status === 'past_articles') {
+            // Past Articles: accepted or rejected
+            if (!empty($keyword)) {
+                $articles = Article::getAuthorPastArticlesBySearchKey($user_id, $keyword)->setPath('');
+                $pagination = $articles->appends(['keyword' => $keyword]);
+            } else {
+                $articles = Article::getAuthorPastArticles($user_id);
+            }
+        } elseif ($article_status === 'published_articles') {
+            // Published Articles: accepted & linked to an edition
+            if (!empty($keyword)) {
+                $articles = Article::getAuthorPublishedArticlesBySearchKey($user_id, $keyword)->setPath('');
+                $pagination = $articles->appends(['keyword' => $keyword]);
+            } else {
+                $articles = Article::getAuthorPublishedArticles($user_id);
+            }
         } else {
-            $articles = Article::getAuthorArticlesByStatus($article_status, $user_id);
+            // Default behavior for existing statuses
+            if (!empty($keyword)) {
+                $articles = Article::getAuthorArticlesBySearchKey($article_status, $user_id, $keyword)->setPath('');
+                $pagination = $articles->appends(['keyword' => $keyword]);
+            } else {
+                $articles = Article::getAuthorArticlesByStatus($article_status, $user_id);
+            }
         }
         
         return view('author.index', compact('author_notification', 'articles', 'user_id', 'page_title'))

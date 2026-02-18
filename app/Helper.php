@@ -33,6 +33,98 @@ class Helper
 
     /**
      * @access public
+     * @param string $comment
+     * @desc Format reviewer comment for display
+     * @return string
+     */
+    public static function formatReviewerComment($comment)
+    {
+        if (empty($comment)) {
+            return '';
+        }
+        
+        // Check if comment follows the structured format (starts with "1.")
+        if (preg_match('/^\d+\.\s/', $comment)) {
+            // Parse structured format
+            $questions = [];
+            
+            // Split by pattern: number followed by dot and space at start of line
+            $lines = explode("\n", $comment);
+            $currentQuestion = '';
+            $currentAnswer = '';
+            
+            foreach ($lines as $line) {
+                $line = trim($line);
+                
+                // Check if line starts with a numbered question
+                if (preg_match('/^(\d+)\.\s(.+)$/', $line, $matches)) {
+                    // Save previous Q&A pair if exists
+                    if (!empty($currentQuestion)) {
+                        $questions[] = [
+                            'question' => $currentQuestion,
+                            'answer' => $currentAnswer
+                        ];
+                    }
+                    
+                    // Check if answer is on same line (after colon/question mark)
+                    if (preg_match('/^(\d+)\.\s(.+?)[:\?]\s*(.+)$/', $line, $sameLineMatches)) {
+                        $currentQuestion = trim($sameLineMatches[2]);
+                        $currentAnswer = trim($sameLineMatches[3]);
+                    } else {
+                        // Question only, answer will be on next line
+                        $currentQuestion = trim($matches[2]);
+                        $currentAnswer = '';
+                    }
+                } else if (!empty($line)) {
+                    // This is part of the answer
+                    if (!empty($currentAnswer)) {
+                        $currentAnswer .= "\n" . $line;
+                    } else {
+                        $currentAnswer = $line;
+                    }
+                }
+            }
+            
+            // Add last Q&A pair
+            if (!empty($currentQuestion)) {
+                $questions[] = [
+                    'question' => $currentQuestion,
+                    'answer' => $currentAnswer
+                ];
+            }
+            
+            // Build table format
+            if (!empty($questions)) {
+                $formatted = '<div class="reviewer-feedback-formatted">';
+                $formatted .= '<table class="table table-bordered reviewer-feedback-table" style="width: 100%; margin-bottom: 0; border-collapse: collapse;">';
+                $formatted .= '<thead>';
+                $formatted .= '<tr style="background-color: #f8f9fa;">';
+                $formatted .= '<th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600; color: #333; width: 40%;">Question</th>';
+                $formatted .= '<th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600; color: #333; width: 60%;">Response</th>';
+                $formatted .= '</tr>';
+                $formatted .= '</thead>';
+                $formatted .= '<tbody>';
+                
+                foreach ($questions as $qa) {
+                    $formatted .= '<tr>';
+                    $formatted .= '<td style="padding: 12px; border: 1px solid #dee2e6; vertical-align: top; font-weight: 600; color: #333; background-color: #f8f9fa;">' . htmlspecialchars($qa['question']) . '</td>';
+                    $formatted .= '<td style="padding: 12px; border: 1px solid #dee2e6; vertical-align: top; color: #666; line-height: 1.6;">' . nl2br(htmlspecialchars($qa['answer'])) . '</td>';
+                    $formatted .= '</tr>';
+                }
+                
+                $formatted .= '</tbody>';
+                $formatted .= '</table>';
+                $formatted .= '</div>';
+                return $formatted;
+            }
+        }
+        
+        // If not structured format, return as-is with line breaks
+        return nl2br(htmlspecialchars($comment));
+    }
+
+    /**
+     * @access public
      * @param string $status
      * @desc Display reviewer comment status
      * @return string
@@ -194,6 +286,10 @@ class Helper
                 $page_title = trans('prs.major_revisions');
             } elseif ($status == "accepted-articles") {
                 $page_title = trans('prs.accpeted_articles');
+            } elseif ($status == "past-articles") {
+                $page_title = trans('prs.past_articles');
+            } elseif ($status == "published-articles") {
+                $page_title = trans('prs.published_articles');
             } else {
                 $page_title = trans('prs.article_under_review');
             }
@@ -240,7 +336,7 @@ class Helper
      */
     public static function statusStaticList()
     {
-        return ['articles_under_review', 'accepted_articles', 'major_revisions', 'minor_revisions', 'rejected'];
+        return ['articles_under_review', 'accepted_articles', 'major_revisions', 'minor_revisions', 'rejected', 'past_articles', 'published_articles'];
     }
 
     /**
@@ -656,18 +752,32 @@ class Helper
         $active_class = '';
         $user_roles_type = User::getUserRoleType(Auth::user()->id);
         $user_roles_type = !empty($user_roles_type) && is_object($user_roles_type) ? $user_roles_type : null;
-        $status = [
-            "sync" => "articles-under-review",
-            "spell-check" => "accepted-articles",
-            "undo" => "minor-revisions",
-            "unlink" => "major-revisions",
-            "cross" => "rejected"
-        ];
-        if (!empty($user_roles_type) && ($user_roles_type->role_type == 'superadmin' || $user_roles_type->role_type == 'editor')) {
-            $dashboard = 'dashboard';
-        } else {
+
+        // Define status menu based on user role
+        if (!empty($user_roles_type) && $user_roles_type->role_type === 'author') {
+            // Simplified menu for authors: Under Review, Past Articles, Published Articles
+            $status = [
+                "sync"        => "articles-under-review",
+                "history"     => "past-articles",
+                "spell-check" => "published-articles",
+            ];
             $dashboard = 'user';
+        } else {
+            // Original menu for admins/editors
+            $status = [
+                "sync"        => "articles-under-review",
+                "spell-check" => "accepted-articles",
+                "undo"        => "minor-revisions",
+                "unlink"      => "major-revisions",
+                "cross"       => "rejected"
+            ];
+            if (!empty($user_roles_type) && ($user_roles_type->role_type == 'superadmin' || $user_roles_type->role_type == 'editor')) {
+                $dashboard = 'dashboard';
+            } else {
+                $dashboard = 'user';
+            }
         }
+
         if (!empty($user_roles_type)) {
             foreach ($status as $key => $s) {
                 if (!empty($page_id)) {
@@ -700,6 +810,10 @@ class Helper
             $status = "minor_revisions";
         } elseif ($status == "major-revisions") {
             $status = "major_revisions";
+        } elseif ($status == "past-articles") {
+            $status = "past_articles";
+        } elseif ($status == "published-articles") {
+            $status = "published_articles";
         }
         return $status;
     }

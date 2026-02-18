@@ -17,18 +17,18 @@
     <section class="figma-hero-slider">
         <div class="figma-slider-container">
             {{-- Slide 1 --}}
-            <div class="figma-slide active" style="background-image: url({{ asset('images/slider-1.png') }});">
+            <div class="figma-slide active" style="background-image: url({{ asset('images/slider-1.jpeg') }});">
                 <div class="figma-hero-content">
                     <h1>International Journal of Advanced Research in English Studies</h1>
                     <p>Publish high-quality research papers, review articles, and case studies with global visibility and fast review process.</p>
                     <div class="figma-hero-buttons">
-                        <a href="{{route('checkAuthor')}}" class="figma-btn-primary">Submit Your Article</a>
+                        <a href="{{route('checkAuthor')}}" class="figma-btn-primary">Add New Article</a>
                         <a href="{{url('published/editions/articles')}}" class="figma-btn-secondary">View Current Issue</a>
                     </div>
                 </div>
             </div>
             {{-- Slide 2 --}}
-            <div class="figma-slide" style="background-image: url({{ asset('images/slider-2.png') }});">
+            <!-- <div class="figma-slide" style="background-image: url({{ asset('images/slider-2.png') }});">
                 <div class="figma-hero-content">
                     <h1>International Journal of Advanced Research in English Studies</h1>
                     <p>Publish high-quality research papers, review articles, and case studies with global visibility and fast review process.</p>
@@ -37,7 +37,7 @@
                         <a href="{{url('published/editions/articles')}}" class="figma-btn-secondary">View Current Issue</a>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </section>
 
@@ -107,7 +107,7 @@
         <div class="figma-issues-container">
             <div class="figma-issue-item">
                 <div class="figma-issue-header">
-                    <h3>2025 - Issues Vol. 1 No. 5 (2025)</h3>
+                    <h3>2026 - Issues Vol. 1 No. 5 (2026)</h3>
                     <a href="{{ route('archives') }}" class="view-all">View All</a>
                 </div>
                 <ul class="figma-article-list">

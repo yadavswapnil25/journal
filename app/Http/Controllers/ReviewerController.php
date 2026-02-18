@@ -102,8 +102,24 @@ class ReviewerController extends Controller
         }
         if (!empty($request)) {
             $this->validate($request, [
-                'comments' => 'required',
+                'q_language' => 'required|string',
+                'q_originality' => 'required|string',
+                'q_norms' => 'required|string',
+                'q_editors' => 'required|string',
+                'q_authors' => 'required|string',
+                'willing_to_review' => 'required|in:yes,no',
             ]);
+
+            // Combine detailed answers into a single comments field
+            $combinedComments = "1. Language quality:\n" . $request->q_language . "\n\n" .
+                                "2. Originality and overall quality:\n" . $request->q_originality . "\n\n" .
+                                "3. Referencing, citation and presentation norms:\n" . $request->q_norms . "\n\n" .
+                                "4. Comments for editors (not shared with authors):\n" . $request->q_editors . "\n\n" .
+                                "5. Comments for authors:\n" . $request->q_authors . "\n\n" .
+                                "6. Willing to review revised manuscript?: " . strtoupper($request->willing_to_review);
+
+            $request->merge(['comments' => $combinedComments]);
+
             $user_id = Auth::user()->id;
             $status = $request->status;
             if (!empty($id) && is_numeric($id)) {

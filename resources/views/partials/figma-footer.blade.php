@@ -56,6 +56,8 @@
                     <li><a href="{{ route('showPage', ['slug' => 'journal-policies']) }}">Journal Policy</a></li>
                     <li><a href="{{ url('/page/submission-guidelines/') }}">Submission Guidelines</a></li>
                     <li><a href="{{ route('showPage', ['slug' => 'call-for-submissions']) }}">Call for Submission</a></li>
+                    <li><a href="{{ route('showPage', ['slug' => 'terms-and-conditions']) }}">Terms &amp; Conditions</a></li>
+                    <li><a href="{{ route('showPage', ['slug' => 'privacy-policy']) }}">Privacy Policy</a></li>
                     <!-- <li><a href="#">Copyright</a></li> -->
                 </ul>
             </div>

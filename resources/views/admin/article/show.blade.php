@@ -103,30 +103,40 @@
                                 </div>
                                 <div id="subaccordion" class="sj-statusholder">
                                     @foreach ($comments as $comment)
-                                        <div id="subheadingOne-{{{$comment->id}}}" class="sj-statusheaderholder sj-statuspadding" data-toggle="collapse"
-                                            data-target="#subcollapseOne-{{{$comment->id}}}" aria-expanded="true" aria-controls="subcollapseOne-{{{$comment->id}}}" role="button">
-                                            <div class="sj-reviewer-acronym">
-                                                <span>{{{App\Helper::getAcronym($comment->name)}}}</span>
+                                        <div style="margin-bottom: 10px; position: relative;">
+                                            <div id="subheadingOne-{{{$comment->id}}}" class="sj-statusheaderholder sj-statuspadding" data-toggle="collapse"
+                                                data-target="#subcollapseOne-{{{$comment->id}}}" aria-expanded="true" aria-controls="subcollapseOne-{{{$comment->id}}}" role="button">
+                                                <div class="sj-reviewer-acronym">
+                                                    <span>{{{App\Helper::getAcronym($comment->name)}}}</span>
+                                                </div>
+                                                <div class="sj-statusheader">
+                                                    <div class="sj-statusasidetitle">
+                                                        <span>{{{ Carbon\Carbon::parse($comment->created_at)->format('F j, Y') }}}</span>
+                                                        <h4>{{{$comment->name}}}</h4>
+                                                    </div>
+                                                    <div class="sj-statusasidetitle sj-statusasidetitlevtwo">
+                                                        <span>{{{trans('prs.status')}}}</span>
+                                                        <h4>
+                                                            @if ($comment->status != "articles_under_review")
+                                                                {{{App\Helper::displayReviewerCommentStatus($comment->status)}}}
+                                                            @endif
+                                                        </h4>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="sj-statusheader">
-                                                <div class="sj-statusasidetitle">
-                                                    <span>{{{ Carbon\Carbon::parse($comment->created_at)->format('F j, Y') }}}</span>
-                                                    <h4>{{{$comment->name}}}</h4>
-                                                </div>
-                                                <div class="sj-statusasidetitle sj-statusasidetitlevtwo">
-                                                    <span>{{{trans('prs.status')}}}</span>
-                                                    <h4>
-                                                        @if ($comment->status != "articles_under_review")
-                                                            {{{App\Helper::displayReviewerCommentStatus($comment->status)}}}
-                                                        @endif
-                                                    </h4>
-                                                </div>
+                                            <div style="position: absolute; right: 10px; top: 10px; z-index: 1000;">
+                                                <a href="{{{url('/'.$user_role.'/dashboard/'.$article->id.'/reviewer-feedback-pdf/'.$comment->id)}}}" 
+                                                   onclick="event.stopPropagation(); return true;"
+                                                   class="sj-btn sj-btnactive" 
+                                                   style="display: inline-block; padding: 8px 16px; background-color: #0066FF !important; color: white !important; text-decoration: none; border-radius: 4px; font-size: 12px; white-space: nowrap; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                    <i class="fa fa-download"></i> {{{trans('prs.download_pdf')}}}
+                                                </a>
                                             </div>
                                         </div>
                                         <div id="subcollapseOne-{{{$comment->id}}}" class="sj-statusdescription collapse sj-active"
                                             aria-labelledby="subheadingOne-{{{$comment->id}}}" data-parent="#subaccordion">
                                             <div class="sj-description">
-                                                {{{$comment->comment}}}
+                                                {!! App\Helper::formatReviewerComment($comment->comment) !!}
                                             </div>
                                         </div>
                                     @endforeach
@@ -167,6 +177,11 @@
                                                         <input type="hidden" name="reviewer_article" value="{{{$article->id}}}">
                                                     </span>
                                                 </div>
+                                                <div class="form-group">
+                                                    <label><strong>{{{trans('prs.upload_file_for_reviewer')}}} ({{{trans('prs.optional')}}})</strong></label>
+                                                    <p class="text-muted" style="font-size: 12px; margin-bottom: 8px;">{{{trans('prs.upload_file_for_reviewer_desc')}}}</p>
+                                                    <input type="file" name="editor_file" class="form-control" accept=".pdf,.doc,.docx">
+                                                </div>
                                                 <div class="sj-popupbtn">
                                                     <input type="submit" class="sj-btn sj-btnactive" value="{{ trans('prs.btn_assign') }}">
                                                 </div>
@@ -189,6 +204,11 @@
                                                     <input type="hidden" name="reviewer_article" value="{{{$article->id}}}">
                                                     </span>
                                                 </div>
+                                                <div class="form-group">
+                                                    <label><strong>{{{trans('prs.upload_file_for_reviewer')}}} ({{{trans('prs.optional')}}})</strong></label>
+                                                    <p class="text-muted" style="font-size: 12px; margin-bottom: 8px;">{{{trans('prs.upload_file_for_reviewer_desc')}}}</p>
+                                                    <input type="file" name="editor_file" class="form-control" accept=".pdf,.doc,.docx">
+                                                </div>
                                                 <div class="sj-popupbtn">
                                                     <input type="submit" class="sj-btn sj-btnactive" value="{{ trans('prs.btn_assign') }}">
                                                 </div>
@@ -205,11 +225,11 @@
                                             <div class="form-group sj-firstformgroup">
                                                 <span class="sj-select">
                                                     {!! Form::select('status', array(
-                                                        'accepted_articles' => trans('prs.accept_article'),
-                                                        'minor_revisions' => trans('prs.minor_revision'),
-                                                        'major_revisions'=>trans('prs.major_revision'),
-                                                        'rejected' => trans('prs.reject_article'),
-                                                        null))
+                                                        'accepted_articles' => trans('prs.publish_as_it_is'),
+                                                        'minor_revisions' => trans('prs.publish_with_minor_revisions'),
+                                                        'major_revisions' => trans('prs.publish_after_substantial_revisions'),
+                                                        'rejected' => trans('prs.not_recommended_for_publishing'),
+                                                        null), null, ['class' => 'form-control'])
                                                     !!}
                                                 </span>
                                             </div>

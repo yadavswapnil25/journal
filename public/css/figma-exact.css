@@ -131,6 +131,7 @@ body {
 
 .figma-signup-btn:hover {
     background: #0052CC;
+    color: #ffffff;
 }
 
 /* Dropdown Submenu */
@@ -343,6 +344,7 @@ body {
 
 .figma-btn-primary:hover {
     background: #0052CC;
+    color: #ffffff;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
 }
@@ -962,6 +964,7 @@ body {
 
 .figma-btn-primary:hover {
     background: #0052cc;
+    color: #ffffff;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
 }
@@ -2910,40 +2913,56 @@ footer.figma-footer {
 
 /* Admin Back Button */
 .figma-admin-back-button-wrapper {
-    margin-bottom: 20px;
-    padding: 20px 15px 0;
-    text-align: left !important;
+    margin-bottom: 16px; /* space above the card below */
+    padding: 0 16px 0 0; /* space from the right edge */
     width: 100%;
     max-width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .figma-back-button {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
-    background: #f5f5f5;
-    color: #333;
+    padding: 8px 18px;
+    background: #0066FF;
+    color: #ffffff;
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 999px;
     font-size: 14px;
     font-weight: 500;
     transition: all 0.3s ease;
-    border: 1px solid #ddd;
+    border: 1px solid #0066FF;
     cursor: pointer;
-    float: left;
-    clear: both;
+    /* space between buttons when multiple exist */
+    margin-top: 4px;
+    margin-left: 8px;
 }
 
 .figma-back-button:hover {
-    background: #e9e9e9;
-    color: #000;
+    background: #0052CC;
+    color: #ffffff;
     text-decoration: none;
-    border-color: #bbb;
+    border-color: #0052CC;
 }
 
 .figma-back-button i {
     font-size: 16px;
+}
+
+/* Secondary style for action button next to Back (Submit New Article) */
+.figma-back-button-secondary {
+    background: #ffffff;
+    color: #0066FF;
+    border-color: #0066FF;
+}
+
+.figma-back-button-secondary:hover {
+    background: #E7F0FF;
+    color: #0052CC;
+    border-color: #0052CC;
 }
 
 /* Admin Panel Save Buttons - Blue Color */
@@ -2975,6 +2994,92 @@ footer.figma-footer {
     }
 }
 
+/* =============================================
+            Terms and Conditions Page
+============================================= */
+.figma-terms-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.figma-terms-section {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.figma-terms-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.figma-terms-heading {
+    font-size: 22px;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 12px;
+    font-family: sans-serif;
+    line-height: 1.4;
+}
+
+.figma-terms-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #333333;
+    margin-bottom: 12px;
+    font-family: sans-serif;
+}
+
+.figma-terms-text:last-child {
+    margin-bottom: 0;
+}
+
+.figma-terms-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+    padding-left: 24px;
+}
+
+.figma-terms-list li {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #333333;
+    margin-bottom: 12px;
+    font-family: sans-serif;
+    position: relative;
+    padding-left: 24px;
+}
+
+.figma-terms-list li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #0066FF;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+.figma-terms-list li:last-child {
+    margin-bottom: 0;
+}
+
+.figma-terms-content .figma-about-description {
+    margin-bottom: 32px;
+}
+
+.figma-terms-content .figma-about-description a {
+    color: #0066FF;
+    text-decoration: underline;
+    transition: color 0.3s;
+}
+
+.figma-terms-content .figma-about-description a:hover {
+    color: #0052CC;
+}
+
 @media (max-width: 768px) {
     .figma-about-title {
         font-size: 28px;
@@ -2991,5 +3096,20 @@ footer.figma-footer {
     .figma-aims-scope-full p {
         font-size: 15px;
         line-height: 1.7;
+    }
+
+    .figma-terms-heading {
+        font-size: 20px;
+    }
+
+    .figma-terms-text,
+    .figma-terms-list li {
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .figma-terms-section {
+        margin-bottom: 24px;
+        padding-bottom: 20px;
     }
 }
