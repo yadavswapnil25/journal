@@ -24,16 +24,7 @@
                     of ideas, resources, insights and expertise in HELE in India and globally.
                 </p>
                 
-                <!-- Social Media Icons -->
-                <div class="social-icons figma-social-icons">
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
-                    <!-- <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a> -->
-                    <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                </div>
+                
             </div>
             
             <!-- Useful Links Column -->

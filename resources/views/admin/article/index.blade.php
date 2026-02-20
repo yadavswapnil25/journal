@@ -1,4 +1,4 @@
-@extends('master')
+@extends('admin.master')
 @php  $breadcrumbs = Breadcrumbs::generate('editorArticles',$user_role,$user_id,$article_status); @endphp
 @section('breadcrumbs')
     @if (count($breadcrumbs))
@@ -14,8 +14,8 @@
     @endif
 @endsection
 @section('content')
-    @include('partials.figma-header')
-    @include('partials.admin-back-button')
+    <!-- @include('partials.figma-header')
+    @include('partials.admin-back-button') -->
     
 <div class="container figma-admin-content-wrapper" style="position: relative; z-index: 1;">
     <div class="row">
@@ -195,5 +195,4 @@
     </div>
 </div>
 
-    @include('partials.figma-footer')
 @endsection

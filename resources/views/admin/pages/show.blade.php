@@ -73,8 +73,8 @@
     @endif
 @endsection
 @section('content')
+    @include('partials.figma-header')
     @if($is_about_page)
-        @include('partials.figma-header')
         
         {{-- Announcements Banner --}}
 
@@ -142,9 +142,7 @@
             </div>
         </section>
 
-        @include('partials.figma-footer')
     @elseif($is_aims_scope_page)
-        @include('partials.figma-header')
 
         {{-- Aims & Scope Page Content --}}
         <section class="figma-about-section">
@@ -174,7 +172,6 @@
             </div>
         </section>
 
-        @include('partials.figma-footer')
     @elseif($is_submission_guidelines_page)
         @include('partials.figma-header')
 
@@ -264,7 +261,6 @@
             </div>
         </section>
 
-        @include('partials.figma-footer')
     @elseif($is_call_for_submissions_page)
         @include('partials.figma-header')
 
@@ -320,7 +316,6 @@
             </div>
         </section>
 
-        @include('partials.figma-footer')
     @elseif($is_journal_policies_page)
         @include('partials.figma-header')
 
@@ -446,7 +441,6 @@
             </div>
         </section>
 
-        @include('partials.figma-footer')
     @elseif($is_editor_in_chief_page)
         @include('partials.figma-header')
 
@@ -473,7 +467,6 @@
             </div>
         </section>
 
-        @include('partials.figma-footer')
     @elseif($is_editorial_board_page)
         @include('partials.figma-header')
 
@@ -526,7 +519,6 @@
             </div>
         </section>
 
-        @include('partials.figma-footer')
     @elseif($is_advisory_board_page)
         @include('partials.figma-header')
 
@@ -645,7 +637,6 @@
             </div>
         </section>
 
-        @include('partials.figma-footer')
     @elseif($is_publication_info_page)
         @include('partials.figma-header')
 
@@ -674,7 +665,6 @@
             </div>
         </section>
 
-        @include('partials.figma-footer')
     @else
         {{-- Old design for other pages --}}
         <div id="sj-twocolumns" class="sj-twocolumns">
@@ -698,4 +688,5 @@
             </div>
         </div>
     @endif
+    @include('partials.figma-footer')
 @endsection

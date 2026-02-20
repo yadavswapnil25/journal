@@ -1,4 +1,4 @@
-@extends('master') 
+@extends('admin.master') 
 @section('content')
     <div class="sj-haslayout">
         <div class="container">

@@ -1,4 +1,4 @@
-@extends('master')
+@extends('admin.master')
 @php $breadcrumbs = Breadcrumbs::generate('editTemplate',$id); @endphp
 @section('breadcrumbs')
     @if (count($breadcrumbs))

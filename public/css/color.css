@@ -18,16 +18,16 @@ a:active,
 .sj-widgetcontent ul li:hover a,
 .sj-widgetcontent ul li.sj-more a,
 .sj-widgetimpactfector .sj-widgetcontent ul li h3 span,
-.sj-radio input[type=radio]+label:hover:before,
-.sj-radio input[type=radio]:checked+label:before,
-.sj-radio input[type=radio]+label:hover,
-.sj-radio input[type=radio]:checked+label,
-.sj-selectgroup .sj-checkbox input[type=checkbox]+label:hover,
-.sj-selectgroup .sj-checkbox input[type=checkbox]:checked+label,
-.sj-selectgroup .sj-checkbox input[type=checkbox]+label:hover:before,
-.sj-selectgroup .sj-checkbox input[type=checkbox]:checked+label:before,
-.sj-selectgroup .sj-checkbox input[type=checkbox]+label:hover em,
-.sj-selectgroup .sj-checkbox input[type=checkbox]:checked+label em,
+.sj-radio input[type=radio]+ label:hover:before,
+.sj-radio input[type=radio]:checked + label:before,
+.sj-radio input[type=radio]+ label:hover,
+.sj-radio input[type=radio]:checked + label,
+.sj-selectgroup .sj-checkbox input[type=checkbox] + label:hover,
+.sj-selectgroup .sj-checkbox input[type=checkbox]:checked + label,
+.sj-selectgroup .sj-checkbox input[type=checkbox] + label:hover:before,
+.sj-selectgroup .sj-checkbox input[type=checkbox]:checked + label:before,
+.sj-selectgroup .sj-checkbox input[type=checkbox] + label:hover em,
+.sj-selectgroup .sj-checkbox input[type=checkbox]:checked + label em,
 .sj-opensuccess .sj-description blockquote,
 .sj-downloadprint li:hover a,
 .sj-downloadprint li:hover a i,
@@ -36,22 +36,18 @@ a:active,
 .sj-posttags li:hover a,
 .sj-newsdetail .sj-description blockquote,
 .sj-clientname,
-.sj-navigation>ul>li:hover>a,
-.sj-navigation>ul>li.current-menu-item>a,
+.sj-navigation > ul > li:hover > a,
+.sj-navigation > ul > li.current-menu-item > a,
 .sj-pagination ul li:hover a,
 .sj-pagination ul li.sj-active a,
 .sj-mailinfo,
-.sj-formaddnewfield .form-group .sj-radio input[type=radio]+label:before,
-.sj-formaddnewfield .form-group .sj-checkbox input[type=checkbox]+label:before,
+.sj-formaddnewfield .form-group .sj-radio input[type=radio] + label:before,
+.sj-formaddnewfield .form-group .sj-checkbox input[type=checkbox] + label:before,
 .sj-editionsettings .sj-modalboxarea .modal-body .sj-manageallsession .sj-categorysinfo a:hover,
-.sj-pagination ul li.sj-active span {
-	color: #0066FF;
-}
+.sj-pagination ul li.sj-active span
 
-.sj-viewchart .ct-bar:hover {
-	stroke: #0066FF;
-}
-
+{ color: #5e9cea; }
+.sj-viewchart .ct-bar:hover {stroke: #5e9cea;}
 /*=============================================
 			Theme Background Color
 =============================================*/
@@ -71,21 +67,19 @@ a:active,
 .sj-btnrecord:hover,
 .sj-tagnew,
 .navbar-toggler,
-.sj-dashboardnav>ul>li>a:before,
+.sj-dashboardnav > ul > li > a:before,
 .sj-formsearchvtwo button,
 .sj-articledetails li:before,
-.sj-formaddnewfield .form-group .sj-radio input[type=radio]+label:after,
-.sj-formaddnewfield .form-group .sj-checkbox input[type=checkbox]+label:after,
+.sj-formaddnewfield .form-group .sj-radio input[type=radio] + label:after,
+.sj-formaddnewfield .form-group .sj-checkbox input[type=checkbox] + label:after,
 .sj-reviewer-acronym span,
 .sj-formsearchvtwo input[type=submit],
-.sj-btnactive {
-	background: #0066FF;
-}
+.sj-btnactive
+{ background:#5e9cea;}
 
 
-.navbar-toggler {
-	background: #0066FF !important;
-}
+.navbar-toggler
+{ background:#5e9cea !important;}
 
 /*=============================================
 			Theme Border Color
@@ -99,6 +93,6 @@ input:focus,
 .sj-btnrecord:hover,
 .sub-menu,
 .children,
-.sj-tagnew:before {
-	border-color: #5e9cea;
-}
+.sj-tagnew:before
+
+{ border-color: #5e9cea; }

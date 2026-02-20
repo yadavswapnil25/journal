@@ -1,4 +1,4 @@
-@extends('master')
+@extends('admin.master')
 @php $breadcrumbs = Breadcrumbs::generate('editionSetting'); @endphp
 @section('breadcrumbs')
     @if (count($breadcrumbs))
@@ -14,8 +14,6 @@
     @endif
 @endsection
 @section('content')
-    @include('partials.figma-header')
-    @include('partials.admin-back-button')
     <div id="general_setting" class="figma-admin-content-wrapper">
         @if (Session::has('message'))
             <div class="toast-holder">
@@ -142,5 +140,4 @@
             </div>
         </div>
     </div>
-    @include('partials.figma-footer')
 @endsection

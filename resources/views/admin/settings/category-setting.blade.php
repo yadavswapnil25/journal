@@ -1,4 +1,4 @@
-@extends('master') 
+@extends('admin.master') 
 @php $breadcrumbs = Breadcrumbs::generate('categorySetting'); @endphp 
 @section('breadcrumbs') 
     @if (count($breadcrumbs))
@@ -14,8 +14,6 @@
     @endif
 @endsection
 @section('content') 
-    @include('partials.figma-header')
-    @include('partials.admin-back-button')
     @php $counter = 0; @endphp
     <div class="container figma-admin-content-wrapper">
         <div class="row">
@@ -169,5 +167,4 @@
             </div>
         </div>
     </div>
-    @include('partials.figma-footer')
 @endsection

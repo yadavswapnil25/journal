@@ -1,4 +1,4 @@
-@extends('master')
+@extends('admin.master')
 @php $breadcrumbs = Breadcrumbs::generate('editPage',$user_role,$id); @endphp
 @section('breadcrumbs')
     @if (count($breadcrumbs))
@@ -14,8 +14,6 @@
     @endif
 @endsection
 @section('content')
-    @include('partials.figma-header')
-    @include('partials.admin-back-button')
     <div class="container">
         <div class="row">
             <div id="sj-twocolumns" class="sj-twocolumns">

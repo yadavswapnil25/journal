@@ -1,4 +1,4 @@
-@extends('master') 
+@extends('admin.master') 
 @php $breadcrumbs = Breadcrumbs::generate('accountSetting'); @endphp 
 @section('breadcrumbs') 
     @if (count($breadcrumbs))
@@ -19,8 +19,6 @@
         $user_role_type = App\Models\User::getUserRoleType($user->id);
         $is_author = !empty($user_role_type) && is_object($user_role_type) && $user_role_type->role_type == 'author';
     @endphp
-    @include('partials.figma-header')
-    @include('partials.admin-back-button')
     <div class="container figma-admin-content-wrapper">
         <div class="row">
             <div id="sj-twocolumns" class="sj-twocolumns">
@@ -122,7 +120,6 @@
             </div>
         </div>
     </div>
-    @include('partials.figma-footer')
     @if($is_author)
     <script>
         document.addEventListener('DOMContentLoaded', function() {

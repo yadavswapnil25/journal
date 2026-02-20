@@ -1,4 +1,4 @@
-@extends('master')
+@extends('admin.master')
 @section('content')
     @if (Session::has('message'))
         <div class="toast-holder">

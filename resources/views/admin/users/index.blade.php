@@ -1,4 +1,4 @@
-@extends('master')
+@extends('admin.master')
 @php
     $breadcrumbs = Breadcrumbs::generate('manageUsers');
     $selected_role = !empty($_GET['role']) ? $_GET['role'] : '';
@@ -17,9 +17,7 @@
     @endif
 @endsection
 @section('content')
-    @include('partials.figma-header')
-    @include('partials.admin-back-button')
-    <div class="container figma-admin-content-wrapper">
+    <div class="container">
         <div class="row">
         <div id="sj-twocolumns" class="sj-twocolumns">
                 @include('includes.side-menu')
@@ -137,5 +135,4 @@
             </div>
         </div>
     </div>
-    @include('partials.figma-footer')
 @endsection

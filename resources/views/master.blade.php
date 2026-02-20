@@ -45,20 +45,20 @@
     @endphp
     
     {{-- Load CSS based on page type --}}
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/fontawesome/fontawesome-all.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/website/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/website/fontawesome/fontawesome-all.css') }}" rel="stylesheet">
     
     @if($is_admin_page)
         {{-- Old admin CSS files --}}
-        <link href="{{ asset('css/main.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/dashboard.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/responsive.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/custom-theme.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/website/main.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/website/dashboard.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/website/responsive.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/website/custom-theme.css') }}" rel="stylesheet">
         {{-- Also load new CSS for header/footer --}}
-        <link href="{{ asset('css/figma-exact.css') }}?v={{ time() }}" rel="stylesheet">
+        <link href="{{ asset('css/website/figma-exact.css') }}?v={{ time() }}" rel="stylesheet">
     @else
         {{-- New public website CSS --}}
-        <link href="{{ asset('css/figma-exact.css') }}?v={{ time() }}" rel="stylesheet">
+        <link href="{{ asset('css/website/figma-exact.css') }}?v={{ time() }}" rel="stylesheet">
     @endif
     <script type="text/javascript">
         var APP_URL = {!! json_encode(url('/')) !!}

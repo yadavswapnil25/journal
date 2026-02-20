@@ -1,4 +1,4 @@
-@extends('master') 
+@extends('admin.master') 
 @section('breadcrumbs') 
     @php $breadcrumbs = Breadcrumbs::generate('general_setting'); @endphp 
     @if (count($breadcrumbs))

@@ -762,6 +762,12 @@ class Helper
                 "spell-check" => "published-articles",
             ];
             $dashboard = 'user';
+        } elseif (!empty($user_roles_type) && $user_roles_type->role_type === 'reviewer') {
+            // Simplified menu for reviewers: Only Articles Under Review
+            $status = [
+                "sync"        => "articles-under-review",
+            ];
+            $dashboard = 'user';
         } else {
             // Original menu for admins/editors
             $status = [
