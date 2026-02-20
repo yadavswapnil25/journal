@@ -24,15 +24,15 @@
             <div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-9 float-right" id="article">
                 <div id="sj-content" class="sj-content sj-addarticleholdcontent">
                     @if (Session::has('message'))
-                        <div class="toast-holder">
+                        <div class="toast-holder" style="top: 100px;">
                             <flash_messages :message="'{{{ Session::get('message') }}}'" :message_class="'success'" v-cloak></flash_messages>
                         </div>
                     @elseif (Session::has('error'))
-                        <div class="toast-holder">
+                        <div class="toast-holder" style="top: 100px;">
                             <flash_messages :message="'{{{ Session::get('error') }}}'" :message_class="'danger'" v-cloak></flash_messages>
                         </div>
                     @elseif ($errors->any())
-                        <div class="toast-holder">
+                        <div class="toast-holder" style="top: 100px;">
                             @foreach ($errors->all() as $error)
                                 <flash_messages :message="'{{{$error}}}'" :message_class="'danger'" v-cloak></flash_messages>
                             @endforeach

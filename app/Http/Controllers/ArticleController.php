@@ -282,6 +282,11 @@ class ArticleController extends Controller
                 $author_article_link = url(
                     '/login?user_id=' . $corresponding_author[0]->id . '&email_type=' . $status . '_editor_feedback&status=' . $status
                 );
+                // For revision loop statuses, fallback to resubmit template if specific template is missing.
+                if (in_array($status, ['minor_revisions', 'major_revisions'], true) && empty($author_template_data) && !empty($corresponding_author_data)) {
+                    $author_template_data = EmailTemplate::getEmailTemplatesByID($corresponding_author_data->id, 'resubmit_article');
+                    $author_article_link = url('/login?user_id=' . $corresponding_author[0]->id . '&email_type=resubmit_article&status=articles-under-review');
+                }
                 $email_params['editor_review_corresponding_author_name'] = $corresponding_author_name;
                 $email_params['author_editor_review_article_link'] = $author_article_link;
             }

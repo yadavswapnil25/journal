@@ -16,6 +16,8 @@
     @endif
 @endsection
 @section('content')
+    @include('partials.figma-header')
+
     @php
         $author = App\Models\User::getUserDataByID($article->corresponding_author_id);
         $edition_image = App\Helper::getEditionImage($article->edition_id);
@@ -36,7 +38,7 @@
                                 @else
                                     <li>
                                         <a href="{{route('getPublishFile', $article->publish_document)}}">
-                                            <i class="fa fa-download"></i>{{trans('prs.btn_download')}}
+                                            <i class="lnr lnr-download"></i>{{trans('prs.btn_download')}}
                                         </a>
                                     </li>
                                 @endif
@@ -62,4 +64,6 @@
             </div>
         </div>
     </div>
+
+    @include('partials.figma-footer')
 @endsection

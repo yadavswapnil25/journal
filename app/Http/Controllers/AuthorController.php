@@ -288,11 +288,43 @@ class AuthorController extends Controller
             return redirect()->back();
         }
         if (!empty($request)) {
-            $this->validate($request, [
-                'resubmit_article' => 'required|mimes:doc,docx',
-            ]);
             $article_id = $request['article_id'];
             $user_id = Auth::user()->id;
+            $article = Article::find($article_id);
+            if (empty($article) || (int) $article->corresponding_author_id !== (int) $user_id) {
+                Session::flash('error', 'Unauthorized resubmission request.');
+                return redirect()->back();
+            }
+            if (!in_array($article->status, ['minor_revisions', 'major_revisions'], true)) {
+                Session::flash('error', 'Resubmission is only allowed for revision requests.');
+                return redirect()->back();
+            }
+            // Category is locked during revision loop and cannot be changed.
+            if (
+                ($request->has('category') && (int) $request->input('category') !== (int) $article->article_category_id)
+                || ($request->has('article_category_id') && (int) $request->input('article_category_id') !== (int) $article->article_category_id)
+            ) {
+                Session::flash('error', 'Category cannot be changed while resubmitting.');
+                return redirect()->back();
+            }
+            $this->validate($request, [
+                'resubmit_article' => 'required|mimes:doc,docx|max:2000',
+                'bio_option' => 'required|in:existing,new',
+                'revised_author_bio' => [
+                    'required_if:bio_option,new',
+                    'nullable',
+                    'string',
+                    'max:500',
+                    function ($attribute, $value, $fail) use ($request) {
+                        if ($request->input('bio_option') === 'new') {
+                            $wordCount = str_word_count((string) $value);
+                            if ($wordCount > 50) {
+                                $fail('The author bio must not exceed 50 words. Current word count: ' . $wordCount);
+                            }
+                        }
+                    },
+                ],
+            ]);
             // file process
             $uploaded_file = $request->file('resubmit_article');
             if (!empty($uploaded_file)) {
@@ -308,10 +340,17 @@ class AuthorController extends Controller
                     $full_doc_name
                 );
                 // article update
-                $article = Article::find($article_id);
                 $article->submitted_document = htmlspecialchars($full_doc_name, ENT_QUOTES, 'UTF-8');
                 $article->status = "articles_under_review";
                 $article->save();
+                // Author can provide a new bio during each resubmission.
+                if ($request->input('bio_option') === 'new') {
+                    $author_user = User::find($corresponding_author_id);
+                    if (!empty($author_user)) {
+                        $author_user->author_bio = trim((string) $request->input('revised_author_bio'));
+                        $author_user->save();
+                    }
+                }
                 // delete article reviewers
                 $reviewers = Article::getReviewerIdByArticle($article_id);
                 if (!empty($reviewers)) {
@@ -407,7 +446,7 @@ class AuthorController extends Controller
                     }
                 }
                 Session::flash('message', trans('prs.article_submitted'));
-                return redirect()->to('/author/user/' . $user_id . '/articles_under_review');
+                return redirect()->to('/author/user/' . $user_id . '/articles-under-review');
             }
         }
     }

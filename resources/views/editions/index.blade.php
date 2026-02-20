@@ -16,6 +16,8 @@
     @endif
 @endsection
 @section('content')
+    @include('partials.figma-header')
+
     <div class="container">
         <div class="row">
             <div id="sj-twocolumns" class="sj-twocolumns">
@@ -63,4 +65,6 @@
             </div>
         </div>
     </div>
+
+    @include('partials.figma-footer')
 @endsection

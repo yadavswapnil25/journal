@@ -470,9 +470,12 @@ if (document.getElementById("article_detail")) {
         methods: {
             assign_reviewer_article: function (event) {
                 this.loading = true;
-                var formContents = jQuery("#assign_reviewer_article").serialize();
+                var formElement = document.getElementById('assign_reviewer_article');
+                var formContents = new FormData(formElement);
                 var self = this;
-                axios.post(APP_URL + '/' + USER_ROLE + '/dashboard/assign-reviewer', formContents)
+                axios.post(APP_URL + '/' + USER_ROLE + '/dashboard/assign-reviewer', formContents, {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                    })
                     .then(function (response) {
                         self.loading = false;
                         //console.log(response);

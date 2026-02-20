@@ -23,17 +23,17 @@
                 @include('includes.side-menu')
                 <div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-9 float-right" id="author_article">
                     @if (Session::has('message'))
-                        <div class="toast-holder">
-                            <flash_messages :message="'{{{ Session::get('message') }}}'" :message_class="'success'" v-cloak></flash_messages>
+                        <div class="alert alert-success" role="alert" style="margin-bottom: 20px;">
+                            {{ Session::get('message') }}
                         </div>
                     @elseif (Session::has('error'))
-                        <div class="toast-holder">
-                            <flash_messages :message="'{{{ Session::get('error') }}}'" :message_class="'danger'" v-cloak></flash_messages>
+                        <div class="alert alert-danger" role="alert" style="margin-bottom: 20px;">
+                            {{ Session::get('error') }}
                         </div>
                     @elseif ($errors->any())
-                        <div class="toast-holder">
+                        <div class="alert alert-danger" role="alert" style="margin-bottom: 20px;">
                             @foreach ($errors->all() as $error)
-                                <flash_messages :message="'{{{$error}}}'" :message_class="'danger'" v-cloak></flash_messages>
+                                <div>{{ $error }}</div>
                             @endforeach
                         </div>
                 @endif
@@ -111,6 +111,11 @@
                                             {!! Form::open(['url' => 'author/resubmit-article', 'enctype' => 'multipart/form-data',
                                             'multiple' => true, 'class' => 'total-fields sj-formtheme sj-formarticle']) !!}
                                                 <div class="form-group">
+                                                    <label style="font-weight: 600; margin-bottom: 10px; display: block;">Category (locked for revision)</label>
+                                                    <input type="text" class="form-control" value="{{ !empty($category) ? $category->title : 'N/A' }}" readonly>
+                                                </div>
+                                                <input type="hidden" name="article_category_id" value="{{ $article->article_category_id }}">
+                                                <div class="form-group">
                                                     <label style="font-weight: 600; margin-bottom: 10px; display: block;">Upload Revised Article Document</label>
                                                     <upload-files-field
                                                         :doc_id="'{{{$article_input_id}}}'"
@@ -120,6 +125,19 @@
                                                         :file_uploaded_label="'{{{trans("prs.ph_file_uploaded")}}}'"
                                                         :file_not_uploaded_label="'{{{trans("prs.ph_file_not_uploaded")}}}'" >
                                                     </upload-files-field>
+                                                </div>
+                                                <div class="form-group" style="margin-top: 15px;">
+                                                    <label style="font-weight: 600; margin-bottom: 10px; display: block;">Author BIO for this revision</label>
+                                                    <div style="margin-bottom: 8px;">
+                                                        <label style="display: block;">
+                                                            <input type="radio" name="bio_option" value="existing" checked> Use my existing BIO
+                                                        </label>
+                                                        <label style="display: block;">
+                                                            <input type="radio" name="bio_option" value="new"> Add/replace BIO for this submission
+                                                        </label>
+                                                    </div>
+                                                    <textarea name="revised_author_bio" class="form-control" rows="4" maxlength="500" placeholder="Write updated BIO (max 50 words)">{{ old('revised_author_bio') }}</textarea>
+                                                    <small class="text-muted">If you keep "Use my existing BIO", this field is optional and current BIO remains unchanged.</small>
                                                 </div>
                                                 {!! Form::hidden('article_id', $article->id) !!}
                                                 <div class="sj-btnarea sj-updatebtns" style="margin-top: 15px;">

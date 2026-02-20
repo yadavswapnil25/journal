@@ -1,47 +1,51 @@
 @extends('master')
 
+@section('title'){{ __('Reset Password') }} - {{ config('app.name') }} @stop
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
+    @include('partials.figma-header')
 
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
+    <section class="figma-register-section">
+        <div class="figma-register-container">
+            <div class="figma-login-wrapper">
+                <div class="figma-login-main" style="max-width: 520px; margin: 0 auto;">
+                    <div class="figma-register-card">
+                        <h2>{{ __('Reset Password') }}</h2>
+                        <p class="mb-4">Enter your email address and we will send you a password reset link.</p>
 
-                    <form method="POST" action="{{ route('password.email') }}">
-                        @csrf
+                        @if (session('status'))
+                            <div class="figma-alert figma-alert-success">
+                                {{ session('status') }}
+                            </div>
+                        @endif
 
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
+                        <form method="POST" action="{{ route('password.email') }}" class="figma-form">
+                            @csrf
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required>
-
+                            <div class="figma-form-group">
+                                <input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value="{{ old('email') }}"
+                                    class="figma-form-input {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                                    placeholder="{{ __('E-Mail Address') }}"
+                                    required
+                                    autofocus
+                                >
                                 @if ($errors->has('email'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
+                                    <span class="figma-form-error">{{ $errors->first('email') }}</span>
                                 @endif
                             </div>
-                        </div>
 
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Send Password Reset Link') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                            <button type="submit" class="figma-btn figma-btn-primary figma-btn-block">
+                                {{ __('Send Password Reset Link') }}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </section>
+
+    @include('partials.figma-footer')
 @endsection

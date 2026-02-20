@@ -218,7 +218,7 @@ class PublicController extends Controller
                     'sub_title' => 'Editor-in-Chief',
                     'body'      => ''
                 ];
-            } elseif (in_array($normalizedSlug, ['editorial-board', 'editorial-board-page'], true)) {
+            } elseif (in_array($normalizedSlug, ['editorial-board', 'editorial-board-page', 'editorial-team'], true)) {
                 $page = (object)[
                     'id'        => 0,
                     'title'     => 'Editorial Board',

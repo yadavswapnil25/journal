@@ -51,6 +51,7 @@
 
     $is_editorial_board_page = strtolower($page->title) === 'editorial board' ||
                                strtolower($slug) === 'editorial-board' ||
+                               strtolower($slug) === 'editorial-team' ||
                                strtolower($slug) === 'editorial-board-page' ||
                                (strpos(strtolower($page->title), 'editorial') !== false && strpos(strtolower($page->title), 'board') !== false);
 
@@ -173,7 +174,7 @@
         </section>
 
     @elseif($is_submission_guidelines_page)
-        @include('partials.figma-header')
+        <!-- @include('partials.figma-header') -->
 
         {{-- Submission Guidelines Page Content --}}
         <section class="figma-about-section">
@@ -262,7 +263,7 @@
         </section>
 
     @elseif($is_call_for_submissions_page)
-        @include('partials.figma-header')
+        <!-- @include('partials.figma-header') -->
 
         {{-- Call for Submissions Page Content --}}
         <section class="figma-about-section">
@@ -317,7 +318,7 @@
         </section>
 
     @elseif($is_journal_policies_page)
-        @include('partials.figma-header')
+        <!-- @include('partials.figma-header') -->
 
         {{-- Journal Policies Page Content --}}
         <section class="figma-policies-section">
@@ -442,7 +443,7 @@
         </section>
 
     @elseif($is_editor_in_chief_page)
-        @include('partials.figma-header')
+        <!-- @include('partials.figma-header') -->  
 
         {{-- Editor-in-Chief Page Content --}}
         <section class="figma-about-section">
@@ -468,7 +469,7 @@
         </section>
 
     @elseif($is_editorial_board_page)
-        @include('partials.figma-header')
+        <!-- @include('partials.figma-header') -->
 
         {{-- Editorial Board Page Content --}}
         <section class="figma-about-section">
@@ -520,7 +521,7 @@
         </section>
 
     @elseif($is_advisory_board_page)
-        @include('partials.figma-header')
+        <!-- @include('partials.figma-header') -->
 
         {{-- Advisory Board Page Content --}}
         <section class="figma-about-section">
@@ -638,7 +639,7 @@
         </section>
 
     @elseif($is_publication_info_page)
-        @include('partials.figma-header')
+        <!-- @include('partials.figma-header') -->
 
         {{-- Publication Information Page Content --}}
         <section class="figma-about-section">

@@ -87,7 +87,7 @@ return [
     'user_note' => 'Add users as many as you want',
     'upload_article' => 'Upload Article',
     'status_note' => 'Your Article status has been changed.',
-    'submit_feedback' => 'Submit Feedback',
+    'submit_feedback' => 'Submit Review',
     'forgot_pass' => 'Forgot Password',
     'add_new_pge' => 'Add A New Page',
     'manage_pages' => 'Manage Pages',
