@@ -368,6 +368,43 @@ body {
     transform: translateY(-2px);
 }
 
+/* Actions just below banner - centered, full width */
+.figma-banner-actions {
+    width: 100%;
+    background: #f8f9fa;
+    padding: 40px 0;
+    border-bottom: 1px solid #e9ecef;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.figma-banner-actions-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.figma-banner-actions-container .figma-btn-primary {
+    margin: 0;
+}
+
+.figma-banner-actions-container .figma-btn-secondary {
+    color: #0066FF;
+    border-color: #0066FF;
+}
+
+.figma-banner-actions-container .figma-btn-secondary:hover {
+    background: rgba(0, 102, 255, 0.08);
+    color: #0066FF;
+}
+
 
 /* =============================================
             Trending Publication Section

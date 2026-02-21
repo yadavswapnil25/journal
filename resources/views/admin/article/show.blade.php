@@ -154,71 +154,24 @@
                                         </div>
                                         <sticky_messages :message="this.success_message"></sticky_messages>
                                     </div>
-                                    @if ($existed_categories->count() > 0 && !empty($existed_reviewers))
-                                        {!! Form::open(['url' => url('/'.$user_role.'/dashboard/assign-reviewer'), 'id' => 'assign_reviewer_article', 'class'=>'sj-formtheme sj-categorydetails', 'enctype' => 'multipart/form-data', '@submit.prevent' => 'assign_reviewer_article']) !!}
-                                            <fieldset>
-                                                <div class="form-group">
-                                                    <span class="sj-select">
-                                                        <select data-placeholder=" {{{($reviewers_categories->count() > 0) ? trans('prs.choose_reviewer') : trans('prs.assign_cat_reviewer')}}} "
-                                                            multiple class="chosen-select" name="reviewers[]">
-                                                            @php $count = 0; @endphp
-                                                            @foreach ($reviewers_categories as $category)
-                                                                @php
-                                                                    $reviewers = App\Models\User::getReviewersByCategory($category->id);
-                                                                    $reviewersID = App\Models\Article::getReviewerIdByArticle($article->id);
-                                                                @endphp
-                                                                <optgroup label="{{{$category->title}}}">
-                                                                    @foreach ($reviewers as $reviewer)
-                                                                        <option value="{{{$reviewer->id}}}" {{{ in_array($reviewer->id, $article_reviewers ) ? 'selected' : '' }}} >{{{$reviewer->name}}}</option>
-                                                                    @endforeach
-                                                                </optgroup>
-                                                            @endforeach
-                                                        </select>
-                                                        <input type="hidden" name="reviewer_article" value="{{{$article->id}}}">
-                                                    </span>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label><strong>{{{trans('prs.upload_file_for_reviewer')}}} ({{{trans('prs.optional')}}})</strong></label>
-                                                    <p class="text-muted" style="font-size: 12px; margin-bottom: 8px;">{{{trans('prs.upload_file_for_reviewer_desc')}}}</p>
-                                                    <input type="file" name="editor_file" class="form-control" accept=".pdf,.doc,.docx">
-                                                </div>
-                                                <div class="sj-popupbtn">
-                                                    <input type="submit" class="sj-btn sj-btnactive" value="{{ trans('prs.btn_assign') }}">
-                                                </div>
-                                            </fieldset>
-                                        {!! Form::close() !!}
-                                    @elseif ($existed_categories->count() == 0 && !empty($existed_reviewers))
-                                        {!! Form::open(['url' => url('/'.$user_role.'/dashboard/assign-reviewer'), 'id' => 'assign_reviewer_article',
-                                        'class'=>'sj-formtheme sj-categorydetails', 'enctype' => 'multipart/form-data', '@submit.prevent' => 'assign_reviewer_article']) !!}
-                                            <fieldset>
-                                                <div class="form-group">
-                                                    <span class="sj-select">
-                                                        <select data-placeholder="{{ trans('prs.choose_reviewer') }}" multiple class="chosen-select" name="reviewers[]">
-                                                            @php $count = 0; @endphp
-                                                            @foreach ($existed_reviewers as $reviewers)
-                                                                <option value="{{{$reviewers->id}}}" {{{ in_array($reviewers->id, $article_reviewers ) ? 'selected' : '' }}} >
-                                                                    {{{$reviewers->name}}} {{{$reviewers->sur_name}}}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    <input type="hidden" name="reviewer_article" value="{{{$article->id}}}">
-                                                    </span>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label><strong>{{{trans('prs.upload_file_for_reviewer')}}} ({{{trans('prs.optional')}}})</strong></label>
-                                                    <p class="text-muted" style="font-size: 12px; margin-bottom: 8px;">{{{trans('prs.upload_file_for_reviewer_desc')}}}</p>
-                                                    <input type="file" name="editor_file" class="form-control" accept=".pdf,.doc,.docx">
-                                                </div>
-                                                <div class="sj-popupbtn">
-                                                    <input type="submit" class="sj-btn sj-btnactive" value="{{ trans('prs.btn_assign') }}">
-                                                </div>
-                                            </fieldset>
-                                        {!! Form::close() !!}
-                                    @else
-                                        <div class="form-group">
-                                            <input type="text" value="{{ trans('prs.add_reviewers') }}" class="form-control" readonly>
-                                        </div>
-                                    @endif
+                                    {{-- Assign Reviewer: email + optional file (no dropdown) --}}
+                                    {!! Form::open(['url' => url('/'.$user_role.'/dashboard/assign-reviewer'), 'id' => 'assign_reviewer_article', 'class'=>'sj-formtheme sj-categorydetails', 'enctype' => 'multipart/form-data', '@submit.prevent' => 'assign_reviewer_article']) !!}
+                                        <fieldset>
+                                            <div class="form-group">
+                                                <label><strong>{{ trans('prs.reviewer_email') }}</strong></label>
+                                                <input type="email" name="reviewer_email" class="form-control" placeholder="{{ trans('prs.ph_reviewer_email') }}" value="{{ old('reviewer_email') }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label><strong>{{ trans('prs.upload_file_for_reviewer') }} ({{ trans('prs.optional') }})</strong></label>
+                                                <p class="text-muted" style="font-size: 12px; margin-bottom: 8px;">{{ trans('prs.upload_file_for_reviewer_desc') }}</p>
+                                                <input type="file" name="editor_file" class="form-control" accept=".pdf,.doc,.docx">
+                                            </div>
+                                            <input type="hidden" name="reviewer_article" value="{{ $article->id }}">
+                                            <div class="sj-popupbtn">
+                                                <input type="submit" class="sj-btn sj-btnactive" value="{{ trans('prs.btn_assign') }}">
+                                            </div>
+                                        </fieldset>
+                                    {!! Form::close() !!}
                                     {!! Form::open(['url' => url('submit-editor-feedback/'.$article->id), 'class'=>'sj-formtheme sj-formsearchvthree','id'=>'admin_feedback']) !!}
                                         <fieldset>
                                             <div class="sj-dashboardboxtitle sj-titlewithform"><h2>{{{trans('prs.reply_revision')}}}</h2></div>

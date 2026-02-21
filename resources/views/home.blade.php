@@ -13,18 +13,13 @@
 
     @include('partials.figma-header')
 
-    {{-- Hero Slider --}}
+    {{-- Hero Slider (Banner) --}}
     <section class="figma-hero-slider">
         <div class="figma-slider-container">
             {{-- Slide 1 --}}
             <div class="figma-slide active" style="background-image: url({{ asset('images/slider-1.jpeg') }});">
                 <div class="figma-hero-content">
-                    <h1>International Journal of Advanced Research in English Studies</h1>
-                    <p>Publish high-quality research papers, review articles, and case studies with global visibility and fast review process.</p>
-                    <div class="figma-hero-buttons">
-                        <a href="{{route('checkAuthor')}}" class="figma-btn-primary">Add New Article</a>
-                        <a href="{{url('published/editions/articles')}}" class="figma-btn-secondary">View Current Issue</a>
-                    </div>
+                    <!-- Optional overlay text can go here -->
                 </div>
             </div>
             {{-- Slide 2 --}}
@@ -38,6 +33,14 @@
                     </div>
                 </div>
             </div> -->
+        </div>
+    </section>
+
+    {{-- Action buttons just below banner --}}
+    <section class="figma-banner-actions">
+        <div class="figma-banner-actions-container">
+            <a href="{{ route('checkAuthor') }}" class="figma-btn-primary">Add New Article</a>
+            <a href="{{ url('published/editions/articles') }}" class="figma-btn-secondary">View Current Issue</a>
         </div>
     </section>
 
@@ -59,16 +62,16 @@
         });
     </script>
 
-    {{-- Trending Publication (Below Hero Slider) --}}
+    {{-- Current highlights (Below Hero Slider) --}}
     <section class="figma-trending">
-        <h2>Trending publication</h2>
-        <p class="figma-trending-subtitle">
+        <h2>Current highlights</h2>
+        <!-- <p class="figma-trending-subtitle">
             Literature Review Related to Cultural Identity Challenges of ESL Learners in African Rural Contexts
         </p>
         <a href="{{ url('published/editions/articles') }}" class="figma-trending-readmore">
             Read more
             <span class="arrow">→</span>
-        </a>
+        </a> -->
 
         <div class="figma-trending-grid">
             {{-- Large Featured Card --}}

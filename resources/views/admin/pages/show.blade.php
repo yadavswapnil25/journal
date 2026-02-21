@@ -59,6 +59,11 @@
                               strtolower($slug) === 'advisory-board' ||
                               strtolower($slug) === 'advisory-board-page' ||
                               (strpos(strtolower($page->title), 'advisory') !== false && strpos(strtolower($page->title), 'board') !== false);
+
+    $is_special_issues_page = strtolower($page->title) === 'special issues and guest editors' ||
+                              strtolower($slug) === 'special-issues' ||
+                              strtolower($slug) === 'special-issues-and-guest-editors' ||
+                              (strpos(strtolower($page->title), 'special issues') !== false);
 @endphp
 @section('breadcrumbs')
     @if (count($breadcrumbs))
@@ -188,74 +193,58 @@
                 <div class="figma-about-content">
                     <h2 class="figma-about-title">Submission Guidelines</h2>
 
+                    <p class="figma-about-description">
+                        The following types of contributions are invited for the issues of the journal:
+                    </p>
+
                     <div class="figma-submission-guidelines">
-                        <h3>1. Scope of submissions</h3>
                         <ul class="figma-submission-list">
-                            <li>We welcome original research articles, theoretical papers, review essays, practice-based reports and case studies related to the history and historiography of English language education (HELE).</li>
-                            <li>Contributions may focus on India or other contexts, provided they offer insights that enrich our understanding of HELE in India and globally.</li>
+                            <li><strong>Feature article</strong> – a detailed and substantial piece of writing (about 7000–8000 words) based on rigorous academic work focusing on important research issues in and/or theoretical approaches to HELE.</li>
+                            <li><strong>Conceptual article</strong> – a shorter piece of writing (about 3000–5000 words) discussing specific theoretical, conceptual or interpretative aspects of HELE.</li>
+                            <li><strong>Research/Working paper</strong> – reports (about 3000–5000 words) based on research studies.</li>
+                            <li><strong>Book reviews</strong> – critical reviews of recent and relevant publications (about 1000–1500 words).</li>
+                            <li><strong>Field notes</strong> – short descriptive notes (about 500–800 words) reporting on particular historical resources, archives, collections, persons, agencies, micro-histories or any field observations specifically related to HELE.</li>
                         </ul>
 
-                        <h3>2. Manuscript preparation</h3>
+                        <p style="margin-top: 1.25rem;">
+                            Submissions for feature and conceptual articles and research/working papers will undergo blind peer review by at least two reviewers.
+                        </p>
+
+                        <h3 style="margin-top: 2rem;">Guidelines for writing</h3>
+                        <p>All manuscripts must be submitted as Word files, conforming to the following requirements:</p>
                         <ul class="figma-submission-list">
-                            <li>Articles are normally between <strong>5,000–8,000 words</strong> (including references). Short reports or notes may be <strong>2,000–3,000 words</strong>.</li>
-                            <li>Submit manuscripts in <strong>.doc / .docx</strong> format, double-spaced, with a clear, readable font (e.g. 12pt Times New Roman or similar).</li>
-                            <li>Include a separate title page with author name(s), affiliation(s), ORCID (if any), and contact details.</li>
-                            <li>The main article file should be suitably anonymised for double blind review.</li>
-                            <li>Provide a structured abstract of <strong>150–200 words</strong> and <strong>4–6 keywords</strong>.</li>
-                            <li>Use a consistent referencing style (e.g. <strong>APA 7th edition</strong>) throughout the manuscript.</li>
+                            <li><strong>Entire document:</strong> Times New Roman fonts, 1.5 spacing and left aligned.</li>
+                            <li><strong>Title:</strong> Max. 15 words, size 14, bold.</li>
+                            <li><strong>Section headings:</strong> size 12, bold.</li>
+                            <li><strong>Section sub-headings:</strong> size 12, italics.</li>
+                            <li><strong>Section headings and sub-headings</strong> NOT to be numbered.</li>
+                            <li><strong>Body text:</strong> size 12.</li>
+                            <li>No footnotes please; kindly use endnotes.</li>
+                            <li>For referencing, in-text citations and other matters, please follow APA style (7th Edn.). More details can be found <a href="https://apastyle.apa.org" target="_blank" rel="noopener noreferrer">here</a> or <a href="https://owl.purdue.edu/owl/research_and_citation/apa_style/apa_formatting_and_style_guide/index.html" target="_blank" rel="noopener noreferrer">here</a>.</li>
                         </ul>
 
-                        <h3>3. Ethics and permissions</h3>
+                        <p style="margin-top: 1rem;">Manuscripts of feature and conceptual articles and research/working papers should include in the beginning –</p>
                         <ul class="figma-submission-list">
-                            <li>Authors are responsible for obtaining informed consent and necessary institutional approvals where required.</li>
-                            <li>All participant data should be anonymised. Pseudonyms may be used where appropriate.</li>
-                            <li>Any use of copyrighted material (figures, tables, long quotations) must be properly acknowledged and used with permission.</li>
+                            <li>An abstract (max. 200 words)</li>
+                            <li>Keywords (between 4 and 8)</li>
+                            <li>But NOT include author name(s), affiliations, contact details or any other personal information.</li>
+                        </ul>
+                        <p>Abstracts and keywords are NOT required for book reviews and field notes.</p>
+
+                        <h3 style="margin-top: 2rem;">File format</h3>
+                        <ul class="figma-submission-list">
+                            <li>Only Word or Text (RTF) files are accepted.</li>
+                            <li>Authors may be asked to submit separate files of tables, graphs, images or any visuals used in the article during or after the review.</li>
                         </ul>
 
-                        <h3>4. Review process & decisions</h3>
-                        <ul class="figma-submission-list">
-                            <li>All manuscripts undergo an initial editorial screening for fit and basic quality.</li>
-                            <li>Suitable manuscripts are sent for <strong>double blind peer review</strong> to at least two reviewers.</li>
-                            <li>Based on reviewers’ recommendations, the editor will reach one of the following decisions: accept, minor revisions, major revisions, or reject.</li>
-                        </ul>
-                    </div>
-
-                    <h2 class="figma-submission-flow-title">Peer Review &amp; Decision Flow</h2>
-
-                    <div class="figma-submission-flow">
-                        <div class="figma-submission-step">
-                            <h4>Step 1 – Submission</h4>
-                            <p>The author creates an account, fills in the online submission form, uploads the manuscript and submits the article.</p>
-                        </div>
-
-                        <div class="figma-submission-step">
-                            <h4>Step 2 – Initial editorial check</h4>
-                            <p>The editor screens the submission for scope, basic quality and ethical compliance, and identifies suitable reviewers.</p>
-                        </div>
-
-                        <div class="figma-submission-step">
-                            <h4>Step 3 – Reviewer assignment &amp; review</h4>
-                            <p>Reviewers are invited and, once they agree, they receive the anonymised manuscript and submit their detailed review reports and recommendations.</p>
-                        </div>
-
-                        <div class="figma-submission-step">
-                            <h4>Step 4 – Editorial decision</h4>
-                            <p>The editor reads the reviews and makes an initial decision: acceptance, minor revisions, major revisions, or rejection.</p>
-                        </div>
-
-                        <div class="figma-submission-step">
-                            <h4>Step 5 – Minor revisions loop</h4>
-                            <p>If minor revisions are required, the editor sends the decision and consolidated comments to the author. The author revises and resubmits. The editor checks the revised file and may accept or request further changes.</p>
-                        </div>
-
-                        <div class="figma-submission-step">
-                            <h4>Step 6 – Major revisions loop</h4>
-                            <p>For major revisions, the author prepares a substantially revised manuscript. The editor may send this version for a second round of review before making a final decision.</p>
-                        </div>
-
-                        <div class="figma-submission-step">
-                            <h4>Step 7 – Final acceptance &amp; production</h4>
-                            <p>Once accepted, the final version is prepared for publication (PDF formatting and proofreading). The editor checks the final files before they are published in the appropriate issue.</p>
+                        <div class="figma-call-for-submissions-note" style="margin-top: 2rem;">
+                            <h3>Note</h3>
+                            <p>
+                                By making the submission the authors confirm that they have read, understood and agreed to respect the policies of the journal regarding the <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=review-policy">review process</a>, <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=anti-plagiarism-policy">anti-plagiarism</a>, <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=data-protection">data protection, privacy and digital preservation</a>, <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=ethical-standards">ethics, copyright and conflicts of interest</a>, among others.
+                            </p>
+                            <p style="margin-top: 1rem; margin-bottom: 0;">
+                                Address any queries related to the journal to <a href="mailto:shelejournal@gmail.com">shelejournal@gmail.com</a>.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -277,55 +266,81 @@
                 <div class="figma-about-content">
                     <h2 class="figma-about-title">Call for Submissions</h2>
                     <p class="figma-about-description">
-                        Submissions are invited for the following kinds of original contributions:
+                        The following types of contributions are invited for publication in the issues of the journal:
                     </p>
 
                     <div class="figma-submission-guidelines">
                         <div class="figma-submission-type">
-                            <h3>Feature article (6000-8000 words)</h3>
-                            <p>A detailed and substantial write-up focused on some significant research issue(s)</p>
+                            <h3>Feature article</h3>
+                            <p>A detailed and substantial piece of writing (about 7000–8000 words) based on rigorous academic work focusing on important research issues in and/or theoretical approaches to HELE.</p>
                         </div>
 
                         <div class="figma-submission-type">
-                            <h3>Conceptual articles (3000-4000 words)</h3>
-                            <p>Critical discussion of theoretical or conceptual positions, arguments or approaches, promoting fresh understandings, interpretations or formulations</p>
+                            <h3>Conceptual article</h3>
+                            <p>A shorter piece of writing (about 3000–5000 words) discussing specific theoretical, conceptual or interpretative aspects of HELE.</p>
                         </div>
 
                         <div class="figma-submission-type">
-                            <h3>Research/ Working papers (2000-3000 words)</h3>
-                            <p>Reporting on small-scale research studies and their outcomes</p>
+                            <h3>Research/Working paper</h3>
+                            <p>Reports (about 3000–5000 words) based on research studies.</p>
                         </div>
 
                         <div class="figma-submission-type">
-                            <h3>Book reviews (1000 words)</h3>
-                            <p>Reviews of recent and significant publications of value and potential for HELE</p>
+                            <h3>Book reviews</h3>
+                            <p>Critical reviews of recent and relevant publications (about 1000–1500 words).</p>
                         </div>
 
                         <div class="figma-submission-type">
-                            <h3>Field notes (200-800 words)</h3>
-                            <p>Brief notes describing interesting and relevant observations or findings from field work</p>
+                            <h3>Field notes</h3>
+                            <p>Short descriptive notes (about 500–800 words) reporting on particular historical resources, archives, collections, persons, agencies, micro-histories or any field observations specifically related to HELE.</p>
                         </div>
                     </div>
 
+                    <p class="figma-about-description" style="margin-top: 1.25rem;">
+                        Submissions for feature and conceptual articles and research/working papers will undergo blind peer review by at least two reviewers.
+                    </p>
+
                     <div class="figma-call-for-submissions-note">
-                        <h3>Brief Notes</h3>
+                        <h3>How to Submit</h3>
                         <p>
-                            SHELE also welcomes brief notes (max. 500 words) on happenings related to HELE, initiatives to promote HELE studies and research, opportunities for HELE related work, etc. Please mail these directly to <a href="mailto:shelejournal@gmail.com">shelejournal@gmail.com</a> for the consideration of the editorial team.
+                            <a href="{{ route('showPage', ['slug' => 'submission-guidelines']) }}">CLICK HERE</a> to see the Submissions Guidelines.<br>
+                            <a href="{{ route('checkAuthor') }}">CLICK HERE</a> to go to the Submissions page.<br>
+                            First-time submitters will need to create an author account through a very easy process.
+                        </p>
+                    </div>
+
+                    <div class="figma-call-for-submissions-note">
+                        <h3>Timelines</h3>
+                        <ul class="figma-submission-list" style="margin-bottom: 0;">
+                            <li>Call for submissions is open round the year.</li>
+                            <li>Special calls for any other kinds of contributions will be separately announced from time to time.</li>
+                            <li>Each volume has two issues published at half-yearly intervals.</li>
+                            <li>Submissions received until 31st January will be considered for the first issue of the year. Those received by 30th June will be considered for the second issue.</li>
+                            <li>Processing timeline is normally four months from submission to the final decision.</li>
+                        </ul>
+                    </div>
+
+                    <div class="figma-call-for-submissions-note">
+                        <h3>Important Notes</h3>
+                        <ul class="figma-submission-list" style="margin-bottom: 0;">
+                            <li>Submission of an article is taken to imply that it has not been published previously and is not under consideration for publication elsewhere.</li>
+                            <li>SHELE does not charge any fee for publication in the journal.</li>
+                        </ul>
+                        <p style="margin-top: 1rem; margin-bottom: 0;">
+                            Any queries related to the journal may be sent to <a href="mailto:shelejournal@gmail.com">shelejournal@gmail.com</a>.
                         </p>
                     </div>
                 </div>
             </div>
         </section>
 
-    @elseif($is_journal_policies_page)
-        <!-- @include('partials.figma-header') -->
-
-        {{-- Journal Policies Page Content --}}
+    @elseif($is_special_issues_page)
+        {{-- Special Issues and Guest Editors (under Submissions) --}}
         <section class="figma-policies-section">
             <div class="figma-policies-container">
                 {{-- Page Title Banner --}}
                 <div class="figma-page-banner">
-                    <h1>Journal Policies</h1>
+                    <h1>Special Issues and Guest Editors</h1>
                 </div>
 
                 {{-- Main Content with Sidebar --}}
@@ -353,16 +368,11 @@
                                 <span class="figma-policy-number">4.</span>
                                 <span class="figma-policy-text">Data Protection, Privacy, Digital Preservation</span>
                             </a>
-                            <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=special-issues" 
-                               class="figma-policy-nav-item {{ $active_policy === 'special-issues' ? 'active' : '' }}">
-                                <span class="figma-policy-number">5.</span>
-                                <span class="figma-policy-text">Special Issues And Guest Editors</span>
-                            </a>
-                            <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=subscription-policy" 
+                            <!-- <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=subscription-policy" 
                                class="figma-policy-nav-item {{ $active_policy === 'subscription-policy' ? 'active' : '' }}">
-                                <span class="figma-policy-number">6.</span>
+                                <span class="figma-policy-number">5.</span>
                                 <span class="figma-policy-text">Subscription Policy</span>
-                            </a>
+                            </a> -->
                         </nav>
                     </div>
 
@@ -410,21 +420,6 @@
                                 
                                 <p><strong>Digital Preservation:</strong> SHELE ensures long-term digital preservation of all published content through appropriate archiving systems. Published articles are archived and made accessible through various digital repositories and library systems.</p>
                             </div>
-                        @elseif($active_policy === 'special-issues')
-                            <h2 class="figma-policy-title">SPECIAL ISSUES AND GUEST EDITORS</h2>
-                            <div class="figma-policy-text-content">
-                                <p>SHELE welcomes proposals for special issues on topics of particular interest to the HELE community. Special issues are typically guest-edited by experts in the field.</p>
-                                
-                                <p><strong>Proposal Process:</strong> Proposals for special issues should include:</p>
-                                <ul>
-                                    <li>A detailed description of the topic and its significance</li>
-                                    <li>Proposed guest editor(s) and their qualifications</li>
-                                    <li>A list of potential contributors or a call for papers</li>
-                                    <li>A proposed timeline for submission and publication</li>
-                                </ul>
-                                
-                                <p><strong>Guest Editor Responsibilities:</strong> Guest editors are responsible for soliciting submissions, coordinating the review process, and ensuring the quality and coherence of the special issue. All submissions undergo the same rigorous peer review process as regular submissions.</p>
-                            </div>
                         @elseif($active_policy === 'subscription-policy')
                             <h2 class="figma-policy-title">SUBSCRIPTION POLICY</h2>
                             <div class="figma-policy-text-content">
@@ -433,6 +428,121 @@
                                 <p><strong>Open Access:</strong> All articles published in SHELE are made immediately available online upon publication. Readers can access, download, and share articles without restrictions, subject to proper attribution.</p>
                                 
                                 <p><strong>Article Processing Charges:</strong> SHELE does not charge authors for publication. The journal is supported by institutional funding and does not require article processing charges (APCs) or publication fees.</p>
+                                
+                                <p><strong>Archiving:</strong> All published content is archived and preserved for long-term access through digital repositories and library systems.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    @elseif($is_journal_policies_page)
+        <!-- @include('partials.figma-header') -->
+
+        {{-- Journal Policies Page Content --}}
+        <section class="figma-policies-section">
+            <div class="figma-policies-container">
+                {{-- Page Title Banner --}}
+                <div class="figma-page-banner">
+                    <h1>Journal Policies</h1>
+                </div>
+
+                {{-- Main Content with Sidebar --}}
+                <div class="figma-policies-wrapper">
+                    {{-- Left Sidebar Navigation --}}
+                    <div class="figma-policies-sidebar">
+                        <nav class="figma-policies-nav">
+                            <!-- <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=review-policy" 
+                               class="figma-policy-nav-item {{ $active_policy === 'review-policy' ? 'active' : '' }}">
+                                <span class="figma-policy-number">1.</span>
+                                <span class="figma-policy-text">Review Policy</span>
+                            </a>
+                            <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=anti-plagiarism-policy" 
+                               class="figma-policy-nav-item {{ $active_policy === 'anti-plagiarism-policy' ? 'active' : '' }}">
+                                <span class="figma-policy-number">2.</span>
+                                <span class="figma-policy-text">Anti-plagiarism Policy</span>
+                            </a>
+                            <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=ethical-standards" 
+                               class="figma-policy-nav-item {{ $active_policy === 'ethical-standards' ? 'active' : '' }}">
+                                <span class="figma-policy-number">3.</span>
+                                <span class="figma-policy-text">Ethical Standards, Copyright And Conflicts Of Interest</span>
+                            </a>
+                            <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=data-protection" 
+                               class="figma-policy-nav-item {{ $active_policy === 'data-protection' ? 'active' : '' }}">
+                                <span class="figma-policy-number">4.</span>
+                                <span class="figma-policy-text">Data Protection, Privacy, Digital Preservation</span>
+                            </a> -->
+                            <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=subscription-policy" 
+                               class="figma-policy-nav-item {{ $active_policy === 'subscription-policy' ? 'active' : '' }}">
+                                <span class="figma-policy-number">1.</span>
+                                <span class="figma-policy-text">Subscription Policy</span>
+                            </a>
+                        </nav>
+                    </div>
+
+                    {{-- Right Content Area --}}
+                    <div class="figma-policies-content">
+                        @if($active_policy === 'review-policy')
+                        <h2 class="figma-policy-title">SUBSCRIPTION POLICY</h2>
+                            <div class="figma-policy-text-content">
+                                <p>SHELE is an open-access journal, meaning all content is freely available to readers without subscription fees. There are no charges for accessing, downloading, or reading articles published in SHELE.</p>
+                                
+                                <p><strong>Open Access:</strong> All articles published in SHELE are made immediately available online upon publication. Readers can access, download, and share articles without restrictions, subject to proper attribution.</p>
+                                
+                                <p>The journal is supported by institutional funding and does not require article processing charges (APCs) or publication fees.</p>
+                                
+                                <p><strong>Archiving:</strong> All published content is archived and preserved for long-term access through digital repositories and library systems.</p>
+                            </div>
+                            <!-- <h2 class="figma-policy-title">REVIEW POLICY</h2>
+                            <div class="figma-policy-text-content">
+                                <p>1. Preliminary selection: The editors will make an initial assessment of the manuscript to determine whether it fits the scope of the journal and meets basic quality standards. Manuscripts that do not meet these criteria will be rejected without external review.</p>
+                                
+                                <p>2. Blind review: Manuscripts that pass the initial screening will be sent for blind review to at least two external reviewers who are experts in the relevant field. Reviewers will evaluate the manuscript based on criteria such as originality, significance, methodology, clarity, and relevance to the journal's scope.</p>
+                                
+                                <p>3. Revision: Based on the reviewers' comments, authors may be asked to revise their manuscript. Revised manuscripts will be re-evaluated by the editors and, if necessary, sent back to the reviewers for further assessment.</p>
+                                
+                                <p>4. Final decision: The final decision on acceptance or rejection will be made by the editors based on the reviewers' recommendations and the manuscript's overall quality. Before publication, the manuscript will be checked for ethics, plagiarism, conflict of interest, and copyright.</p>
+                            </div> -->
+                        @elseif($active_policy === 'anti-plagiarism-policy')
+                            <h2 class="figma-policy-title">ANTI-PLAGIARISM POLICY</h2>
+                            <div class="figma-policy-text-content">
+                                <p>SHELE is committed to maintaining the highest standards of academic integrity. All submitted manuscripts are screened for plagiarism using appropriate software tools. Authors are expected to ensure that their work is original and properly cited. Any instances of plagiarism will result in immediate rejection of the manuscript and may lead to further action.</p>
+                                
+                                <p>Authors must:</p>
+                                <ul>
+                                    <li>Ensure all sources are properly cited and referenced</li>
+                                    <li>Obtain permission for any copyrighted material used</li>
+                                    <li>Disclose any previous publication of the work or parts thereof</li>
+                                    <li>Not submit the same work to multiple journals simultaneously</li>
+                                </ul>
+                            </div>
+                        @elseif($active_policy === 'ethical-standards')
+                            <h2 class="figma-policy-title">ETHICAL STANDARDS, COPYRIGHT AND CONFLICTS OF INTEREST</h2>
+                            <div class="figma-policy-text-content">
+                                <p><strong>Ethical Standards:</strong> Authors must adhere to ethical guidelines in research and publication. This includes obtaining informed consent from participants, ensuring data confidentiality, and reporting research findings accurately and honestly.</p>
+                                
+                                <p><strong>Copyright:</strong> Upon acceptance, authors grant SHELE the right to publish their work. Authors retain copyright and may use their published work for educational and research purposes. All content published in SHELE is licensed under Creative Commons Attribution License.</p>
+                                
+                                <p><strong>Conflicts of Interest:</strong> Authors, reviewers, and editors must disclose any potential conflicts of interest that could influence the research, review process, or editorial decisions. Conflicts may include financial relationships, personal relationships, or professional affiliations.</p>
+                            </div>
+                        @elseif($active_policy === 'data-protection')
+                            <h2 class="figma-policy-title">DATA PROTECTION, PRIVACY, DIGITAL PRESERVATION</h2>
+                            <div class="figma-policy-text-content">
+                                <p><strong>Data Protection:</strong> SHELE is committed to protecting the personal data of authors, reviewers, and readers. All personal information is collected and processed in accordance with applicable data protection laws.</p>
+                                
+                                <p><strong>Privacy:</strong> Personal information provided during submission and review processes is kept confidential and used only for editorial purposes. Reviewers' identities are not disclosed to authors, and authors' identities are not disclosed to reviewers during the blind review process.</p>
+                                
+                                <p><strong>Digital Preservation:</strong> SHELE ensures long-term digital preservation of all published content through appropriate archiving systems. Published articles are archived and made accessible through various digital repositories and library systems.</p>
+                            </div>
+                        @elseif($active_policy === 'subscription-policy')
+                            <h2 class="figma-policy-title">SUBSCRIPTION POLICY</h2>
+                            <div class="figma-policy-text-content">
+                                <p>SHELE is an open-access journal, meaning all content is freely available to readers without subscription fees. There are no charges for accessing, downloading, or reading articles published in SHELE.</p>
+                                
+                                <p><strong>Open Access:</strong> All articles published in SHELE are made immediately available online upon publication. Readers can access, download, and share articles without restrictions, subject to proper attribution.</p>
+                                
+                                <p>The journal is supported by institutional funding and does not require article processing charges (APCs) or publication fees.</p>
                                 
                                 <p><strong>Archiving:</strong> All published content is archived and preserved for long-term access through digital repositories and library systems.</p>
                             </div>
@@ -521,119 +631,14 @@
         </section>
 
     @elseif($is_advisory_board_page)
-        <!-- @include('partials.figma-header') -->
-
         {{-- Advisory Board Page Content --}}
         <section class="figma-about-section">
             <div class="figma-about-container">
-                {{-- Page Title Banner --}}
                 <div class="figma-page-banner">
                     <h1>Advisory Board</h1>
                 </div>
-
-                {{-- Main Content --}}
                 <div class="figma-about-content">
-                    <div class="figma-editorial-board-content">
-                        <div class="figma-editorial-board-list">
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">1.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Prof. Sunita Mishra</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">2.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Prof. Parimala Rao</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">3.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Prof. M. Sridhar</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">4.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Prof. Richard Smith</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">5.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Prof. Santosh Mahapatra</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">6.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Prof. Shreesh Chaudhary</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">7.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Prof. Asma Rashid EFLU</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">8.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Prof. Prachi Deshpande</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">9.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Dr. Leya Matthew</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">10.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Dr. Fredericke Kippel</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">11.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Prof. Marcelo Karuso</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">12.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Prof. Nicolla McLelland</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">13.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Dr. Xi Li</h3>
-                                </div>
-                            </div>
-
-                            <div class="figma-board-member">
-                                <span class="figma-member-number">14.</span>
-                                <div class="figma-member-details">
-                                    <h3 class="figma-member-name">Mr. Simon Dunton</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <p class="figma-about-description" style="text-align: center; font-size: 1.1rem;">This page is under construction. The advisory board list will be displayed soon.</p>
                 </div>
             </div>
         </section>

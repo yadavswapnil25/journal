@@ -20,6 +20,7 @@
                     <div class="figma-navbar-dropdown">
                         <a href="{{ route('showPage', ['slug' => 'submission-guidelines']) }}">Submissions Guidelines</a>
                         <a href="{{ route('showPage', ['slug' => 'call-for-submissions']) }}">Call for submissions</a>
+                        <a href="{{ route('showPage', ['slug' => 'special-issues']) }}">Special issues and guest editors</a>
                     </div>
                 </div>
                 <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}" class="figma-navbar-link {{ Request::is('page/journal-policies*') || Request::is('page/policies*') ? 'active' : '' }}">Policies</a>

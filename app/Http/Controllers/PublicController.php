@@ -202,6 +202,14 @@ class PublicController extends Controller
                     'sub_title' => 'Call for Submissions',
                     'body'      => ''
                 ];
+            } elseif (in_array($normalizedSlug, ['special-issues', 'special-issues-and-guest-editors'], true)) {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'Special Issues and Guest Editors',
+                    'slug'      => 'special-issues',
+                    'sub_title' => 'Special Issues and Guest Editors',
+                    'body'      => ''
+                ];
             } elseif (in_array($normalizedSlug, ['journal-policies', 'policies', 'policy'], true)) {
                 $page = (object)[
                     'id'        => 0,

@@ -68,8 +68,8 @@ class ArticleNotificationMailable extends Mailable
         $this->email_params = $email_params;
         $this->template_data = $template_data;
         $this->user_type = $user_type;
-        $this->name = $title[0]['site_title'];
-        $this->email = $email_settings[0]['email'];
+        $this->name = (!empty($title) && isset($title[0]['site_title'])) ? $title[0]['site_title'] : (config('app.name') ?: 'Journal');
+        $this->email = (!empty($email_settings) && isset($email_settings[0]['email'])) ? $email_settings[0]['email'] : (config('mail.from.address') ?: config('mail.username') ?: 'no-reply@example.com');
     }
 
     /**

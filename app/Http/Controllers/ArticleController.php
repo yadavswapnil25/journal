@@ -139,85 +139,85 @@ class ArticleController extends Controller
             $response['message'] = $server->getData()->message;
             return $response;
         }
-        $reviewers = $request['reviewers'];
-        $article_id = $request['reviewer_article'];
+
+        $this->validate($request, [
+            'reviewer_email' => 'required|email',
+            'reviewer_article' => 'required|exists:articles,id',
+        ]);
+
+        $reviewer_email = trim($request->input('reviewer_email'));
+        $article_id = (int) $request->input('reviewer_article');
         $editor_file_path = null;
-        
+
         // Handle file upload if provided
         if ($request->hasFile('editor_file')) {
-            $this->validate($request, [
-                'editor_file' => 'mimes:pdf,doc,docx|max:10000',
-            ]);
-            
+            $request->validate(['editor_file' => 'mimes:pdf,doc,docx|max:10000']);
             $uploaded_file = $request->file('editor_file');
             $file_original_name = $uploaded_file->getClientOriginalName();
             $file_name_without_extension = pathinfo($file_original_name, PATHINFO_FILENAME);
             $file_path = 'uploads/articles_editor/' . $article_id . '/';
             $extension = $uploaded_file->getClientOriginalExtension();
             $file_name = $article_id . '-editor-' . $file_name_without_extension . '-' . time() . '.' . $extension;
-            
-            Storage::disk('local')->putFileAs(
-                $file_path,
-                $uploaded_file,
-                $file_name
-            );
-            
+            Storage::disk('local')->putFileAs($file_path, $uploaded_file, $file_name);
             $editor_file_path = htmlspecialchars($file_name, ENT_QUOTES, 'UTF-8');
         }
-        
-        if (!empty($reviewers)) {
-            $submitted_article = Article::getArticleNotificationData($article_id);
-            if (!empty($submitted_article)) {
-                $article_title = $submitted_article->title;
+
+        $submitted_article = Article::getArticleNotificationData($article_id);
+        $article_title = !empty($submitted_article) ? $submitted_article->title : '';
+
+        $mail_username = config('mail.mailers.smtp.username') ?: config('mail.username');
+        $mail_password = config('mail.mailers.smtp.password') ?: config('mail.password');
+        $mail_configured = !empty($mail_username) && !empty($mail_password);
+        $email_settings_available = !empty(SiteManagement::getMetaValue('email_settings'));
+        $mail_driver = config('mail.default');
+        $can_send_email = $mail_configured || $email_settings_available || in_array($mail_driver, ['log', 'array']);
+
+        // Match email case-insensitively so assignment is found and appears in reviewer dashboard
+        $user = User::whereRaw('LOWER(email) = ?', [strtolower($reviewer_email)])->first();
+        $user_role = $user ? User::getUserRoleType($user->id) : null;
+        $is_reviewer = $user && (
+            ($user_role && isset($user_role->role_type) && $user_role->role_type === 'reviewer')
+            || (method_exists($user, 'hasRole') && $user->hasRole('reviewer'))
+        );
+
+        if ($can_send_email) {
+            $email_params = [
+                'reviewer_assign_article_title' => $article_title,
+                'assign_article_reviewer_name'  => $user ? trim($user->name . ' ' . $user->sur_name) : $reviewer_email,
+                'reviewer_email'                => $reviewer_email,
+                'assign_article_id'             => $article_id,
+                'article_link'                 => $is_reviewer ? url('/login?user_id=' . $user->id . '&email_type=assign_reviewer') : url('/login?email_type=assign_reviewer'),
+            ];
+
+            $role_id = $is_reviewer ? User::getRoleIDByUserID($user->id) : null;
+            if ($role_id) {
+                $template_data = EmailTemplate::getEmailTemplatesByID($role_id, 'assign_reviewer');
+            } else {
+                $reviewer_role = DB::table('roles')->where('role_type', 'reviewer')->first();
+                $template_data = $reviewer_role ? EmailTemplate::getEmailTemplatesByID($reviewer_role->id, 'assign_reviewer') : null;
             }
-            // Check email configuration - support both old and new Laravel config structure
-            $mail_username = config('mail.mailers.smtp.username') ?: config('mail.username');
-            $mail_password = config('mail.mailers.smtp.password') ?: config('mail.password');
-            $mail_configured = !empty($mail_username) && !empty($mail_password);
-            $email_settings_available = !empty(SiteManagement::getMetaValue('email_settings'));
-            $mail_driver = config('mail.default');
-            $can_send_email = $mail_configured || $email_settings_available || in_array($mail_driver, ['log', 'array']);
-            
-            if ($can_send_email) {
-                $email_params = array();
-                $email_params['reviewer_assign_article_title'] = $article_title;
-                foreach ($reviewers as $reviewer_id) {
-                    $reviewer_data = User::getUserDataByID($reviewer_id);
-                    if (!empty($reviewer_data)) {
-                        $reviewer_name = $reviewer_data->name . " " . $reviewer_data->sur_name;
-                        $reviewer_email = $reviewer_data->email;
-                    }
-                    $email_params['assign_article_reviewer_name'] = $reviewer_name;
-                    $email_params['reviewer_email'] = $reviewer_email;
-                    $article_link = url('/login?user_id=' . $reviewer_id . '&email_type=assign_reviewer');
-                    $email_params['article_link'] = $article_link;
-                    $email_params['assign_article_id'] = $article_id;
-                    $role_id = User::getRoleIDByUserID($reviewer_id);
-                    $template_data = EmailTemplate::getEmailTemplatesByID($role_id, 'assign_reviewer');
-                    if (!empty($template_data)) {
-                        try {
-                            Mail::to($reviewer_email)->send(new ArticleNotificationMailable($email_params, $template_data, 'reviewer'));
-                        } catch (\Exception $e) {
-                            // Log error but continue with other reviewers
-                        }
-                    }
+            if (!empty($template_data)) {
+                try {
+                    Mail::to($reviewer_email)->send(new ArticleNotificationMailable($email_params, $template_data, 'reviewer'));
+                } catch (\Exception $e) {
+                    \Log::warning('Assign reviewer email failed: ' . $e->getMessage(), ['article_id' => $article_id, 'reviewer_email' => $reviewer_email, 'exception' => $e]);
+                    return response()->json(['message' => trans('prs.article_assigned') . ' ' . __('Email could not be sent.')]);
                 }
             }
-            DB::table('reviewers')->where('article_id', $article_id)->delete();
-            Article::SaveArticleReviewers('articles_under_review', $article_id, $reviewers, $editor_file_path);
-            $message = trans('prs.article_assigned');
-            return response()->json(['message' => $message]);
-        } else {
-            $assignedReviewers = DB::table('reviewers')->where('article_id', $article_id)->get();
-            if ($assignedReviewers->count() == 0) {
-                $message = trans('prs.reviewer_assigned_error');
-                return response()->json(['message' => $message]);
-            } else {
+        }
+
+        // Always link article to the user when email matches, so it appears under Articles Under Review
+        if ($user) {
+            try {
                 DB::table('reviewers')->where('article_id', $article_id)->delete();
-                $message = trans('prs.reviewers_delete');
-                return response()->json(['message' => $message]);
+                Article::SaveArticleReviewers('articles_under_review', $article_id, [$user->id], $editor_file_path);
+            } catch (\Exception $e) {
+                return response()->json(['message' => trans('prs.article_assigned') . ' ' . __('Assignment could not be saved. Please try again.')], 500);
             }
         }
+
+        $message = trans('prs.article_assigned');
+        return response()->json(['message' => $message]);
     }
 
     /**

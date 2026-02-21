@@ -309,21 +309,25 @@ class Article extends Model
      */
     public static function SaveArticleReviewers($status, $article_id, $reviewers = [], $editor_file = null)
     {
-        if (!empty($status) && !empty($article_id) && !empty($reviewers)) {
-            foreach ($reviewers as $reviewer_id) {
-                $reviewer_article = DB::table('reviewers')->insert(
-                    [
-                        'status' => $status, 
-                        'reviewer_id' => $reviewer_id, 
-                        'article_id' => $article_id,
-                        'editor_file' => $editor_file,
-                        'created_at' => \Carbon\Carbon::now(), 
-                        'updated_at' => \Carbon\Carbon::now()
-                    ]
-                );
-            }
-            return $reviewer_article;
+        if (empty($status) || empty($article_id) || empty($reviewers)) {
+            return false;
         }
+        $base = [
+            'status' => $status,
+            'reviewer_id' => null,
+            'article_id' => $article_id,
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now(),
+        ];
+        if (\Illuminate\Support\Facades\Schema::hasColumn('reviewers', 'editor_file')) {
+            $base['editor_file'] = $editor_file;
+        }
+        $result = false;
+        foreach ($reviewers as $reviewer_id) {
+            $row = array_merge($base, ['reviewer_id' => $reviewer_id]);
+            $result = DB::table('reviewers')->insert($row);
+        }
+        return $result;
     }
 
     /**
