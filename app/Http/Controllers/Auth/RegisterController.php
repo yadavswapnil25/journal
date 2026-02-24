@@ -92,17 +92,6 @@ class RegisterController extends Controller
             'password' => 'required|string|min:6|confirmed',
             'mobile_number' => 'required|string|max:20',
             'institutional_affiliation' => 'nullable|string|max:255',
-            'author_bio' => [
-                'required',
-                'string',
-                'max:500',
-                function ($attribute, $value, $fail) {
-                    $wordCount = str_word_count($value);
-                    if ($wordCount > 50) {
-                        $fail('The author bio must not exceed 50 words. Current word count: ' . $wordCount);
-                    }
-                },
-            ],
             'terms_condition' => 'required',
         ]);
 
@@ -127,7 +116,7 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
             'mobile_number' => $data['mobile_number'],
             'institutional_affiliation' => $data['institutional_affiliation'] ?? null,
-            'author_bio' => $data['author_bio'],
+            'author_bio' => null,
             'token' => md5(uniqid(rand(), true)),
         ]);
         

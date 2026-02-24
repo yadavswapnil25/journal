@@ -36,15 +36,16 @@ class Author extends Model
      * @desc store author in database
      * @return bool
      */
-    public static function saveAuthor($author_name, $author_email)
+    public static function saveAuthor($author_name, $author_email, $author_bio = null)
     {
         if (!empty($author_name) && !empty($author_email)) {
             return DB::table('authors')->insert(
                 [
-                    'name' => $author_name, 
+                    'name' => $author_name,
                     'email' => $author_email,
-                    "created_at" => \Carbon\Carbon::now(), 
-                    "updated_at" => \Carbon\Carbon::now()
+                    'bio' => $author_bio ? trim((string) $author_bio) : null,
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now()
                 ]
             );
         }
@@ -59,7 +60,7 @@ class Author extends Model
     public static function getAuthorByID($author_id)
     {
         if (!empty($author_id) && is_numeric($author_id)) {
-            return DB::table('authors')->select('name', 'email')->where('id', $author_id)->get()->all();
+            return DB::table('authors')->select('name', 'email', 'bio')->where('id', $author_id)->get()->all();
         }
     }
 
@@ -75,7 +76,7 @@ class Author extends Model
             return DB::table('authors')
                 ->join('author_article', 'authors.id', '=', 'author_article.author_id')
                 ->join('articles', 'articles.id', '=', 'author_article.article_id')
-                ->select('authors.id', 'authors.name', 'authors.email')
+                ->select('authors.id', 'authors.name', 'authors.email', 'authors.bio')
                 ->where('author_article.article_id', '=', $article_id)
                 ->get()->all();
         }

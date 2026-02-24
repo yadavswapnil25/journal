@@ -144,10 +144,45 @@ class AuthorController extends Controller
             }
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string',
-                'abstract' => 'required',
-                // 'excerpt' => 'required',
+                'abstract' => [
+                    'required',
+                    'string',
+                    function ($attribute, $value, $fail) {
+                        $wordCount = str_word_count(strip_tags(trim($value)));
+                        if ($wordCount < 100 || $wordCount > 250) {
+                            $fail(trans('prs.ph_article_desc_error') . ' Current word count: ' . $wordCount);
+                        }
+                    },
+                ],
+                'excerpt' => 'required|string',
+                'authors.0.bio' => [
+                    'required',
+                    'string',
+                    'max:500',
+                    function ($attribute, $value, $fail) {
+                        $wordCount = str_word_count(trim($value));
+                        if ($wordCount > 50) {
+                            $fail('The first author bio must not exceed 50 words. Current word count: ' . $wordCount);
+                        }
+                    },
+                ],
                 'uploaded_new_article' => 'required|mimes:doc,docx|max:2000',
             ]);
+            $validator->after(function ($validator) use ($request) {
+                $authors = $request->input('authors', []);
+                if (is_array($authors) && count($authors) > 5) {
+                    $validator->errors()->add('authors', 'Maximum 4 co-authors allowed (1 main author + 4 co-authors).');
+                }
+                foreach ($authors as $i => $author) {
+                    $bio = $author['bio'] ?? '';
+                    if ($bio !== '' && is_string($bio)) {
+                        $wordCount = str_word_count(trim($bio));
+                        if ($wordCount > 50) {
+                            $validator->errors()->add("authors.{$i}.bio", 'Author bio must not exceed 50 words (author ' . ($i + 1) . ').');
+                        }
+                    }
+                }
+            });
             if ($validator->fails()) {
                 return redirect()->back()->withInput($request->input())->with([
                     'errors' => $validator->errors()
@@ -157,18 +192,38 @@ class AuthorController extends Controller
                 Session::flash('upload_error', 'Article Field is required');
                 return redirect()->back()->withInput($request->all());
             }
-            // save author data
-            $authors = $request['authors'];
+            // save author data: main author (0) = logged-in user; co-authors = from form
+            $authors = $request->input('authors', []);
             $author_id = array();
+            $main_user = User::find($user_id);
+            $main_name = $main_user ? trim($main_user->name . ' ' . $main_user->sur_name) : '';
+            $main_email = $main_user ? $main_user->email : '';
             if (!empty($authors)) {
                 foreach ($authors as $key => $author) {
-                    Author::saveAuthor($author['title'], $author['email']);
-                    $author_id[] = DB::getPdo()->lastInsertId();
+                    $bio = isset($author['bio']) ? trim((string) $author['bio']) : null;
+                    if ((string) $key === '0') {
+                        Author::saveAuthor($main_name, $main_email, $bio);
+                        $author_id[] = DB::getPdo()->lastInsertId();
+                    } else {
+                        $name = isset($author['title']) ? trim((string) $author['title']) : '';
+                        $email = isset($author['email']) ? trim((string) $author['email']) : '';
+                        if ($name !== '' && $email !== '') {
+                            Author::saveAuthor($name, $email, $bio);
+                            $author_id[] = DB::getPdo()->lastInsertId();
+                        }
+                    }
                 }
             }
             // save article data
             Article::saveArticle($request);
             $article_id = DB::getPdo()->lastInsertId();
+
+            // update current user's author bio from first author (corresponding author)
+            $author_user = User::find($user_id);
+            if ($author_user && !empty($authors[0]['bio'])) {
+                $author_user->author_bio = trim((string) $authors[0]['bio']);
+                $author_user->save();
+            }
             // save data in pivot data
             if (!empty($article_id)) {
                 foreach ($author_id as $auth_id) {

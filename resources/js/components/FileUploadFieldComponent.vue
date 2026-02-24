@@ -4,43 +4,13 @@
       <div class="sj-title">
         <h3>{{field_title}}</h3>
       </div>
-      <label :for="this.doc_id" :id="'label'+doc_id" v-if="slider_from_db">
-        <span class="uploaded_slider_image_name">{{slider_from_db}}</span>
+      <label :for="this.doc_id" :id="'label'+doc_id">
+        <span :class="{ 'uploaded_slider_image_name': slider_from_db }">{{ displayLabel }}</span>
         <div class="sj-filerightarea">
-          <span>
+          <span v-if="fileSize">
             <em>{{fileSize}}</em>
           </span>
-        </div>
-        <input
-          type="file"
-          :class="this.input_class"
-          @change="notifyFileInput"
-          :name="file_name"
-          :id="doc_id"
-          :ref="doc_ref"
-        >
-        <input type="hidden" :value="slider_from_db" :name="hidden_field_name" :id="hidden_id">
-      </label>
-      <label :for="this.doc_id" v-else-if="file">
-        <span>{{file}}</span>
-        <div class="sj-filerightarea">
-          <span>
-            <em>{{fileSize}}</em>
-          </span>
-        </div>
-        <input
-          type="file"
-          :class="this.input_class"
-          @change="notifyFileInput"
-          :name="file_name"
-          :id="doc_id"
-          :ref="doc_ref"
-        >
-      </label>
-      <label :for="this.doc_id" v-else>
-        <span>{{file_placeholder}}</span>
-        <div class="sj-filerightarea">
-          <span>
+          <span v-else>
             <i v-bind:class="{ 'ti-upload': this.file_na, 'ti-close': this.file_check }"></i>
           </span>
         </div>
@@ -52,11 +22,11 @@
           :id="doc_id"
           :ref="doc_ref"
         >
+        <input v-if="slider_from_db && hidden_field_name" type="hidden" :value="slider_from_db" :name="hidden_field_name" :id="hidden_id">
       </label>
       <div class="sj-filedetails">
         <span>{{file_size_label}}</span>
-        <em v-if="slider_from_db">{{file_uploaded_label}}</em>
-        <em v-else-if="file">{{file_uploaded_label}}</em>
+        <em v-if="slider_from_db || file">{{file_uploaded_label}}</em>
         <em v-else>{{file_not_uploaded_label}}</em>
       </div>
     </div>
@@ -92,6 +62,12 @@ export default {
       deleted: "",
       slider_from_db: this.uploaded_file
     };
+  },
+  computed: {
+    displayLabel() {
+      if (this.slider_from_db || this.file) return this.slider_from_db || this.file;
+      return this.file_placeholder;
+    }
   },
   methods: {
     watchFileInput: function() {

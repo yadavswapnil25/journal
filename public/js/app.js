@@ -48122,7 +48122,8 @@ if (document.getElementById("new_article")) {
             author: {
                 author_name: '',
                 author_email: '',
-                count: 0
+                author_bio: '',
+                count: 1
             },
             authors: [],
             title_check: false,
@@ -48154,13 +48155,26 @@ if (document.getElementById("new_article")) {
             excerpt: "",
             price: "",
             form_errors: [],
+            error_title: '',
+            error_author_name: '',
+            error_author_email: '',
+            error_abstract: '',
+            error_excerpt: '',
+            error_doc: '',
             custom_error: false,
             progressing: false,
             file_input_name: 'uploaded_new_article',
             create_article: 'create_article',
             formErrors: '',
             loading: false,
-            notified: true
+            notified: true,
+            abstract_word_count: 0,
+            abstract_error_template: ''
+        },
+        computed: {
+            submitDisabled: function submitDisabled() {
+                return this.abstract_word_count < 100 || this.abstract_word_count > 250;
+            }
         },
         ready: function ready() {
             this.watchFileInput();
@@ -48174,16 +48188,19 @@ if (document.getElementById("new_article")) {
             if (document.getElementsByClassName("toast-holder") != null) {
                 flashVue.$emit('showFlashMessage');
             }
+            this.abstract_error_template = (this.$el && this.$el.getAttribute('data-abstract-error-template')) || 'Abstract is required and must be between 100 - 250 words. Current word count: :count';
             this.upload_file_check = false;
             this.upload_file_na = true;
             this.upload_file_error = true;
             this.upload_file_completed = false;
+            var self = this;
             $(document).on('change', '#create_article', function (e) {
                 var _this = $(this);
                 _this.parents('#new_article').find('.sj-profilecomplete .uploadfilestatus.sj-profileerror').removeClass('sj-profileerror');
                 _this.parents('#new_article').find('.sj-profilecomplete .uploadfilestatus').addClass('sj-profilecompleted');
                 _this.parents('#new_article').find('.sj-profilecomplete .uploadstatusinner.ti-na').removeClass('ti-na');
                 _this.parents('#new_article').find('.sj-profilecomplete .uploadstatusinner').addClass('ti-check');
+                self.autoComplete();
             });
             $(document).on('click', '.clear_data', function (e) {
                 var _this = $(this);
@@ -48191,63 +48208,83 @@ if (document.getElementById("new_article")) {
                 _this.parents('#new_article').find('.sj-profilecomplete .uploadfilestatus').addClass('sj-profileerror');
                 _this.parents('#new_article').find('.sj-profilecomplete .uploadstatusinner.ti-check').removeClass('ti-check');
                 _this.parents('#new_article').find('.sj-profilecomplete .uploadstatusinner').addClass('ti-na');
+                self.autoComplete();
             });
         },
         methods: {
             addAnother: function addAnother() {
-                this.authors.push(__WEBPACK_IMPORTED_MODULE_6_vue___default.a.util.extend({}, this.author, this.author.count++));
+                if (this.authors.length >= 4) return;
+                this.authors.push(__WEBPACK_IMPORTED_MODULE_6_vue___default.a.util.extend({}, this.author, { count: this.author.count++ }));
             },
             removeAuthor: function removeAuthor(index) {
                 __WEBPACK_IMPORTED_MODULE_6_vue___default.a.delete(this.authors, index);
             },
-            checkForm: function checkForm(e) {
-                var abstract = tinyMCE.get('abstract').getContent();
-                var fileInput = document.getElementById("create_article").value;
-                var article_title = document.querySelector("input[name=title]").value;
-                var first_author_name = document.getElementById("first_author_name").value;
-                var first_author_email = document.getElementById("first_author_email").value;
-                var excerpt = document.getElementById("excerpt").value;
-                if (first_author_name && first_author_email && article_title && abstract && excerpt && fileInput) {
+            checkForm: function checkForm() {
+                var article_title = document.querySelector("input[name=title]") ? document.querySelector("input[name=title]").value : '';
+                var abstractField = document.getElementById("abstract");
+                var abstract = abstractField ? abstractField.value.trim() : '';
+                var excerptField = document.getElementById("excerpt");
+                var excerpt = excerptField ? excerptField.value.trim() : '';
+                var fileInputEl = document.getElementById("create_article");
+                var fileInput = fileInputEl ? fileInputEl.value : '';
+
+                if (article_title && abstract && excerpt && fileInput) {
+                    this.error_title = '';
+                    this.error_author_name = '';
+                    this.error_author_email = '';
+                    this.error_abstract = '';
+                    this.error_excerpt = '';
+                    this.error_doc = '';
                     this.loading = true;
                     this.progressing = true;
                     messageVue.$emit('showAlert');
                     this.custom_error = false;
-                    return true;
+                    var form = document.getElementById('article_form');
+                    if (form) {
+                        form.submit();
+                    }
+                    return;
                 }
-                this.form_errors = [];
                 this.custom_error = true;
                 var self = this;
                 axios.post(APP_URL + '/author/user/article/new-article-custom-errors').then(function (response) {
-                    if (!article_title) self.form_errors.push(response.data.article_title_error);
-                    if (!first_author_name) self.form_errors.push(response.data.author_name_error);
-                    if (!first_author_email) self.form_errors.push(response.data.author_email_error);
-                    if (!abstract) self.form_errors.push(response.data.article_desc_error);
-                    if (!excerpt) self.form_errors.push(response.data.article_excerpt_error);
-                    if (!fileInput) self.form_errors.push(response.data.article_doc_error);
+                    self.error_title = !article_title ? (response.data.article_title_error || '') : '';
+                    self.error_author_name = '';
+                    self.error_author_email = '';
+                    self.error_abstract = !abstract ? (response.data.article_desc_error || '') : '';
+                    self.error_excerpt = !excerpt ? (response.data.article_excerpt_error || '') : '';
+                    self.error_doc = !fileInput ? (response.data.article_doc_error || '') : '';
                     setTimeout(function () {
                         self.custom_error = false;
-                    }, 3000);
+                    }, 5000);
                 }).catch(function (error) {
                     //console.log(error.response.data);
                 });
-
-                e.preventDefault();
+            },
+            getAbstractWordCount: function getAbstractWordCount(text) {
+                var t = (text || '').trim();
+                return t === '' ? 0 : t.split(/\s+/).filter(function (w) {
+                    return w.length > 0;
+                }).length;
             },
             autoComplete: function autoComplete() {
-                var title = document.querySelector("input[name=title]").value;
-                var abstract = tinyMCE.get('abstract').getContent();
-                var author_title = document.querySelector(".author_title").value;
-                var author_email = document.querySelector(".author_email").value;
-                var excerpt = document.querySelector(".excerpt").value;
-                var fileInput = document.getElementById("create_article").value;
+                var title = document.querySelector("input[name=title]") ? document.querySelector("input[name=title]").value : '';
+                var abstractEl = document.getElementById("abstract");
+                var abstract = abstractEl ? abstractEl.value.trim() : '';
+                var excerptEl = document.getElementById("excerpt");
+                var excerpt = excerptEl ? excerptEl.value.trim() : '';
+                var fileInput = document.getElementById("create_article") ? document.getElementById("create_article").value : '';
+
+                var abstractWords = this.getAbstractWordCount(abstract);
+                this.abstract_word_count = abstractWords;
 
                 var checked_value = "";
                 this.title_na = true;
                 this.title_check = false;
                 this.abst_na = true;
                 this.abst_check = false;
-                this.author_na = true;
-                this.author_check = false;
+                this.author_na = false;
+                this.author_check = true;
                 this.excerpt_na = true;
                 this.excerpt_check = false;
                 this.upload_file_check = false;
@@ -48257,8 +48294,8 @@ if (document.getElementById("new_article")) {
                 this.title_completed = false;
                 this.abst_error = true;
                 this.abst_completed = false;
-                this.author_error = true;
-                this.author_completed = false;
+                this.author_error = false;
+                this.author_completed = true;
                 this.excerpt_error = true;
                 this.excerpt_completed = false;
                 this.upload_file_error = true;
@@ -48271,11 +48308,20 @@ if (document.getElementById("new_article")) {
                     this.title_completed = true;
                 }
 
-                if (abstract) {
+                if (abstractWords >= 100 && abstractWords <= 250) {
                     this.abst_na = false;
                     this.abst_check = true;
                     this.abst_completed = true;
                     this.abst_error = false;
+                    this.error_abstract = '';
+                } else if (abstract) {
+                    this.abst_na = false;
+                    this.abst_check = false;
+                    this.abst_completed = false;
+                    this.abst_error = true;
+                    this.error_abstract = (this.abstract_error_template || 'Abstract is required and must be between 100 - 250 words. Current word count: :count').replace(':count', abstractWords);
+                } else {
+                    this.error_abstract = (this.abstract_error_template || 'Abstract is required and must be between 100 - 250 words. Current word count: :count').replace(':count', '0');
                 }
 
                 if (excerpt) {
@@ -48285,18 +48331,11 @@ if (document.getElementById("new_article")) {
                     this.excerpt_error = false;
                 }
 
-                if (author_title && author_email) {
-                    this.author_na = false;
-                    this.author_check = true;
-                    this.author_completed = true;
-                    this.author_error = false;
-                }
-
                 if (fileInput) {
-                    this.upload_file_check = false;
-                    this.upload_file_na = true;
-                    this.upload_file_error = true;
-                    this.upload_file_completed = false;
+                    this.upload_file_check = true;
+                    this.upload_file_na = false;
+                    this.upload_file_error = false;
+                    this.upload_file_completed = true;
                 }
             }
         }

@@ -156,28 +156,6 @@
                                     </span>
                                 @endif
                             </div>
-                            <div class="figma-form-group">
-                                <textarea id="author_bio" 
-                                    class="form-control {{ $errors->register->first('author_bio') ? 'is-invalid' : '' }}"  
-                                    name="author_bio"
-                                    rows="4"
-                                    placeholder="Author's Bio (50 words maximum) *" 
-                                    maxlength="500"
-                                    required>{{ old('author_bio') }}</textarea>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
-                                    <small class="form-text text-muted">
-                                        Maximum 50 words (approximately 500 characters)
-                                    </small>
-                                    <small id="word_count" class="form-text" style="font-weight: 600; color: #0066FF;">
-                                        <span id="current_words">0</span> / 50 words
-                                    </small>
-                                </div>
-                                @if ($errors->register->first('author_bio'))
-                                    <span class="figma-form-error">
-                                        {{$errors->register->first('author_bio')}}
-                                    </span>
-                                @endif
-                            </div>
                             <div class="figma-form-row">
                                 <div class="figma-form-group">
                                     <input id="password" type="password" 
@@ -232,54 +210,5 @@
     </section>
 
     @include('partials.figma-footer')
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const textarea = document.getElementById('author_bio');
-            const wordCountDisplay = document.getElementById('current_words');
-            const wordCountContainer = document.getElementById('word_count');
-            
-            function countWords(text) {
-                // Remove leading/trailing whitespace and split by whitespace
-                const trimmedText = text.trim();
-                if (trimmedText === '') {
-                    return 0;
-                }
-                // Split by one or more whitespace characters
-                return trimmedText.split(/\s+/).filter(word => word.length > 0).length;
-            }
-            
-            function updateWordCount() {
-                const text = textarea.value;
-                const wordCount = countWords(text);
-                
-                // Update the display
-                wordCountDisplay.textContent = wordCount;
-                
-                // Change color based on word count
-                if (wordCount > 50) {
-                    wordCountContainer.style.color = '#dc3545'; // Red for over limit
-                    textarea.classList.add('is-invalid');
-                } else if (wordCount >= 45) {
-                    wordCountContainer.style.color = '#ffc107'; // Yellow for warning
-                    textarea.classList.remove('is-invalid');
-                } else {
-                    wordCountContainer.style.color = '#0066FF'; // Blue for normal
-                    textarea.classList.remove('is-invalid');
-                }
-            }
-            
-            // Update on input, paste, and initial load
-            if (textarea) {
-                textarea.addEventListener('input', updateWordCount);
-                textarea.addEventListener('paste', function() {
-                    setTimeout(updateWordCount, 10);
-                });
-                
-                // Initial count if there's old value
-                updateWordCount();
-            }
-        });
-    </script>
 
 @endsection
