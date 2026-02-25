@@ -154,7 +154,7 @@ class AuthorController extends Controller
                         }
                     },
                 ],
-                'excerpt' => 'required|string',
+                'excerpt' => 'nullable|string',
                 'authors.0.bio' => [
                     'required',
                     'string',

@@ -64,6 +64,10 @@
                               strtolower($slug) === 'special-issues' ||
                               strtolower($slug) === 'special-issues-and-guest-editors' ||
                               (strpos(strtolower($page->title), 'special issues') !== false);
+
+    $is_announcements_page = strtolower($page->title) === 'announcements' ||
+                             strtolower($slug) === 'announcements' ||
+                             strtolower($slug) === 'announcement';
 @endphp
 @section('breadcrumbs')
     @if (count($breadcrumbs))
@@ -639,6 +643,56 @@
                 </div>
                 <div class="figma-about-content">
                     <p class="figma-about-description" style="text-align: center; font-size: 1.1rem;">This page is under construction. The advisory board list will be displayed soon.</p>
+                </div>
+            </div>
+        </section>
+
+    @elseif($is_announcements_page)
+        {{-- Announcements Page Content --}}
+        <section class="figma-about-section">
+            <div class="figma-about-container">
+                <div class="figma-page-banner">
+                    <h1>Announcements</h1>
+                </div>
+                <div class="figma-about-content">
+                    <article class="figma-announcement-item" style="margin-bottom: 2rem; padding: 1.75rem; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #0066FF; display: flex; flex-wrap: wrap; gap: 20px;">
+                        <div class="figma-announcement-image" style="flex: 0 0 260px; max-width: 100%;">
+                            <img src="{{ asset('images/banner1.jpeg') }}" alt="HELE Webinar 3 Poster" style="width: 100%; height: auto; border-radius: 6px;">
+                        </div>
+                        <div class="figma-announcement-text" style="flex: 1 1 260px; min-width: 0;">
+                            <p style="margin: 0 0 0.5rem 0; font-weight: 600; letter-spacing: 0.03em;">MARK YOUR DATES 🗓️</p>
+                            <p style="margin: 0 0 1rem 0;">
+                                HELE Webinar – 3, jointly organised by AINET – Association of English Teachers,
+                                HELE-India Group and HELE Society.
+                            </p>
+
+                            <p style="margin: 0 0 0.25rem 0;"><strong>Title:</strong> Beyond &quot;Impressionistic&quot; History: A Case Study of the First Shakespeare Adaptation in India</p>
+                            <p style="margin: 0 0 0.25rem 0;"><strong>Speaker:</strong> Prof. Sunil Sagar, Department of English Studies, Central University of Gujarat</p>
+                            <p style="margin: 0 0 0.25rem 0;"><strong>Date:</strong> Friday, 20 March 2026</p>
+                            <p style="margin: 0 0 1rem 0;"><strong>Time:</strong> 7.00 PM (India Time)</p>
+
+                            <p style="margin: 0 0 1rem 0;">
+                                In this insightful session, Prof. Sagar will revisit the first Indian adaptation of
+                                <em>The Taming of the Shrew</em> (1852 Gujarati rendering) and raise important questions
+                                about translation history in India. The webinar will encourage us to move beyond
+                                impressionistic narratives and adopt research grounded in archival evidence. This promises
+                                to be a significant academic discussion for scholars and teachers of English, translation
+                                studies, and nineteenth-century literature.
+                            </p>
+
+                            <div style="margin-top: 1rem;">
+                                <p style="margin: 0 0 0.25rem 0; font-weight: 600;">Zoom Meeting Details:</p>
+                                <p style="margin: 0 0 0.25rem 0;">
+                                    <strong>Meeting Link:</strong>
+                                    <a href="https://us02web.zoom.us/j/88342580364?pwd=pN50lA5CEnBThHgPYxI7B5MQ8ylm34.1" target="_blank" rel="noopener">
+                                        Join Zoom Meeting
+                                    </a>
+                                </p>
+                                <p style="margin: 0 0 0.25rem 0;"><strong>Meeting ID:</strong> 883 4258 0364</p>
+                                <p style="margin: 0;"><strong>Passcode:</strong> hele12</p>
+                            </div>
+                        </div>
+                    </article>
                 </div>
             </div>
         </section>

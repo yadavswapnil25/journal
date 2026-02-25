@@ -17,7 +17,8 @@
     <section class="figma-hero-slider">
         <div class="figma-slider-container">
             {{-- Slide 1 --}}
-            <div class="figma-slide active" style="background-image: url({{ asset('images/slider-1.jpeg') }});">
+            <div class="figma-slide active">
+                <img src="{{ asset('images/banner.jpeg') }}" alt="Banner" class="figma-banner-img" width="1200" height="600">
                 <div class="figma-hero-content">
                     <!-- Optional overlay text can go here -->
                 </div>

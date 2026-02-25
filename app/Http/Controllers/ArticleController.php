@@ -363,7 +363,6 @@ class ArticleController extends Controller
         $errors['author_email_error'] = trans('prs.ph_article_author_email_error');
         $errors['article_title_error'] = trans('prs.ph_article_title_error');
         $errors['article_desc_error'] = trans('prs.ph_article_desc_error');
-        $errors['article_excerpt_error'] = trans('prs.ph_article_excerpt_error');
         $errors['article_doc_error'] = trans('prs.ph_article_doc_error');
         return $errors;
     }

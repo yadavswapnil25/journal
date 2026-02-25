@@ -113,7 +113,7 @@ class Article extends Model
                 $article->slug = htmlspecialchars($request['title'], ENT_QUOTES, 'UTF-8');
                 $article->price = null;
                 $article->abstract = $request['abstract'];
-                $article->excerpt = htmlspecialchars($request['excerpt'], ENT_QUOTES, 'UTF-8');
+                $article->excerpt = htmlspecialchars($request['excerpt'] ?? '', ENT_QUOTES, 'UTF-8');
                 $article->submitted_document = htmlspecialchars($full_doc_name, ENT_QUOTES, 'UTF-8');
                 $article->publish_document = null;
                 $article->status = 'articles_under_review';

@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div class="sj-inputtyfile" v-bind:class="{ 'sj-uploading': this.uploading }">
+    <div class="sj-inputtyfile" v-bind:class="{ 'sj-uploading': this.uploading, 'sj-drag-over': isDragOver }"
+         @dragover.prevent="onDragOver"
+         @dragleave.prevent="onDragLeave"
+         @drop.prevent="onDrop">
       <div class="sj-title">
         <h3>{{field_title}}</h3>
       </div>
@@ -56,6 +59,7 @@ export default {
       file: "",
       fileSize: "",
       uploading: false,
+      isDragOver: false,
       doc_ref: "uploaded_doc",
       doc_input: "",
       file_object: "",
@@ -72,6 +76,25 @@ export default {
   methods: {
     watchFileInput: function() {
       $('input[type="file"]').change(this.notifyFileInput.bind(this));
+    },
+
+    onDragOver() {
+      this.isDragOver = true;
+    },
+    onDragLeave() {
+      this.isDragOver = false;
+    },
+    onDrop(event) {
+      this.isDragOver = false;
+      var file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+      if (!file) return;
+      var input = this.doc_id ? document.getElementById(this.doc_id) : (this.$refs[this.doc_ref] || null);
+      if (input && typeof DataTransfer !== 'undefined') {
+        var dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
     },
 
     notifyFileInput: function(event) {
@@ -120,3 +143,10 @@ export default {
   created: function() {}
 };
 </script>
+<style scoped>
+.sj-inputtyfile.sj-drag-over {
+  outline: 2px dashed #0066ff;
+  outline-offset: 2px;
+  background-color: rgba(0, 102, 255, 0.05);
+}
+</style>

@@ -108,10 +108,10 @@
                                 @endif
                                 {!! Form::open(['url' => '/reviewer/user/submit-feedback/'.$article[0]->id, 'class'=>'sj-formtheme sj-formsearchvthree']) !!}
                                     <fieldset>
-                                        <div class="sj-dashboardboxtitle sj-titlewithform">
-                                            <h2>{{{trans('prs.reply_revision')}}}</h2>
+                                        <div class="sj-dashboardboxtitle sj-titlewithform reviewer-recommendation-heading">
+                                            <h2>{{{trans('prs.overall_recommendation')}}}</h2>
                                         </div>
-                                        <div class="form-group sj-firstformgroup">
+                                        <div class="form-group sj-firstformgroup reviewer-recommendation-select-wrap">
                                             <span class="sj-select">
                                                 {!! Form::select('status', [
                                                     'accepted_articles' => trans('prs.publish_as_it_is'),

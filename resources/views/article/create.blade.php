@@ -32,7 +32,7 @@
                         @endif
 
                         <transition name="fade">
-                            <div class="figma-alert figma-alert-error" v-if="(error_title || error_author_name || error_author_email || error_abstract || error_excerpt || error_doc)" v-show="custom_error" v-cloak>
+                            <div class="figma-alert figma-alert-error" v-if="(error_title || error_author_name || error_author_email || error_abstract || error_doc)" v-show="custom_error" v-cloak>
                                 <div>Please fix the errors below.</div>
                             </div>
                         </transition>
@@ -133,15 +133,6 @@
                             </div>
 
                             <div class="figma-form-group">
-                                <label class="figma-form-label">{{ trans('prs.add_excerpt') }} <span class="figma-required">*</span></label>
-                                {!! Form::textarea('excerpt', null, ['class' => 'figma-form-input figma-form-textarea ' . ($errors->has('excerpt') ? 'is-invalid' : ''), 'id' => 'excerpt', 'placeholder' => trans('prs.add_excerpt'), 'rows' => 3, '@keyup' => 'autoComplete']) !!}
-                                @if ($errors->has('excerpt'))
-                                    <span class="figma-form-error">{{ $errors->first('excerpt') }}</span>
-                                @endif
-                                <span class="figma-form-error" v-if="error_excerpt" v-cloak>@{{ error_excerpt }}</span>
-                            </div>
-
-                            <div class="figma-form-group">
                                 <label class="figma-form-label">{{trans('prs.ph_upload_article')}} <span class="figma-required">*</span></label>
                                 <upload-files-field
                                     :doc_id="create_article"
@@ -186,10 +177,6 @@
                             <li v-bind:class="{ 'figma-error': this.abst_error, 'figma-success': this.abst_completed }">
                                 <i v-bind:class="{ 'fa fa-times': this.abst_na, 'fa fa-check': this.abst_check }"></i>
                                 <span>{{{trans('prs.add_abstract')}}}</span>
-                            </li>
-                            <li v-bind:class="{ 'figma-error': this.excerpt_error, 'figma-success': this.excerpt_completed }">
-                                <i v-bind:class="{ 'fa fa-times': this.excerpt_na, 'fa fa-check': this.excerpt_check }"></i>
-                                <span>{{{trans('prs.add_excerpt')}}}</span>
                             </li>
                             <li class="uploadfilestatus" v-bind:class="{ 'figma-error': this.upload_file_error, 'figma-success': this.upload_file_completed }">
                                 <i class="uploadstatusinner" v-bind:class="{ 'fa fa-times': this.upload_file_na, 'fa fa-check': this.upload_file_check }"></i>

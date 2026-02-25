@@ -326,16 +326,16 @@ if (document.getElementById("new_article")) {
                 Vue.delete(this.authors, index);
             },
             checkForm: function () {
-                var article_title = document.querySelector("input[name=title]") ? document.querySelector("input[name=title]").value : '';
+                var titleEl = document.getElementById("article_title") || document.querySelector("input[name=title]");
+                var article_title = titleEl ? titleEl.value.trim() : '';
                 var abstractField = document.getElementById("abstract");
                 var abstract = abstractField ? abstractField.value.trim() : '';
-                var excerptField = document.getElementById("excerpt");
-                var excerpt = excerptField ? excerptField.value.trim() : '';
-                var fileInput = document.getElementById("create_article") ? document.getElementById("create_article").value : '';
+                var fileInputEl = document.getElementById("create_article");
+                var hasFile = fileInputEl && ((fileInputEl.files && fileInputEl.files.length > 0) || (fileInputEl.value && fileInputEl.value.trim() !== ''));
                 var abstractWords = this.getAbstractWordCount(abstract);
                 var abstractValid = abstractWords >= 100 && abstractWords <= 250;
 
-                if (article_title && abstractValid && excerpt && fileInput) {
+                if (article_title && abstractValid && hasFile) {
                     this.error_title = '';
                     this.error_author_name = '';
                     this.error_author_email = '';
@@ -367,8 +367,7 @@ if (document.getElementById("new_article")) {
                         if (!abstractValid) {
                             self.error_abstract = (self.abstract_error_template || 'Abstract is required and must be between 100 - 250 words. Current word count: :count').replace(':count', self.getAbstractWordCount(document.getElementById("abstract") ? document.getElementById("abstract").value : ''));
                         }
-                        self.error_excerpt = !excerpt ? (response.data.article_excerpt_error || '') : '';
-                        self.error_doc = !fileInput ? (response.data.article_doc_error || '') : '';
+                        self.error_doc = !hasFile ? (response.data.article_doc_error || '') : '';
                         setTimeout(function () {
                             self.custom_error = false;
                         }, 5000);
@@ -382,12 +381,12 @@ if (document.getElementById("new_article")) {
                 return t === '' ? 0 : t.split(/\s+/).filter(function (w) { return w.length > 0; }).length;
             },
             autoComplete: function () {
-                var title = document.querySelector("input[name=title]") ? document.querySelector("input[name=title]").value : '';
+                var titleEl = document.getElementById("article_title") || document.querySelector("input[name=title]");
+                var title = titleEl ? titleEl.value.trim() : '';
                 var abstractEl = document.getElementById("abstract");
                 var abstract = abstractEl ? abstractEl.value.trim() : '';
-                var excerptEl = document.getElementById("excerpt");
-                var excerpt = excerptEl ? excerptEl.value.trim() : '';
-                var fileInput = document.getElementById("create_article") ? document.getElementById("create_article").value : '';
+                var fileInputEl = document.getElementById("create_article");
+                var hasFile = fileInputEl && ((fileInputEl.files && fileInputEl.files.length > 0) || (fileInputEl.value && fileInputEl.value.trim() !== ''));
 
                 var abstractWords = this.getAbstractWordCount(abstract);
                 this.abstract_word_count = abstractWords;
@@ -444,7 +443,7 @@ if (document.getElementById("new_article")) {
                     this.excerpt_error = false;
                 }
 
-                if (fileInput) {
+                if (hasFile) {
                     this.upload_file_check = true;
                     this.upload_file_na = false;
                     this.upload_file_error = false;

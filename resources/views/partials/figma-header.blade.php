@@ -65,13 +65,15 @@
     </div>
 </nav>
 
-{{-- Announcement Bar --}}
+{{-- Announcement Bar (above banner) --}}
 <div class="figma-announcement-bar" style="display: block !important; visibility: visible !important; width: 100% !important;">
     <div class="figma-announcement-container">
         <div class="figma-announcement-label">Announcements</div>
         <div class="figma-announcement-content">
             <div class="figma-announcement-marquee">
-                9th AINET International Conference 2026. Participate in a Poll. &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp; Submit your research papers before the deadline. &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp; New special issue on Language Education now open for submissions. &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp; 9th AINET International Conference 2026. Participate in a Poll. &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp; Submit your research papers before the deadline. &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp; New special issue on Language Education now open for submissions.
+                <a href="{{ route('showPage', ['slug' => 'submission-guidelines']) }}">Call for submissions is now open. Submit your manuscripts for the first issue by 31st May 2026.</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="{{ route('showPage', ['slug' => 'announcements']) }}">HELE Webinar - 3: History of the first adaptation of a Shakespearean play, 20 March 2026, 7.00 PM India time</a>
             </div>
         </div>
     </div>

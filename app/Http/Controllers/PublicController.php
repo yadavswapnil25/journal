@@ -242,6 +242,14 @@ class PublicController extends Controller
                     'sub_title' => 'Advisory Board',
                     'body'      => ''
                 ];
+            } elseif (in_array($normalizedSlug, ['announcements', 'announcement'], true)) {
+                $page = (object)[
+                    'id'        => 0,
+                    'title'     => 'Announcements',
+                    'slug'      => 'announcements',
+                    'sub_title' => 'Announcements',
+                    'body'      => ''
+                ];
             } else {
                 abort(404);
             }

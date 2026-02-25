@@ -480,3 +480,14 @@
 .mt-3 { margin-top: 24px; }
 .mt-4 { margin-top: 32px; }
 .mt-5 { margin-top: 40px; }
+
+/* Reviewer feedback: remove icon/checkbox inside recommendation dropdown */
+.reviewer-recommendation-select-wrap .sj-select::after {
+    display: none;
+}
+
+/* Reviewer feedback: hide overall recommendation dropdown and its heading */
+#reviewer_feedback .reviewer-recommendation-heading,
+#reviewer_feedback .reviewer-recommendation-select-wrap {
+    display: none !important;
+}
