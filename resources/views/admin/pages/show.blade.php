@@ -427,11 +427,11 @@
                         @elseif($active_policy === 'subscription-policy')
                             <h2 class="figma-policy-title">SUBSCRIPTION POLICY</h2>
                             <div class="figma-policy-text-content">
-                                <p>SHELE is an open-access journal, meaning all content is freely available to readers without subscription fees. There are no charges for accessing, downloading, or reading articles published in SHELE.</p>
+                                <p>SHELE is an open-access journal. The content of the journal is freely available to readers without any subscription fees as of now. There are no charges for accessing, downloading, or reading articles published in SHELE.</p>
                                 
-                                <p><strong>Open Access:</strong> All articles published in SHELE are made immediately available online upon publication. Readers can access, download, and share articles without restrictions, subject to proper attribution.</p>
+                                <p><strong>Open Access:</strong> All articles published in SHELE are available online upon publication. Readers can access, download, and share articles without restrictions, subject to proper attribution.</p>
                                 
-                                <p><strong>Article Processing Charges:</strong> SHELE does not charge authors for publication. The journal is supported by institutional funding and does not require article processing charges (APCs) or publication fees.</p>
+                                <p><strong>Article Processing Charges:</strong> SHELE does not charge authors for publication. The journal is does not ask for any article processing charges (APCs) or publication fees.</p>
                                 
                                 <p><strong>Archiving:</strong> All published content is archived and preserved for long-term access through digital repositories and library systems.</p>
                             </div>
@@ -490,11 +490,11 @@
                         @if($active_policy === 'review-policy')
                         <h2 class="figma-policy-title">SUBSCRIPTION POLICY</h2>
                             <div class="figma-policy-text-content">
-                                <p>SHELE is an open-access journal, meaning all content is freely available to readers without subscription fees. There are no charges for accessing, downloading, or reading articles published in SHELE.</p>
+                                <p>SHELE is an open-access journal. The content of the journal is freely available to readers without any subscription fees as of now. There are no charges for accessing, downloading, or reading articles published in SHELE.</p>
                                 
-                                <p><strong>Open Access:</strong> All articles published in SHELE are made immediately available online upon publication. Readers can access, download, and share articles without restrictions, subject to proper attribution.</p>
+                                <p><strong>Open Access:</strong> All articles published in SHELE are available online upon publication. Readers can access, download, and share articles without restrictions, subject to proper attribution.</p>
                                 
-                                <p>The journal is supported by institutional funding and does not require article processing charges (APCs) or publication fees.</p>
+                                <p>The journal is does not ask for any article processing charges (APCs) or publication fees.</p>
                                 
                                 <p><strong>Archiving:</strong> All published content is archived and preserved for long-term access through digital repositories and library systems.</p>
                             </div>
@@ -542,11 +542,11 @@
                         @elseif($active_policy === 'subscription-policy')
                             <h2 class="figma-policy-title">SUBSCRIPTION POLICY</h2>
                             <div class="figma-policy-text-content">
-                                <p>SHELE is an open-access journal, meaning all content is freely available to readers without subscription fees. There are no charges for accessing, downloading, or reading articles published in SHELE.</p>
+                                <p>SHELE is an open-access journal. The content of the journal is freely available to readers without any subscription fees as of now. There are no charges for accessing, downloading, or reading articles published in SHELE.</p>
                                 
-                                <p><strong>Open Access:</strong> All articles published in SHELE are made immediately available online upon publication. Readers can access, download, and share articles without restrictions, subject to proper attribution.</p>
+                                <p><strong>Open Access:</strong> All articles published in SHELE are available online upon publication. Readers can access, download, and share articles without restrictions, subject to proper attribution.</p>
                                 
-                                <p>The journal is supported by institutional funding and does not require article processing charges (APCs) or publication fees.</p>
+                                <p>The journal is does not ask for any article processing charges (APCs) or publication fees.</p>
                                 
                                 <p><strong>Archiving:</strong> All published content is archived and preserved for long-term access through digital repositories and library systems.</p>
                             </div>

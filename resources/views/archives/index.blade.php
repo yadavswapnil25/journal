@@ -23,7 +23,7 @@
 
             {{-- Archives List --}}
             <div class="figma-archives-list">
-                @if(!empty($archives))
+                <!-- @if(!empty($archives))
                     @foreach($archives as $year => $yearEditions)
                         @foreach($yearEditions as $edition)
                             @php
@@ -61,7 +61,10 @@
                     <div class="figma-no-archives">
                         <p>No archives available at this time.</p>
                     </div>
-                @endif
+                @endif -->
+                <div class="figma-no-archives">
+                        <p>No archives available at this time.</p>
+                    </div>
             </div>
         </div>
     </section>

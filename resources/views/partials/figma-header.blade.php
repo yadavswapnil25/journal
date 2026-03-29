@@ -23,7 +23,6 @@
                         <a href="{{ route('showPage', ['slug' => 'special-issues']) }}">Special issues and guest editors</a>
                     </div>
                 </div>
-                <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}" class="figma-navbar-link {{ Request::is('page/journal-policies*') || Request::is('page/policies*') ? 'active' : '' }}">Policies</a>
                 <div class="figma-navbar-item">
                     <a href="#" class="figma-navbar-link has-dropdown">Editorial Team</a>
                     <div class="figma-navbar-dropdown">
@@ -71,7 +70,7 @@
         <div class="figma-announcement-label">Announcements</div>
         <div class="figma-announcement-content">
             <div class="figma-announcement-marquee">
-                <a href="{{ route('showPage', ['slug' => 'submission-guidelines']) }}">Call for submissions is now open. Submit your manuscripts for the first issue by 31st May 2026.</a>
+                <a href="{{ route('showPage', ['slug' => 'submission-guidelines']) }}">Call for submissions is now open. Submit your manuscripts for the first issue by 30 June 2026.</a>
                 &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
                 <a href="{{ route('showPage', ['slug' => 'announcements']) }}">HELE Webinar - 3: History of the first adaptation of a Shakespearean play, 20 March 2026, 7.00 PM India time</a>
             </div>

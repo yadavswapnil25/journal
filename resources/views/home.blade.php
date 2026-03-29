@@ -106,7 +106,7 @@
     </section>
 
     {{-- Issues Section --}}
-    @if (!empty($published_articles))
+    <!-- @if (!empty($published_articles))
     <section class="figma-issues-section">
         <div class="figma-issues-container">
             <div class="figma-issue-item">
@@ -149,7 +149,7 @@
             </div>
         </div>
     </section>
-    @endif
+    @endif -->
 
     {{-- Newsletter Section --}}
     <section class="figma-newsletter-section">
