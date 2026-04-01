@@ -242,6 +242,15 @@
                         </ul>
 
                         <div class="figma-call-for-submissions-note" style="margin-top: 2rem;">
+                            <h3>How to Submit</h3>
+                            <p>
+                                <a href="{{ route('showPage', ['slug' => 'submission-guidelines']) }}">CLICK HERE</a> to see the Submissions Guidelines.<br>
+                                <a href="{{ route('checkAuthor') }}">CLICK HERE</a> to go to the Submissions page.<br>
+                                First-time submitters will need to create an author account through a very easy process.
+                            </p>
+                        </div>
+
+                        <div class="figma-call-for-submissions-note" style="margin-top: 2rem;">
                             <h3>Note</h3>
                             <p>
                                 By making the submission the authors confirm that they have read, understood and agreed to respect the policies of the journal regarding the <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=review-policy">review process</a>, <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=anti-plagiarism-policy">anti-plagiarism</a>, <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=data-protection">data protection, privacy and digital preservation</a>, <a href="{{ route('showPage', ['slug' => 'journal-policies']) }}?section=ethical-standards">ethics, copyright and conflicts of interest</a>, among others.
