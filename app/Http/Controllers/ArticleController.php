@@ -62,14 +62,30 @@ class ArticleController extends Controller
         $user_role_type = User::getUserRoleType($user_id);
         $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
         $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
+        $assigned_role_types = DB::table('model_has_roles')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_id', $user_id)
+            ->pluck('roles.role_type')
+            ->toArray();
+        $role_allowed = false;
+        if ($role === 'editor') {
+            $role_allowed = in_array('editor', $assigned_role_types, true) || in_array('superadmin', $assigned_role_types, true);
+        } elseif ($role === 'superadmin') {
+            $role_allowed = in_array('superadmin', $assigned_role_types, true);
+        } else {
+            $role_allowed = in_array($role, $assigned_role_types, true);
+        }
         $page_title = Helper::DashboardArticlePageTitle($status);
         $payment_mode = SiteManagement::getMetaValue('payment_mode');
         if (empty($article_status)) {
-            return redirect()->to('/' . $user_role . '/dashboard/' . $user_id . '/articles-under-review');
+            $redirect_role = $role_allowed && !empty($role) ? $role : $user_role;
+            return redirect()->to('/' . $redirect_role . '/dashboard/' . $user_id . '/articles-under-review');
         } else {
-            if ($user_role != $role || $user_id != $id || !(is_numeric($id)) || !(in_array($article_status, Helper::statusStaticList()))) {
+            if (!$role_allowed || $user_id != $id || !(is_numeric($id)) || !(in_array($article_status, Helper::statusStaticList()))) {
                 return view('errors.401');
             }
+            // Keep links/status actions aligned with selected dashboard role.
+            $user_role = $role;
             $editions = Edition::getEditionsListByStatus();
             if (!empty($request->get('keyword'))) {
                 $keyword = $request->get('keyword');
@@ -104,9 +120,23 @@ class ArticleController extends Controller
         $user_role_type = User::getUserRoleType($user_id);
         $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
         $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
-        if ($user_role != $role || $user_id != $id || !(is_numeric($id)) || !(in_array($article_status, Helper::statusStaticList()))) {
+        $assigned_role_types = DB::table('model_has_roles')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_id', $user_id)
+            ->pluck('roles.role_type')
+            ->toArray();
+        $role_allowed = false;
+        if ($role === 'editor') {
+            $role_allowed = in_array('editor', $assigned_role_types, true) || in_array('superadmin', $assigned_role_types, true);
+        } elseif ($role === 'superadmin') {
+            $role_allowed = in_array('superadmin', $assigned_role_types, true);
+        } else {
+            $role_allowed = in_array($role, $assigned_role_types, true);
+        }
+        if (!$role_allowed || $user_id != $id || !(is_numeric($id)) || !(in_array($article_status, Helper::statusStaticList()))) {
             return view('errors.401');
         }
+        $user_role = $role;
         $article = DB::table('articles')->where('slug', $slug)->where('status', $article_status)->first();
         if (!empty($article)) {
             $existed_reviewers = User::getUserByRoleType('reviewer');
@@ -290,8 +320,8 @@ class ArticleController extends Controller
                 $email_params['editor_review_corresponding_author_name'] = $corresponding_author_name;
                 $email_params['author_editor_review_article_link'] = $author_article_link;
             }
-            $superadmin = User::getUserByRoleType('superadmin');
-            $email_params['editor_review_super_admin_name'] = $superadmin[0]->name;
+            $superadmins = User::getUserByRoleType('superadmin');
+            $email_params['editor_review_super_admin_name'] = !empty($superadmins) ? $superadmins[0]->name : '';
             $articles = Article::select('title')->where('id', $id)->first();
             if (!empty($articles)) {
                 $email_params['editor_review_author_article_title'] = $articles->title;
@@ -312,14 +342,18 @@ class ArticleController extends Controller
                 $user_email = "";
                 foreach ($role_type as $key => $role) {
                     if ($role == "superadmin") {
-                        $article_link = url('/login?user_id=' . $superadmin[0]->id . '&email_type=' . $status . '_editor_feedback&status=' . $status);
-                        $email_params['editor_review_article_link'] = $article_link;
-                        $template_data = EmailTemplate::getEmailTemplatesByID($superadmin[0]->role_id, $status . '_editor_feedback');
-                        if (!empty($template_data)) {
-                            try {
-                                Mail::to($superadmin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
-                            } catch (\Exception $e) {
-                                // Log error but continue with other emails
+                        if (!empty($superadmins)) {
+                            foreach ($superadmins as $superadmin) {
+                                $article_link = url('/login?user_id=' . $superadmin->id . '&email_type=' . $status . '_editor_feedback&status=' . $status);
+                                $email_params['editor_review_article_link'] = $article_link;
+                                $template_data = EmailTemplate::getEmailTemplatesByID($superadmin->role_id, $status . '_editor_feedback');
+                                if (!empty($template_data)) {
+                                    try {
+                                        Mail::to($superadmin->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                                    } catch (\Exception $e) {
+                                        // Log error but continue with other emails
+                                    }
+                                }
                             }
                         }
                     } elseif ($role == "author") {

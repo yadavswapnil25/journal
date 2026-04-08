@@ -268,18 +268,20 @@ class AuthorController extends Controller
                 $user_email = "";
                 foreach ($role_type as $key => $role) {
                     if ($role == "superadmin") {
-                        $superadmin = User::getUserByRoleType('superadmin');
-                        if (!empty($superadmin)) {
-                            $email_params['superadmin_name'] = $superadmin[0]->name;
-                            $email_params['superadmin_email'] = $superadmin[0]->email;
-                            $article_link = url('/login?user_id=' . $superadmin[0]->id . '&email_type=new_article');
-                            $email_params['article_link'] = $article_link;
-                            $template_data = EmailTemplate::getEmailTemplatesByID($superadmin[0]->role_id, 'new_article');
-                            if (!empty($template_data)) {
-                                try {
-                                    Mail::to($superadmin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
-                                } catch (\Exception $e) {
-                                    // Log error but continue with other emails
+                        $superadmins = User::getUserByRoleType('superadmin');
+                        if (!empty($superadmins)) {
+                            foreach ($superadmins as $superadmin) {
+                                $email_params['superadmin_name'] = $superadmin->name;
+                                $email_params['superadmin_email'] = $superadmin->email;
+                                $article_link = url('/login?user_id=' . $superadmin->id . '&email_type=new_article');
+                                $email_params['article_link'] = $article_link;
+                                $template_data = EmailTemplate::getEmailTemplatesByID($superadmin->role_id, 'new_article');
+                                if (!empty($template_data)) {
+                                    try {
+                                        Mail::to($superadmin->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                                    } catch (\Exception $e) {
+                                        // Log error but continue with other emails
+                                    }
                                 }
                             }
                         }
@@ -442,18 +444,20 @@ class AuthorController extends Controller
                     $user_email = "";
                     foreach ($role_type as $key => $role) {
                         if ($role == "superadmin") {
-                            $superadmin = User::getUserByRoleType('superadmin');
-                            if (!empty($superadmin)) {
-                                $email_params['superadmin_name'] = $superadmin[0]->name;
-                                $email_params['superadmin_email'] = $superadmin[0]->email;
-                                $article_link = url('/login?user_id=' . $superadmin[0]->id . '&email_type=resubmit_article&status=articles-under-review');
-                                $email_params['article_link'] = $article_link;
-                                $template_data = EmailTemplate::getEmailTemplatesByID($superadmin[0]->role_id, 'resubmit_article');
-                                if (!empty($template_data)) {
-                                    try {
-                                        Mail::to($superadmin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
-                                    } catch (\Exception $e) {
-                                        // Log error but continue with other emails
+                            $superadmins = User::getUserByRoleType('superadmin');
+                            if (!empty($superadmins)) {
+                                foreach ($superadmins as $superadmin) {
+                                    $email_params['superadmin_name'] = $superadmin->name;
+                                    $email_params['superadmin_email'] = $superadmin->email;
+                                    $article_link = url('/login?user_id=' . $superadmin->id . '&email_type=resubmit_article&status=articles-under-review');
+                                    $email_params['article_link'] = $article_link;
+                                    $template_data = EmailTemplate::getEmailTemplatesByID($superadmin->role_id, 'resubmit_article');
+                                    if (!empty($template_data)) {
+                                        try {
+                                            Mail::to($superadmin->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                                        } catch (\Exception $e) {
+                                            // Log error but continue with other emails
+                                        }
                                     }
                                 }
                             }

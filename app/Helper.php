@@ -752,9 +752,19 @@ class Helper
         $active_class = '';
         $user_roles_type = User::getUserRoleType(Auth::user()->id);
         $user_roles_type = !empty($user_roles_type) && is_object($user_roles_type) ? $user_roles_type : null;
+        $active_dashboard_role = session('active_dashboard_role');
+        $assigned_role_types = DB::table('model_has_roles')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_id', Auth::user()->id)
+            ->pluck('roles.role_type')
+            ->toArray();
+        $current_role_type = !empty($user_roles_type) ? $user_roles_type->role_type : '';
+        if (!empty($active_dashboard_role) && in_array($active_dashboard_role, $assigned_role_types, true)) {
+            $current_role_type = $active_dashboard_role;
+        }
 
         // Define status menu based on user role
-        if (!empty($user_roles_type) && $user_roles_type->role_type === 'author') {
+        if ($current_role_type === 'author') {
             // Simplified menu for authors: Under Review, Past Articles, Published Articles
             $status = [
                 "sync"        => "articles-under-review",
@@ -762,7 +772,7 @@ class Helper
                 "spell-check" => "published-articles",
             ];
             $dashboard = 'user';
-        } elseif (!empty($user_roles_type) && $user_roles_type->role_type === 'reviewer') {
+        } elseif ($current_role_type === 'reviewer') {
             // Simplified menu for reviewers: Only Articles Under Review
             $status = [
                 "sync"        => "articles-under-review",
@@ -777,19 +787,19 @@ class Helper
                 "unlink"      => "major-revisions",
                 "cross"       => "rejected"
             ];
-            if (!empty($user_roles_type) && ($user_roles_type->role_type == 'superadmin' || $user_roles_type->role_type == 'editor')) {
+            if ($current_role_type == 'superadmin' || $current_role_type == 'editor') {
                 $dashboard = 'dashboard';
             } else {
                 $dashboard = 'user';
             }
         }
 
-        if (!empty($user_roles_type)) {
+        if (!empty($current_role_type)) {
             foreach ($status as $key => $s) {
                 if (!empty($page_id)) {
                     $active_class = $page_id == $s ? 'class="sj-active"' : '';
                 }
-                $link = url('/' . $user_roles_type->role_type . '/' . $dashboard . '/' . Auth::user()->id . '/' . $s);
+                $link = url('/' . $current_role_type . '/' . $dashboard . '/' . Auth::user()->id . '/' . $s);
                 $output .= "<li $active_class>";
                 $output .= "<a href='$link'>";
                 $output .= "<i class='lnr lnr-$key'></i><span>" . self::DashboardArticlePageTitle($s) . "</span>";

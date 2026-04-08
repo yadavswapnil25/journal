@@ -4,6 +4,7 @@
 @section('content')
     
     @php
+        $is_admin_login = $is_admin_login ?? false;
         if (!empty($_GET['user_id']) && !empty($_GET['email_type'])) {
             $user_id = $_GET['user_id'];
             $email_type = $_GET['email_type'];
@@ -17,7 +18,7 @@
                 $action = route('login',['user_id='.$user_id,'email_type='.$email_type]);
             }
         }else{
-            $action = route('login');
+            $action = $is_admin_login ? route('admin.login.submit') : route('login');
         }
         $reg_data = App\Models\SiteManagement::getMetaValue('reg_data');
         $login_focus = '';
@@ -40,7 +41,7 @@
                 {{-- Login Form --}}
                 <div class="figma-login-main">
                     <div class="figma-register-card">
-                        <h2>{{trans('prs.login_now')}}</h2>
+                        <h2>{{ $is_admin_login ? 'Admin Login' : trans('prs.login_now') }}</h2>
                         @if (Session::has('message'))
                             <div class="figma-alert figma-alert-success">
                                 {{ Session::get('message') }}
@@ -52,6 +53,28 @@
                         @endif
                         <form method="POST" action="{{$action}}" class="figma-form">
                             @csrf
+                            @if($is_admin_login)
+                                <input type="hidden" name="login_context" value="admin">
+                            @endif
+                            @if(!$is_admin_login)
+                                <div class="figma-form-group">
+                                    <label class="figma-form-label" style="display:block; margin-bottom: 8px;">Login as</label>
+                                    <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                                        <label class="figma-checkbox" style="width:auto;">
+                                            <input type="radio" name="login_as" value="author" {{ old('login_as', 'author') === 'author' ? 'checked' : '' }}>
+                                            <span>Author</span>
+                                        </label>
+                                        <label class="figma-checkbox" style="width:auto;">
+                                            <input type="radio" name="login_as" value="editor" {{ old('login_as') === 'editor' ? 'checked' : '' }}>
+                                            <span>Editor</span>
+                                        </label>
+                                        <label class="figma-checkbox" style="width:auto;">
+                                            <input type="radio" name="login_as" value="reviewer" {{ old('login_as') === 'reviewer' ? 'checked' : '' }}>
+                                            <span>Reviewer</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            @endif
                             <div class="figma-form-group">
                                 <input type="email" name="email" value="{{$errors->has('email') ? old('email') : ''}}" 
                                     class="figma-form-input {{ $errors->has('email') ? 'is-invalid' : '' }}"

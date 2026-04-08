@@ -37,7 +37,7 @@
                         <div class="sj-dashboardboxtitle">
                             <div class="sj-title">
                                 <h2>{{{trans('prs.edit_user')}}}</h2>
-                                <span>{{ trans('prs.provide') }}<strong>{{{!empty($role) ? $role->name : ''}}}</strong> {{ trans('prs.detls') }}</span>
+                                <span>{{ trans('prs.provide') }}<strong>{{{ !empty($users->roles) ? $users->roles->pluck('name')->implode(', ') : (!empty($role) ? $role->name : '') }}}</strong> {{ trans('prs.detls') }}</span>
                             </div>
                         </div>
                         <div class="sj-addnewuserform sj-manageallsession sj-edituser">
@@ -55,7 +55,17 @@
                                     <div class="form-group">
                                         {!! Form::email('email', null, ['class' => 'form-control']) !!}
                                     </div>
-                                    @if (!empty($role) && $role->role_type === 'reviewer')
+                                    @if(!empty($roles))
+                                        @foreach ($roles as $availableRole)
+                                            <div class="form-group half-width assign-role">
+                                                <span class="sj-checkbox">
+                                                    {{ Form::checkbox('roles[]', e($availableRole->id), in_array($availableRole->id, $assigned_role_ids ?? []), ['id' => 'edit-role-' . e($availableRole->name), 'data-assignrole' => e($availableRole->name)]) }}
+                                                    {{ Form::label('edit-role-' . e($availableRole->name), ucfirst(e($availableRole->name))) }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                    @if (!empty($is_reviewer_assigned))
                                         <div class="form-group">
                                             <span class="sj-select">
                                                 <select data-placeholder="{{{!empty($categories) ? trans('prs.choose_cat') : trans('prs.choose_cat_for_sel')}}}"

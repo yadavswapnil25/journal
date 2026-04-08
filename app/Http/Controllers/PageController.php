@@ -50,10 +50,16 @@ class PageController extends Controller
         $user_role_type = User::getUserRoleType($editor_id);
         $user_role_type = !empty($user_role_type) && is_object($user_role_type) ? $user_role_type : null;
         $user_role = !empty($user_role_type) ? $user_role_type->role_type : '';
-        if ($user_role != $role) {
+        $assigned_role_types = DB::table('model_has_roles')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_id', $editor_id)
+            ->pluck('roles.role_type')
+            ->toArray();
+        if (!in_array($role, $assigned_role_types, true)) {
             return view('errors.no-record');
         }
         $pages = Page::getPages();
+        $user_role = $role;
         return view('admin.pages.index', compact('editor_id', 'user_role', 'pages'));
     }
 
@@ -68,11 +74,15 @@ class PageController extends Controller
     {
         $parent_page = $this->pages->getParentPages();
         $user_id = Auth::user()->id;
-        $user_role_type = User::getUserRoleType($user_id);
-        $user_role = $user_role_type->role_type;
-        if ($user_role != $role) {
+        $assigned_role_types = DB::table('model_has_roles')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_id', $user_id)
+            ->pluck('roles.role_type')
+            ->toArray();
+        if (!in_array($role, $assigned_role_types, true)) {
             return view('errors.no-record');
         }
+        $user_role = $role;
         return view('admin.pages.create', compact('parent_page', 'user_role', 'user_id'));
     }
 
@@ -99,8 +109,14 @@ class PageController extends Controller
                 ]
             );
             $user_id = Auth::user()->id;
-            $user_role_type = User::getUserRoleType($user_id);
-            $user_role = $user_role_type->role_type;
+            $assigned_role_types = DB::table('model_has_roles')
+                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                ->where('model_has_roles.model_id', $user_id)
+                ->pluck('roles.role_type')
+                ->toArray();
+            if (!in_array($role, $assigned_role_types, true)) {
+                return view('errors.no-record');
+            }
             $page_save = $this->pages->savePage($request);
             if ($request['parent_id']) {
                 DB::table('parent_child_pages')->insert(
@@ -108,7 +124,7 @@ class PageController extends Controller
                 );
             }
             Session::flash('message', trans('prs.page_created'));
-            return redirect()->to('/' . $user_role . '/dashboard/pages');
+            return redirect()->to('/' . $role . '/dashboard/pages');
         }
     }
 
@@ -140,8 +156,15 @@ class PageController extends Controller
     {
         if (!empty($id)) {
             $user_id = Auth::user()->id;
-            $user_role_type = User::getUserRoleType($user_id);
-            $user_role = $user_role_type->role_type;
+            $assigned_role_types = DB::table('model_has_roles')
+                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                ->where('model_has_roles.model_id', $user_id)
+                ->pluck('roles.role_type')
+                ->toArray();
+            if (!in_array($role, $assigned_role_types, true)) {
+                return view('errors.no-record');
+            }
+            $user_role = $role;
             $page = Page::find($id);
             $parent_selected_id = '';
             $parent_page = $this->pages->getParentPages($id);
@@ -181,8 +204,14 @@ class PageController extends Controller
             $parent_id = filter_var($request['parent_id'], FILTER_SANITIZE_NUMBER_INT);
             $child_id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
             $user_id = Auth::user()->id;
-            $user_role_type = User::getUserRoleType($user_id);
-            $user_role = $user_role_type->role_type;
+            $assigned_role_types = DB::table('model_has_roles')
+                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                ->where('model_has_roles.model_id', $user_id)
+                ->pluck('roles.role_type')
+                ->toArray();
+            if (!in_array($userRole, $assigned_role_types, true)) {
+                return view('errors.no-record');
+            }
             $this->pages->updatePage($id, $request);
             if ($parent_id == null) {
                 DB::table('parent_child_pages')->where('child_id', '=', $child_id)->delete();
@@ -193,7 +222,7 @@ class PageController extends Controller
                 );
             }
             Session::flash('message', trans('prs.page_updated'));
-            return redirect()->to('/' . $user_role . '/dashboard/pages');
+            return redirect()->to('/' . $userRole . '/dashboard/pages');
         }
     }
 

@@ -242,7 +242,7 @@ class EditionController extends Controller
                         if ($can_send_email) {
                             $email_params = array();
                             $email_params['publish_edition_edition_title'] = $edition->title;
-                            $super_admin = User::getUserByRoleType('superadmin');
+                            $super_admins = User::getUserByRoleType('superadmin');
                             $article_list = array();
                             foreach ($articles as $article) {
                                 $author_role_id = User::getRoleIDByUserID($article->corresponding_author_id);
@@ -252,7 +252,7 @@ class EditionController extends Controller
                                 $email_params['publish_edition_author_article_id'] = $author_article->id;
                                 $email_params['publish_edition_author_article_title'] = $author_article->title;
                                 $email_params['publish_edition_author_article_link'] = url('/article/' . $article->slug);
-                                $email_params['publish_edition_article_super_admin_name'] = $super_admin[0]->name;
+                                $email_params['publish_edition_article_super_admin_name'] = !empty($super_admins) ? $super_admins[0]->name : '';
                                 $author_template_data = EmailTemplate::getEmailTemplatesByID($author_role_id, 'publish_edition');
                                 if (!empty($author_template_data)) {
                                     try {
@@ -270,12 +270,16 @@ class EditionController extends Controller
                             foreach ($article_list as $article_list_data) {
                                 $email_params['publish_edition_article_list_data'][] = $article_list_data;
                             }
-                            $template_data = EmailTemplate::getEmailTemplatesByID($super_admin[0]->role_id, 'publish_edition');
-                            if (!empty($template_data)) {
-                                try {
-                                    Mail::to($super_admin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, 'superadmin'));
-                                } catch (\Exception $e) {
-                                    // Log error but continue
+                            if (!empty($super_admins)) {
+                                foreach ($super_admins as $super_admin) {
+                                    $template_data = EmailTemplate::getEmailTemplatesByID($super_admin->role_id, 'publish_edition');
+                                    if (!empty($template_data)) {
+                                        try {
+                                            Mail::to($super_admin->email)->send(new ArticleNotificationMailable($email_params, $template_data, 'superadmin'));
+                                        } catch (\Exception $e) {
+                                            // Log error but continue
+                                        }
+                                    }
                                 }
                             }
                         }

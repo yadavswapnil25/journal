@@ -39,6 +39,8 @@ use App\Http\Controllers\SubscriberController;
 // Authentication routes
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
+Route::get('admin/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
+Route::post('admin/login', [LoginController::class, 'adminLogin'])->name('admin.login.submit');
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
 // Registration routes

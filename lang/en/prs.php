@@ -48,7 +48,7 @@ return [
     'provide' => 'Provide',
     'select_roles' => 'Select Roles',
     'add_article' => 'Submit New Article',
-    'login_now' => 'Login As Author',
+    'login_now' => 'Login',
     'terms_conditions' => 'Terms & Conditions',
     'article_strength' => 'Article Strength',
     'strength_note' => 'Check the strength of your article',

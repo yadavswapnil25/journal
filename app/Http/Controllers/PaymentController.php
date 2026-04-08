@@ -221,20 +221,22 @@ class PaymentController extends Controller
         if ($can_send_email) {
             $email_params = array();
             $role_type = array("superadmin", "reader");
-            $superadmin = User::getUserByRoleType('superadmin');
-            $super_admin_email = $superadmin[0]->email;
-
-            $email_params['new_order_admin_email'] = $superadmin[0]->name;
+            $superadmins = User::getUserByRoleType('superadmin');
+            $email_params['new_order_admin_email'] = !empty($superadmins) ? $superadmins[0]->name : '';
             $email_params['new_order_id'] = $data['invoice_id'];
             $email_params['new_order_customer_name'] = Auth::user()->name;
             foreach ($role_type as $key => $role) {
                 if ($role == "superadmin") {
-                    $template_data = EmailTemplate::getEmailTemplatesByID($superadmin[0]->role_id, 'new_order');
-                    if (!empty($template_data)) {
-                        try {
-                            Mail::to($super_admin_email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
-                        } catch (\Exception $e) {
-                            // Log error but continue
+                    if (!empty($superadmins)) {
+                        foreach ($superadmins as $superadmin) {
+                            $template_data = EmailTemplate::getEmailTemplatesByID($superadmin->role_id, 'new_order');
+                            if (!empty($template_data)) {
+                                try {
+                                    Mail::to($superadmin->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                                } catch (\Exception $e) {
+                                    // Log error but continue
+                                }
+                            }
                         }
                     }
                 } elseif ($role == "reader") {
@@ -336,8 +338,7 @@ class PaymentController extends Controller
             if (session()->has('product_title')) {
                 $title = session()->get('product_title');
             }
-            $super_admin = User::getUserByRoleType('superadmin');
-            $super_admin_email = $super_admin[0]->email;
+            $super_admins = User::getUserByRoleType('superadmin');
             $date = Carbon::parse($payment_detail['payment_date'])->format('F j, Y');
             if (session()->has('product_vat')) {
                 $tax = sprintf("%.2f", session()->get('product_vat'));
@@ -346,7 +347,7 @@ class PaymentController extends Controller
                 $tax = 0.00;
             }
             $email_params = array();
-            $email_params['success_order_admin_name'] = $super_admin[0]->name;
+            $email_params['success_order_admin_name'] = !empty($super_admins) ? $super_admins[0]->name : '';
             $email_params['success_order_product_title'] = $title;
             $email_params['success_order_invoice_id'] = $payment_detail['invoice_id'];
             $email_params['success_order_vat_amount'] = $tax;
@@ -357,17 +358,23 @@ class PaymentController extends Controller
             $email_params['success_order_quantity'] = $payment_detail['product_qty'];
             $email_params['success_order_payment_date'] = $date;
             $email_params['success_order_customer_name'] = User::getUserNameByID(Auth::user()->id);
-            $email_params['admin_success_order_link'] = url('/login?user_id=' . $super_admin[0]->id . '&email_type=success_order&invoice_id=' . $invoice_id);
+            $email_params['admin_success_order_link'] = !empty($super_admins) ? url('/login?user_id=' . $super_admins[0]->id . '&email_type=success_order&invoice_id=' . $invoice_id) : url('/login');
             $email_params['customer_success_order_link'] = url('/login?user_id=' . Auth::user()->id . '&email_type=success_order&invoice_id=' . $invoice_id);
             $role_type = array("superadmin", "reader");
             foreach ($role_type as $key => $role) {
                 if ($role == "superadmin") {
-                    $template_data = EmailTemplate::getEmailTemplatesByID($super_admin[0]->role_id, 'success_order');
-                    if (!empty($template_data)) {
-                        try {
-                            Mail::to($super_admin_email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
-                        } catch (\Exception $e) {
-                            // Log error but continue
+                    if (!empty($super_admins)) {
+                        foreach ($super_admins as $super_admin) {
+                            $email_params['success_order_admin_name'] = $super_admin->name;
+                            $email_params['admin_success_order_link'] = url('/login?user_id=' . $super_admin->id . '&email_type=success_order&invoice_id=' . $invoice_id);
+                            $template_data = EmailTemplate::getEmailTemplatesByID($super_admin->role_id, 'success_order');
+                            if (!empty($template_data)) {
+                                try {
+                                    Mail::to($super_admin->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                                } catch (\Exception $e) {
+                                    // Log error but continue
+                                }
+                            }
                         }
                     }
                 } elseif ($role == "reader") {

@@ -10,7 +10,15 @@
         $user_roles_type = App\Models\User::getUserRoleType($user->id);
         $user_roles_type = !empty($user_roles_type) && is_object($user_roles_type) ? $user_roles_type : null;
         $user_role = !empty($user_roles_type) ? $user_roles_type->role_type : '';
-        $role_name = !empty($user_roles_type) ? $user_roles_type->name : '';
+        $active_dashboard_role = session('active_dashboard_role');
+        if (in_array($active_dashboard_role, ['superadmin', 'editor', 'reviewer', 'author', 'reader'], true)) {
+            $user_role = $active_dashboard_role;
+        }
+        $segment_role = Request::segment(1);
+        if (in_array($segment_role, ['superadmin', 'editor', 'reviewer', 'author', 'reader'], true)) {
+            $user_role = $segment_role;
+        }
+        $role_name = ucfirst(str_replace('_', ' ', $user_role));
         $user_name = $user->name;
         if ($user_role == 'superadmin' || $user_role == 'editor') {
             $dashboard = 'dashboard';
@@ -47,7 +55,7 @@
                         {{App\Helper::displayArticleMenu($page_id)}}
 
                         {{-- Submit New Article (authors only) --}}
-                        @if (!empty($user_roles_type) && $user_roles_type->role_type == 'author')
+                        @if ($user_role == 'author')
                             <li class="{{ \Request::route()->getName() === 'checkAuthor' ? 'sj-active' : '' }}">
                                 <a href="{{ route('checkAuthor') }}">
                                     <i class="lnr lnr-pencil"></i>
@@ -56,6 +64,7 @@
                             </li>
                         @endif
                     @endif
+                    @if ($user_role === 'superadmin')
                     @can ('View Categories')
                         <li class="{{\Request::route()->getName() === 'editionSetting' ? 'sj-active' : ''}}">
                             <a href="{{url('/dashboard/edition/settings')}}">
@@ -68,6 +77,8 @@
                             </a>
                         </li>
                     @endcan
+                    @endif
+                    @if ($user_role === 'superadmin')
                     @can ('Manage Users')
                         <li class="{{\Request::route()->getName() === 'manageUsers' ? 'sj-active' : ''}}">
                             <a href="{{url('superadmin/users/manage-users')}}">
@@ -75,11 +86,13 @@
                             </a>
                         </li>
                     @endcan
+                    @endif
                         <li class="{{\Request::route()->getName() === 'accountSetting' ? 'sj-active' : ''}}">
                             <a href="{{url('dashboard/general/settings/account-settings')}}">
                                 <i class="lnr lnr-cog"></i><span>{{trans('prs.account_settings')}}</span>
                             </a>
                         </li>
+                    @if (in_array($user_role, ['superadmin', 'editor'], true))
                     @can ('Manage Pages')
                         <li class="{{\Request::route()->getName() === 'managePages' ? 'sj-active' : ''}}">
                             <a href="{{url('/'.$page_author.'/dashboard/pages')}}">
@@ -87,6 +100,8 @@
                             </a>
                         </li>
                     @endcan
+                    @endif
+                    @if (in_array($user_role, ['superadmin', 'editor'], true))
                     @can ('Site Management')
                         <li class="{{\Request::route()->getName() === 'manageSite' ? 'sj-active' : ''}}">
                             <a href="{{url('/dashboard/'.$page_author.'/site-management/settings')}}">
@@ -94,13 +109,14 @@
                             </a>
                         </li>
                     @endcan
-                    @if (!empty($user_roles_type) && $user_roles_type->role_type == 'reader')
+                    @endif
+                    @if ($user_role == 'reader')
                         <li class="{{\Request::route()->getName() === 'downloads' ? 'sj-active' : ''}}">
                             <a href="{{url('/user/products/downloads')}}">
                                 <i class="lnr lnr-download"></i><span>{{trans('prs.downloads')}}</span>
                             </a>
                         </li>
-                    @elseif (!empty($user_roles_type) && $user_roles_type->role_type == 'superadmin')
+                    @elseif ($user_role == 'superadmin')
                         <li class="{{\Request::route()->getName() === 'orders' ? 'sj-active' : ''}}">
                             <a href="{{url('/superadmin/downloads')}}">
                                 <i class="lnr lnr-download"></i><span>{{trans('prs.downloads')}}</span>

@@ -134,21 +134,25 @@ class RegisterController extends Controller
         
         if ($can_send_email) {
             $site = SiteManagement::getMetaValue('site_title');
-            $superadmin = User::getUserByRoleType('superadmin');
+            $superadmins = User::getUserByRoleType('superadmin');
             $email_params = [];
-            $email_params['new_user_supper_admin_name'] = $superadmin[0]->name;
+            $email_params['new_user_supper_admin_name'] = !empty($superadmins) ? $superadmins[0]->name : '';
             $email_params['site_title'] = $site[0]['site_title'];
             $email_params['user_edit_page_link'] = url('/login?user_id=' . $user->id . '&email_type=new_user');
             $email_params['new_user_name'] = $data['name'] . " " . $data['sur_name'];
             $email_params['new_user_role'] = $role;
             $email_params['login_email'] = $data['email'];
             $email_params['new_user_password'] = $data['password'];
-            $template_data = EmailTemplate::getEmailTemplatesByID($superadmin[0]->role_id, 'new_user');
-            if (!empty($template_data)) {
-                try {
-                    Mail::to($superadmin[0]->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
-                } catch (\Exception $e) {
-                    // Log error but continue
+            if (!empty($superadmins)) {
+                foreach ($superadmins as $superadmin) {
+                    $template_data = EmailTemplate::getEmailTemplatesByID($superadmin->role_id, 'new_user');
+                    if (!empty($template_data)) {
+                        try {
+                            Mail::to($superadmin->email)->send(new ArticleNotificationMailable($email_params, $template_data, $role));
+                        } catch (\Exception $e) {
+                            // Log error but continue
+                        }
+                    }
                 }
             }
             $user_template_data = DB::table('email_templates')->where('email_type', 'new_user')->where('role_id', null)->first();

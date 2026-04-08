@@ -14,8 +14,8 @@
     @endif
 @endsection
 @section('content')
-    @include('partials.figma-header')
-    @include('partials.admin-back-button')
+    <!-- @include('partials.figma-header') -->
+    <!-- @include('partials.admin-back-button') -->
 <div class="container">
     <div class="row">
         <div id="sj-twocolumns" class="sj-twocolumns">
@@ -54,15 +54,12 @@
                                     {!! Form::email('email', null, ['class' => 'form-control', 'placeholder' => trans('prs.ph_email')]) !!}
                                 </div>
                                 @foreach ($roles as $role) 
-                                    @php $excludedRole = $role->role_type; @endphp 
-                                    @if (!($excludedRole === "superadmin"))
-                                        <div class="form-group half-width assign-role">
-                                            <span class="sj-radio">
-                                                {{ Form::radio('roles[]', e($role->id), null, array('id' => e($role->name), 'data-assignrole' => e($role->name))) }}
-                                                {{ Form::label(e($role->name), ucfirst(e($role->name))) }}
-                                            </span>
-                                        </div>
-                                    @endif 
+                                    <div class="form-group half-width assign-role">
+                                        <span class="sj-checkbox">
+                                            {{ Form::checkbox('roles[]', e($role->id), false, array('id' => e($role->name), 'data-assignrole' => e($role->name))) }}
+                                            {{ Form::label(e($role->name), ucfirst(e($role->name))) }}
+                                        </span>
+                                    </div>
                                 @endforeach
                                 <div class="form-group sj-formbtns">
                                     {!! Form::submit(trans('prs.btn_create_now'), ['class' => 'sj-btn sj-btnactive']) !!}
@@ -75,4 +72,5 @@
             </div>
         </div>
     </div>
+</div>
 @endsection

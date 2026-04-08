@@ -48,6 +48,15 @@
                         $userRoleType = App\Models\User::getUserRoleType($userId);
                         $userRoleType = !empty($userRoleType) && is_object($userRoleType) ? $userRoleType : null;
                         $roleType = !empty($userRoleType) ? $userRoleType->role_type : '';
+                        $roleTypes = Illuminate\Support\Facades\DB::table('model_has_roles')
+                            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                            ->where('model_has_roles.model_id', $userId)
+                            ->pluck('roles.role_type')
+                            ->toArray();
+                        $sessionRole = session('active_dashboard_role');
+                        if (!empty($sessionRole) && in_array($sessionRole, $roleTypes, true)) {
+                            $roleType = $sessionRole;
+                        }
 
                         if ($roleType === 'author') {
                             $dashboardUrl = url('author/user/' . $userId . '/articles-under-review');

@@ -93,7 +93,7 @@ class UserController extends Controller
      */
     public function addUser()
     {
-        $roles = Role::whereIn('role_type', ['editor', 'reviewer'])->get();
+        $roles = Role::whereIn('role_type', ['superadmin', 'editor', 'reviewer'])->get();
         return view('admin.users.create')->with('roles', $roles);
     }
 
@@ -117,8 +117,20 @@ class UserController extends Controller
                 'name' => 'required|max:20',
                 'sur_name' => 'required|max:20',
                 'email' => 'required|email|unique:users',
-                'roles' => 'required',
+                'roles' => 'required|array|min:1',
+                'roles.*' => 'exists:roles,id',
             ]);
+
+            // Only logged-in superadmin can assign superadmin role.
+            $selectedRoleTypes = Role::whereIn('id', $request['roles'])->pluck('role_type')->toArray();
+            if (in_array('superadmin', $selectedRoleTypes, true)) {
+                $currentUserRole = User::getUserRoleType(Auth::id());
+                $currentRoleType = !empty($currentUserRole) && is_object($currentUserRole) ? $currentUserRole->role_type : '';
+                if ($currentRoleType !== 'superadmin') {
+                    Session::flash('error', 'Only superadmin can assign superadmin role.');
+                    return redirect()->back()->withInput($request->all());
+                }
+            }
             // Generate secure temporary password with uppercase, lowercase, numbers
             // Mix of random string and numbers for better security
             $temp_password = Str::upper(Str::random(4)) . Str::lower(Str::random(4)) . rand(1000, 9999);
@@ -164,7 +176,8 @@ class UserController extends Controller
             if ($can_send_email) {
                 $site = SiteManagement::getMetaValue('site_title');
                 $superadmin = User::getUserByRoleType('superadmin');
-                $role_type = User::getRoleByRoleID($request['roles'][0]);
+                $first_role_id = !empty($request['roles']) && is_array($request['roles']) ? $request['roles'][0] : null;
+                $role_type = !empty($first_role_id) ? User::getRoleByRoleID($first_role_id) : null;
                 $role_type = !empty($role_type) && is_object($role_type) ? $role_type : null;
                 $email_params = array();
                 $email_params['new_user_supper_admin_name'] = !empty($superadmin) && !empty($superadmin[0]) ? $superadmin[0]->name : '';
@@ -229,9 +242,13 @@ class UserController extends Controller
             if (!empty($users)) {
                 $role = User::getUserRoleType($id);
                 $role = !empty($role) && is_object($role) ? $role : null;
+                $roles = Role::whereIn('role_type', ['superadmin', 'editor', 'reviewer'])->get();
+                $assigned_role_ids = $users->roles()->pluck('id')->toArray();
+                $assigned_role_types = $users->roles()->pluck('role_type')->toArray();
+                $is_reviewer_assigned = in_array('reviewer', $assigned_role_types, true);
                 $categories = Category::getCategories()->all();
                 $categories_id = Category::getCategoryByReviewerID($users->id);
-                return view('admin.users.edit', compact('role', 'categories', 'categories_id', 'id'))
+                return view('admin.users.edit', compact('role', 'roles', 'assigned_role_ids', 'is_reviewer_assigned', 'categories', 'categories_id', 'id'))
                     ->with('users', $users);
                 Session::flash('message', trans('prs.user_delete'));
                 return redirect()->to('superadmin/users/manage-users');
@@ -269,8 +286,19 @@ class UserController extends Controller
                     'name' => 'required|max:20',
                     'sur_name' => 'required|max:20',
                     'email' => 'required',
+                    'roles' => 'required|array|min:1',
+                    'roles.*' => 'exists:roles,id',
                 ]
             );
+            $selectedRoleTypes = Role::whereIn('id', $request['roles'])->pluck('role_type')->toArray();
+            if (in_array('superadmin', $selectedRoleTypes, true)) {
+                $currentUserRole = User::getUserRoleType(Auth::id());
+                $currentRoleType = !empty($currentUserRole) && is_object($currentUserRole) ? $currentUserRole->role_type : '';
+                if ($currentRoleType !== 'superadmin') {
+                    Session::flash('error', 'Only superadmin can assign superadmin role.');
+                    return redirect()->back()->withInput($request->all());
+                }
+            }
             $file = $request['user_image'];
             $users = User::find($id);
             $users->name = htmlspecialchars($request['name'], ENT_QUOTES, 'UTF-8');
@@ -338,9 +366,12 @@ class UserController extends Controller
                 $users->password = Hash::make($request->password);
             }
             $users->save();
-            $categories = $request['category'];
-            if (!empty($categories)) {
+            $users->syncRoles($request['roles']);
+            $categories = $request['category'] ?? [];
+            if (in_array('reviewer', $selectedRoleTypes, true) && !empty($categories)) {
                 Category::saveReviewerCategory($categories, $users->id);
+            } elseif (!in_array('reviewer', $selectedRoleTypes, true)) {
+                DB::table('reviewers_categories')->where('reviewer_id', $users->id)->delete();
             }
             Session::flash('message', trans('prs.user_updated'));
             return redirect()->to('superadmin/users/manage-users');
