@@ -97,6 +97,7 @@ Route::post('notify-article-review', [ArticleController::class, 'notifyArticleRe
 Route::post('submit-editor-feedback/{id}', [ArticleController::class, 'submitEditorFeedback']);
 Route::post('{role}/dashboard/assign-reviewer', [ArticleController::class, 'assignReviewer']);
 Route::post('{role}/dashboard/update-accepted-article', [ArticleController::class, 'updateAcceptedArticle']);
+Route::post('{role}/dashboard/update-article-unique-code', [ArticleController::class, 'updateArticleUniqueCode']);
 Route::post('{role}/dashboard/delete-article', [ArticleController::class, 'destroy']);
 
 // Author controller routes

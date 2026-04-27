@@ -14,12 +14,21 @@
             !empty($_GET['show']) ? $show_records = $_GET['show'] : '';
             !empty($_GET['category']) ? $requested_category = $_GET['category'] : array();
             !empty($_GET['edition']) ? $requested_edition = $_GET['edition'] : array();
+            $hasPublishedArticles = false;
+            if (isset($published_articles)) {
+                if (is_object($published_articles) && method_exists($published_articles, 'count')) {
+                    $hasPublishedArticles = $published_articles->count() > 0;
+                } elseif (is_array($published_articles)) {
+                    $hasPublishedArticles = count($published_articles) > 0;
+                }
+            }
         @endphp
         <div class="container py-4" id="public_publish_articles">
             <div class="row g-4">
                 <div class="col-12 col-lg-9">
                     {!! Form::open(['url' => url('published/editions/filters'), 'method' => 'get', 'id' => 'edition_filters']) !!}
                         <div class="row g-4">
+                            @if ($hasPublishedArticles)
                             <div class="col-12 col-md-5 col-lg-4">
                                 <div class="card shadow-sm border-0">
                                     <div class="card-body">
@@ -51,8 +60,9 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
 
-                            <div class="col-12 col-md-7 col-lg-8">
+                            <div class="col-12 {{ $hasPublishedArticles ? 'col-md-7 col-lg-8' : 'col-md-12 col-lg-12' }}">
                                 @if (Auth::user())
                                     @php
                                         $user_id = Auth::user()->id;
@@ -84,28 +94,30 @@
 
                                 <div class="card shadow-sm border-0">
                                     <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
-                                            <div class="mb-2 mb-md-0">
-                                                <label class="mr-2 mb-0">{!! trans('prs.sort_by') !!}</label>
-                                                <select name="sort" class="form-control d-inline-block w-auto" @change="onChange()">
-                                                    <option value="date">{!! trans('prs.sort_by') !!}</option>
-                                                    <option value="title">{!! trans('prs.lbl_name') !!}</option>
-                                                    <option value="updated_at">{!! trans('prs.date') !!}</option>
-                                                </select>
+                                        @if ($hasPublishedArticles)
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+                                                <div class="mb-2 mb-md-0">
+                                                    <label class="mr-2 mb-0" for="sort_articles">{!! trans('prs.sort_by') !!}</label>
+                                                    <select id="sort_articles" name="sort" class="form-control d-inline-block w-auto" @change="onChange()">
+                                                        <option value="date">{!! trans('prs.sort_by') !!}</option>
+                                                        <option value="title">{!! trans('prs.lbl_name') !!}</option>
+                                                        <option value="updated_at">{!! trans('prs.date') !!}</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label class="mr-2 mb-0" for="show_articles">{!! trans('prs.show') !!}</label>
+                                                    <select id="show_articles" name="show" class="form-control d-inline-block w-auto" @change="onChange()">
+                                                        <option @if ($show_records == 10) selected @endif>10</option>
+                                                        <option @if ($show_records == 20) selected @endif>20</option>
+                                                        <option @if ($show_records == 30) selected @endif>30</option>
+                                                        <option @if ($show_records == 40) selected @endif>40</option>
+                                                        <option @if ($show_records == 50) selected @endif>50</option>
+                                                    </select>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label class="mr-2 mb-0">{!! trans('prs.show') !!}</label>
-                                                <select name="show" class="form-control d-inline-block w-auto" @change="onChange()">
-                                                    <option @if ($show_records == 10) selected @endif>10</option>
-                                                    <option @if ($show_records == 20) selected @endif>20</option>
-                                                    <option @if ($show_records == 30) selected @endif>30</option>
-                                                    <option @if ($show_records == 40) selected @endif>40</option>
-                                                    <option @if ($show_records == 50) selected @endif>50</option>
-                                                </select>
-                                            </div>
-                                        </div>
+                                        @endif
 
-                                        @if (!empty($published_articles))
+                                        @if ($hasPublishedArticles)
                                             @foreach ($published_articles as $article)
                                                 @php $edition_image = App\Helper::getEditionImage($article->edition_id, 'medium'); @endphp
                                                 <div class="card mb-3 border">
@@ -132,9 +144,9 @@
                                                     </div>
                                                 </div>
                                             @endforeach
-                                        @elseif (Session::has('message'))
+                                        @else
                                             <div class="alert alert-warning mb-0">
-                                                {!! Session::get('message') !!}
+                                                The inaugural issue is in process and will be published in September 2026. Thanks for your patience!
                                             </div>
                                         @endif
                                     </div>
@@ -143,7 +155,7 @@
                         </div>
                     {!! Form::close() !!}
 
-                    @if (is_object($published_articles) && method_exists($published_articles,'links'))
+                    @if ($hasPublishedArticles && is_object($published_articles) && method_exists($published_articles,'links'))
                         <div class="mt-4">
                             {!! $published_articles->links('pagination.custom') !!}
                         </div>

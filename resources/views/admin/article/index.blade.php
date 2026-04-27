@@ -120,6 +120,9 @@
                                                                 {!! Form::number('price',!empty($article->price) ? $article->price : null  , ['class' => 'form-control', 'min' => '1', 'placeholder' => trans('prs.ph_article_price') ]) !!}
                                                             </div>
                                                         @endif
+                                                        <div class="form-group">
+                                                            {!! Form::text('unique_code', !empty($article->unique_code) ? $article->unique_code : null, ['class' => 'form-control', 'placeholder' => 'Unique Code']) !!}
+                                                        </div>
                                                         {!! Form::hidden('article', $article->id) !!}
                                                         <div class="sj-categorysbtn">
                                                             {!! Form::submit(trans('prs.btn_save'), ['class' => 'sj-btn sj-btnactive','id' =>$article->id ]) !!}
@@ -134,6 +137,21 @@
                                                     <a href="#" v-on:click.prevent="deleteArticle($event,'{{{$delete_title}}}','{{{$delete_message}}}','{{{$deleted}}}')" class="sj-btn sj-danger-btn" id="{{{$article->id}}}">Delete</a>
                                                 @endif
                                             </div>
+                                            @if (in_array($user_role, ['superadmin', 'editor'], true))
+                                                <div class="sj-acceptedarticleshold" style="margin-top: 15px;">
+                                                    {!! Form::open(['url' => url('/'.$user_role.'/dashboard/update-article-unique-code'),'class'=>'sj-categorysform']) !!}
+                                                        <fieldset>
+                                                            <div class="form-group">
+                                                                {!! Form::text('unique_code', !empty($article->unique_code) ? $article->unique_code : null, ['class' => 'form-control', 'placeholder' => 'Unique Code']) !!}
+                                                            </div>
+                                                            {!! Form::hidden('article', $article->id) !!}
+                                                            <div class="sj-categorysbtn">
+                                                                {!! Form::submit(trans('prs.btn_save'), ['class' => 'sj-btn sj-btnactive']) !!}
+                                                            </div>
+                                                        </fieldset>
+                                                    {!! Form::close() !!}
+                                                </div>
+                                            @endif
                                         @else
                                             @if (in_array($user_role, ['superadmin', 'editor'], true))
                                                 <div class="sj-userbtnarea">

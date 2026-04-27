@@ -651,7 +651,19 @@
                     <h1>Advisory Board</h1>
                 </div>
                 <div class="figma-about-content">
-                    <p class="figma-about-description" style="text-align: center; font-size: 1.1rem;">This page is under construction. The advisory board list will be displayed soon.</p>
+                    <p class="figma-about-description" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">
+                        Studies in History of English Language Education (SHELE)
+                    </p>
+                    <ul class="figma-publication-info-list" style="margin: 0; padding-left: 1.25rem;">
+                        <li><strong>Prof. Shreesh Chaudhary</strong> - (Retd.) Department of HSS, IIT Madras</li>
+                        <li><strong>Prof. Santosh Mahapatra</strong> - Department of HSS, BITS-Pilani, Hyderabad Campus</li>
+                        <li><strong>Dr. Leya Matthew</strong> - School of Arts &amp; Sciences, Ahmedabad University</li>
+                        <li><strong>Prof. Sunita Mishra</strong> - Centre for English Language Studies, University of Hyderabad</li>
+                        <li><strong>Prof. Parimala Rao</strong> - ZHCES, Jawaharlal Nehru University Delhi</li>
+                        <li><strong>Prof. Asma Rasheed</strong> - Department of ELT, EFL University Hyderabad</li>
+                        <li><strong>Prof. Richard Smith</strong> - ELT &amp; Applied Linguistics, University of Warwick, UK</li>
+                        <li><strong>Prof. M. Sridhar</strong> - (Retd.) Department of English, University of Hyderabad</li>
+                    </ul>
                 </div>
             </div>
         </section>

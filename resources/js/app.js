@@ -520,14 +520,13 @@ if (document.getElementById("article")) {
                                     self.success_message = response.data.message;
                                     messageVue.$emit('showAlert');
                                 } else {
-                                    setTimeout(function () {
-                                        swal({
-                                            title: deleted,
-                                            text: delete_message,
-                                            type: "success"
-                                        });
-                                    }, 500);
-                                    jQuery('.delArticle-' + article_id).remove();
+                                    swal({
+                                        title: deleted,
+                                        text: delete_message,
+                                        type: "success"
+                                    }, function () {
+                                        window.location.reload();
+                                    });
                                 }
                             })
                             .catch(function () {

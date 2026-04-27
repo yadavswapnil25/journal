@@ -452,6 +452,9 @@ class ArticleController extends Controller
                 } else {
                     $article->price = null;
                 }
+                if (!empty($unique_code)) {
+                    $article->unique_code = htmlspecialchars($unique_code, ENT_QUOTES, 'UTF-8');
+                }
                 $article->publish_document = htmlspecialchars($file_name, ENT_QUOTES, 'UTF-8');
                 $article->save();
                 Session::flash('message', trans('prs.article_updated'));
@@ -463,10 +466,18 @@ class ArticleController extends Controller
                 } else {
                     $article->price = null;
                 }
+                if (!empty($unique_code)) {
+                    $article->unique_code = htmlspecialchars($unique_code, ENT_QUOTES, 'UTF-8');
+                }
                 $article->save();
                 Session::flash('message', trans('prs.article_updated'));
                 return redirect()->back();
             } else {
+                $article = Article::find($article_id);
+                if (!empty($article) && !empty($unique_code)) {
+                    $article->unique_code = htmlspecialchars($unique_code, ENT_QUOTES, 'UTF-8');
+                    $article->save();
+                }
                 Session::flash('message', trans('prs.article_updated'));
                 return redirect()->back();
             }
@@ -527,6 +538,64 @@ class ArticleController extends Controller
         $json['type'] = 'success';
         $json['message'] = 'Article has been deleted.';
         return $json;
+    }
+
+    /**
+     * @access public
+     * @desc Update article unique code from dashboard.
+     * @param \Illuminate\Http\Request $request
+     * @param string $role
+     * @return \Illuminate\Http\Response
+     */
+    public function updateArticleUniqueCode(Request $request, $role = "")
+    {
+        $server_verification = Helper::journal_is_demo_site();
+        if (!empty($server_verification)) {
+            Session::flash('error', $server_verification);
+            return redirect()->back();
+        }
+
+        $this->validate(
+            $request,
+            [
+                'article' => 'required|integer|exists:articles,id',
+                'unique_code' => 'required|string|max:50|regex:/^[A-Z0-9]+$/',
+            ]
+        );
+
+        $article_id = (int) $request->get('article');
+        $unique_code = strtoupper(trim((string) $request->get('unique_code', '')));
+        $user_id = Auth::user()->id;
+
+        $assigned_role_types = DB::table('model_has_roles')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_id', $user_id)
+            ->pluck('roles.role_type')
+            ->toArray();
+        $allowed_dashboard_roles = ['superadmin', 'editor'];
+        $role_allowed = in_array($role, $allowed_dashboard_roles, true) && in_array($role, $assigned_role_types, true);
+        if (!$role_allowed) {
+            Session::flash('error', trans('prs.page_not_found'));
+            return redirect()->back();
+        }
+
+        $exists = Article::where('unique_code', $unique_code)->where('id', '!=', $article_id)->exists();
+        if ($exists) {
+            Session::flash('error', 'Unique code already exists.');
+            return redirect()->back()->withInput();
+        }
+
+        $article = Article::find($article_id);
+        if (empty($article)) {
+            Session::flash('error', 'Article not found.');
+            return redirect()->back();
+        }
+
+        $article->unique_code = htmlspecialchars($unique_code, ENT_QUOTES, 'UTF-8');
+        $article->save();
+        Session::flash('message', trans('prs.article_updated'));
+
+        return redirect()->back();
     }
 
     /**
