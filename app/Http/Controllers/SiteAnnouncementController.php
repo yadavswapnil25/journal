@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\SiteAnnouncement;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Throwable;
 
 class SiteAnnouncementController extends Controller
 {
@@ -47,10 +50,21 @@ class SiteAnnouncementController extends Controller
     public function store(Request $request)
     {
         $this->ensureSuperadmin();
-        $data = $this->validatedData($request);
-        $data['image'] = $this->uploadImage($request);
-        SiteAnnouncement::create($data);
-        Session::flash('message', trans('prs.announcement_saved'));
+        try {
+            $data = $this->validatedData($request);
+            unset($data['image'], $data['remove_image']);
+            $data['image'] = $this->uploadImage($request);
+            SiteAnnouncement::create($data);
+            Session::flash('message', trans('prs.announcement_saved'));
+        } catch (Throwable $e) {
+            Log::error('Site announcement create failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            Session::flash('error', 'Announcement could not be saved. Please try again.');
+            return redirect()->back()->withInput();
+        }
 
         return redirect()->route('manageAnnouncements');
     }
@@ -68,6 +82,7 @@ class SiteAnnouncementController extends Controller
         $this->ensureSuperadmin();
         $announcement = SiteAnnouncement::findOrFail($id);
         $data = $this->validatedData($request);
+        unset($data['image'], $data['remove_image']);
         $newImage = $this->uploadImage($request);
         if (!empty($newImage)) {
             $this->deleteImageFile($announcement->image);
@@ -91,7 +106,7 @@ class SiteAnnouncementController extends Controller
         $announcement->delete();
         Session::flash('message', trans('prs.announcement_deleted'));
 
-        return redirect()->route('manageAnnouncements');
+        return redirect()->route('manageAnnouncements', ['refresh' => time()]);
     }
 
     /**
@@ -121,7 +136,7 @@ class SiteAnnouncementController extends Controller
     protected function uploadImage(Request $request): ?string
     {
         $uploadedImage = $request->file('image');
-        if (empty($uploadedImage)) {
+        if (!($uploadedImage instanceof UploadedFile) || !$uploadedImage->isValid()) {
             return null;
         }
 
