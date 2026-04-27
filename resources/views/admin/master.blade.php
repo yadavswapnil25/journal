@@ -25,6 +25,7 @@
     <link href="{{ asset('css/color.css') }}" rel="stylesheet">
     <link href="{{ asset('css/transitions.css') }}" rel="stylesheet">
     <link href="{{ asset('css/responsive.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/website/figma-exact.css') }}?v={{ time() }}" rel="stylesheet">
     <link href="{{ asset('css/sweetalert.css') }}" rel="stylesheet">
     <link href="{{ asset('css/vue-transition.css') }}" rel="stylesheet">
 
@@ -52,7 +53,7 @@
         <div class="sj-contentwrapper">
             <header id="sj-header" class="sj-header sj-haslayout">
                 @if(Schema::hasTable('users'))
-                @include('includes.header') @endif
+                @include('partials.figma-header') @endif
             </header>
             <main id="sj-main" class="sj-main sj-haslayout sj-sectionspace">
                 @yield('content')

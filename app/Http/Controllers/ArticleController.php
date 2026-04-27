@@ -475,6 +475,62 @@ class ArticleController extends Controller
 
     /**
      * @access public
+     * @desc Delete article from admin dashboard.
+     * @param \Illuminate\Http\Request $request
+     * @param string $role
+     * @return array
+     */
+    public function destroy(Request $request, $role = "")
+    {
+        $json = array();
+        $server = Helper::ajax_journal_is_demo_site();
+        if (!empty($server)) {
+            $json['type'] = 'error';
+            $json['message'] = $server->getData()->message;
+            return $json;
+        }
+
+        $article_id = (int) $request->get('id');
+        if (empty($article_id)) {
+            $json['type'] = 'error';
+            $json['message'] = 'Something went wrong.';
+            return $json;
+        }
+
+        $user_id = Auth::user()->id;
+        $assigned_role_types = DB::table('model_has_roles')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_id', $user_id)
+            ->pluck('roles.role_type')
+            ->toArray();
+
+        $allowed_dashboard_roles = ['superadmin', 'editor'];
+        $role_allowed = in_array($role, $allowed_dashboard_roles, true) && in_array($role, $assigned_role_types, true);
+        if (!$role_allowed) {
+            $json['type'] = 'error';
+            $json['message'] = trans('prs.page_not_found');
+            return $json;
+        }
+
+        $article = Article::find($article_id);
+        if (empty($article)) {
+            $json['type'] = 'error';
+            $json['message'] = 'Article not found.';
+            return $json;
+        }
+
+        DB::table('reviewers')->where('article_id', $article_id)->delete();
+        DB::table('comments')->where('article_id', $article_id)->delete();
+        DB::table('author_article')->where('article_id', $article_id)->delete();
+        $article->delete();
+
+        $json['type'] = 'success';
+        $json['message'] = 'Article has been deleted.';
+        return $json;
+    }
+
+    /**
+     * @access public
      * @desc Download reviewer feedback as PDF
      * @param string $role
      * @param int $article_id

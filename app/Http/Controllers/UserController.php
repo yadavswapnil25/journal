@@ -74,7 +74,11 @@ class UserController extends Controller
         } else {
             $users = User::getUsers();
         }
-        $role_list = Role::select('name', 'id')->get()->pluck('name', 'id');
+        $role_list = Role::select('name', 'id', 'role_type')
+            ->orderBy('id')
+            ->get()
+            ->unique('role_type')
+            ->pluck('name', 'id');
         $categories = Category::getCategories()->all();
         //Get roles with role type Editor & Reviewer
         $roles = Role::whereIn('role_type', ['editor', 'reviewer'])->get();
@@ -93,7 +97,11 @@ class UserController extends Controller
      */
     public function addUser()
     {
-        $roles = Role::whereIn('role_type', ['superadmin', 'editor', 'reviewer'])->get();
+        $roles = Role::whereIn('role_type', ['superadmin', 'editor', 'reviewer'])
+            ->orderBy('id')
+            ->get()
+            ->unique('role_type')
+            ->values();
         return view('admin.users.create')->with('roles', $roles);
     }
 
@@ -242,7 +250,11 @@ class UserController extends Controller
             if (!empty($users)) {
                 $role = User::getUserRoleType($id);
                 $role = !empty($role) && is_object($role) ? $role : null;
-                $roles = Role::whereIn('role_type', ['superadmin', 'editor', 'reviewer'])->get();
+                $roles = Role::whereIn('role_type', ['superadmin', 'editor', 'reviewer'])
+                    ->orderBy('id')
+                    ->get()
+                    ->unique('role_type')
+                    ->values();
                 $assigned_role_ids = $users->roles()->pluck('id')->toArray();
                 $assigned_role_types = $users->roles()->pluck('role_type')->toArray();
                 $is_reviewer_assigned = in_array('reviewer', $assigned_role_types, true);

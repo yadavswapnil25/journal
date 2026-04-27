@@ -17,6 +17,7 @@ use App\Models\SiteManagement;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Page;
+use App\Models\SiteAnnouncement;
 use App\Helper;
 
 class PublicController extends Controller
@@ -262,7 +263,13 @@ class PublicController extends Controller
             ->first();
 
         $meta_desc = !empty($meta) ? $meta : '';
-        return view('admin.pages.show', compact('page', 'slug', 'meta_desc'));
+
+        $siteAnnouncementList = SiteAnnouncement::listForAnnouncementsPage(
+            (string) ($page->slug ?? ''),
+            (string) $slug
+        );
+
+        return view('admin.pages.show', compact('page', 'slug', 'meta_desc', 'siteAnnouncementList'));
     }
 
     /**

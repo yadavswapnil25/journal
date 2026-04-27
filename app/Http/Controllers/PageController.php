@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Helper;
 use App\Models\SiteManagement;
+use App\Models\SiteAnnouncement;
 
 class PageController extends Controller
 {
@@ -138,9 +139,20 @@ class PageController extends Controller
     {
         if (!empty($slug)) {
             $page = $this->pages->getPageData($slug);
+            $meta = DB::table('sitemanagements')
+                ->where('meta_key', 'seo-desc-'.$page->id)
+                ->select('meta_value')
+                ->pluck('meta_value')
+                ->first();
+            $meta_desc = !empty($meta) ? $meta : '';
+            $siteAnnouncementList = SiteAnnouncement::listForAnnouncementsPage(
+                (string) ($page->slug ?? ''),
+                (string) $slug
+            );
+
             return view(
                 'admin.pages.show',
-                compact('page', 'slug')
+                compact('page', 'slug', 'meta_desc', 'siteAnnouncementList')
             );
         }
     }

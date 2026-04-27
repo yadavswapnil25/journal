@@ -81,7 +81,7 @@
                                         <span class="sj-mailinfo">{{{$author->email}}}</span>
                                     </div>
                                 </li>
-                                <li id="collapseOne-{{{$article->id}}}" class="collapse sj-active sj-userinfohold" aria-labelledby="headingOne-{{{$article->id}}}" data-parent="#accordion">
+                                <li id="collapseOne-{{{$article->id}}}" class="collapse sj-active sj-userinfohold delArticle-{{{$article->id}}}" aria-labelledby="headingOne-{{{$article->id}}}" data-parent="#accordion">
                                     <div class="sj-userinfoimgname">
                                         <figure class="sj-userinfimg">
                                             <img src="{{{ asset(App\Helper::getUserImage($article->corresponding_author_id,$author->user_image,'medium')) }}}" alt="{{{trans('prs.user_img')}}}">
@@ -90,6 +90,11 @@
                                             <span>{{{ Carbon\Carbon::parse($article->created_at)->diffForHumans()}}} {{ trans('prs.on') }} {{{Carbon\Carbon::parse($article->created_at)->format('l \\a\\t H:i:s')}}}</span>
                                             <h3>{{{$article->title}}}</h3>
                                         </div>
+                                        @php
+                                            $delete_title = trans("prs.ph_delete_confirm_title");
+                                            $delete_message = 'Article has been deleted.';
+                                            $deleted = trans("prs.ph_delete_title");
+                                        @endphp
                                         @if ($article->status == "accepted_articles")
                                             @php
                                                 $edition = !empty($editions) ? $editions : array();
@@ -125,7 +130,16 @@
                                         @elseif ($article->status == "articles_under_review")
                                             <div class="sj-userbtnarea">
                                                 <a href="{{{url('/'.$user_role.'/dashboard/'.$user_id.'/'.'articles-under-review'.'/'.$article->slug.'')}}}" class="sj-btn sj-btnactive">{{{trans('prs.btn_view_detail')}}}</a>
+                                                @if (in_array($user_role, ['superadmin', 'editor'], true))
+                                                    <a href="#" v-on:click.prevent="deleteArticle($event,'{{{$delete_title}}}','{{{$delete_message}}}','{{{$deleted}}}')" class="sj-btn sj-danger-btn" id="{{{$article->id}}}">Delete</a>
+                                                @endif
                                             </div>
+                                        @else
+                                            @if (in_array($user_role, ['superadmin', 'editor'], true))
+                                                <div class="sj-userbtnarea">
+                                                    <a href="#" v-on:click.prevent="deleteArticle($event,'{{{$delete_title}}}','{{{$delete_message}}}','{{{$deleted}}}')" class="sj-btn sj-danger-btn" id="{{{$article->id}}}">Delete</a>
+                                                </div>
+                                            @endif
                                         @endif
                                         <div class="sj-description">
                                             @php echo htmlspecialchars_decode(stripslashes($article->excerpt)); @endphp

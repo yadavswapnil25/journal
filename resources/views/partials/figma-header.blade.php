@@ -79,9 +79,14 @@
         <div class="figma-announcement-label">Announcements</div>
         <div class="figma-announcement-content">
             <div class="figma-announcement-marquee">
-                <a href="{{ route('showPage', ['slug' => 'submission-guidelines']) }}">Call for submissions is now open. Submit your manuscripts for the first issue by 30 June 2026.</a>
-                &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="{{ route('showPage', ['slug' => 'announcements']) }}">HELE Webinar - 3: History of the first adaptation of a Shakespearean play, 20 March 2026, 7.00 PM India time</a>
+                @forelse ($headerAnnouncements ?? [] as $ann)
+                    @if (! $loop->first)
+                        &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+                    @endif
+                    <a href="{{ $ann->publicUrl() }}">{{ $ann->message }}</a>
+                @empty
+                    <span class="figma-announcement-empty">{{ trans('prs.marquee_empty') }}</span>
+                @endforelse
             </div>
         </div>
     </div>

@@ -16,7 +16,6 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Edition;
 use App\Models\Author;
-use App\Helper;
 
 class Article extends Model
 {
@@ -92,8 +91,7 @@ class Article extends Model
             $article = new Article();
             $user = User::find(Auth::id());
             $user_role = $user->getRoleNames()->toArray();
-            $random_number = Helper::generateRandomCode(8);
-            $unique_code = strtoupper($random_number);
+            $unique_code = self::generateArticleUniqueCode($request['category'] ?? null);
             if ($user_role[0] === 'author') {
                 $uploaded_file = $request->file('uploaded_new_article');
                 $file_original_name = $uploaded_file->getClientOriginalName();
@@ -128,6 +126,42 @@ class Article extends Model
                 return $article->save();
             }
         }
+    }
+
+    /**
+     * Build article ID in YYYYMM + category initial + 3-digit sequence format.
+     *
+     * Example: 202604F001
+     *
+     * @param int|null $category_id
+     * @return string
+     */
+    private static function generateArticleUniqueCode($category_id)
+    {
+        $category_initial = 'X';
+        if (!empty($category_id) && is_numeric($category_id)) {
+            $category = Category::getCategoryByID($category_id);
+            if (!empty($category) && !empty($category->title)) {
+                if (preg_match('/[A-Za-z]/', $category->title, $matches)) {
+                    $category_initial = strtoupper($matches[0]);
+                }
+            }
+        }
+
+        $prefix = date('Ym') . $category_initial;
+        $last_code = self::where('unique_code', 'like', $prefix . '%')
+            ->orderBy('unique_code', 'desc')
+            ->value('unique_code');
+
+        $next_sequence = 1;
+        if (!empty($last_code)) {
+            $last_sequence = substr($last_code, -3);
+            if (is_numeric($last_sequence)) {
+                $next_sequence = (int)$last_sequence + 1;
+            }
+        }
+
+        return $prefix . str_pad((string)$next_sequence, 3, '0', STR_PAD_LEFT);
     }
 
     /**

@@ -24,6 +24,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\SiteAnnouncementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,6 +97,7 @@ Route::post('notify-article-review', [ArticleController::class, 'notifyArticleRe
 Route::post('submit-editor-feedback/{id}', [ArticleController::class, 'submitEditorFeedback']);
 Route::post('{role}/dashboard/assign-reviewer', [ArticleController::class, 'assignReviewer']);
 Route::post('{role}/dashboard/update-accepted-article', [ArticleController::class, 'updateAcceptedArticle']);
+Route::post('{role}/dashboard/delete-article', [ArticleController::class, 'destroy']);
 
 // Author controller routes
 Route::get('author/user/{id}/{status}', [AuthorController::class, 'index'])->name('authorArticles');
@@ -218,6 +220,13 @@ Route::post('/dashboard/superadmin/emails/store-templates', [EmailController::cl
 Route::get('/dashboard/superadmin/emails/edit-template/{id}', [EmailController::class, 'edit'])->name('editTemplate');
 Route::post('/dashboard/superadmin/emails/email/{id}/update-template', [EmailController::class, 'update']);
 Route::post('/superadmin/emails/email/delete-template', [EmailController::class, 'destroy']);
+
+Route::get('/dashboard/superadmin/announcements', [SiteAnnouncementController::class, 'index'])->name('manageAnnouncements');
+Route::get('/dashboard/superadmin/announcements/create', [SiteAnnouncementController::class, 'create'])->name('createAnnouncement');
+Route::post('/dashboard/superadmin/announcements', [SiteAnnouncementController::class, 'store'])->name('storeAnnouncement');
+Route::get('/dashboard/superadmin/announcements/{id}/edit', [SiteAnnouncementController::class, 'edit'])->name('editAnnouncement');
+Route::post('/dashboard/superadmin/announcements/{id}', [SiteAnnouncementController::class, 'update'])->name('updateAnnouncement');
+Route::post('/dashboard/superadmin/announcements/{id}/delete', [SiteAnnouncementController::class, 'destroy'])->name('deleteAnnouncement');
 
 // Subscriber Controller Route
 Route::post('/prs/store-subscriber', [SubscriberController::class, 'store']);

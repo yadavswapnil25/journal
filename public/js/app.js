@@ -48375,6 +48375,47 @@ if (document.getElementById("article")) {
                 }).catch(function (error) {
                     //console.log(error);
                 });
+            },
+            deleteArticle: function deleteArticle(event, delete_title, delete_message, deleted) {
+                var element = event.currentTarget;
+                var self = this;
+                swal({
+                    title: delete_title,
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonClass: "btn-danger",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                    closeOnConfirm: true,
+                    closeOnCancel: true,
+                    showLoaderOnConfirm: true
+                }, function (isConfirm) {
+                    var article_id = element.getAttribute('id');
+                    if (isConfirm) {
+                        axios.post(APP_URL + '/' + USER_ROLE + '/dashboard/delete-article', {
+                            id: article_id
+                        }).then(function (response) {
+                            if (response.data.type === 'error') {
+                                self.success_message = response.data.message;
+                                messageVue.$emit('showAlert');
+                            } else {
+                                setTimeout(function () {
+                                    swal({
+                                        title: deleted,
+                                        text: delete_message,
+                                        type: "success"
+                                    });
+                                }, 500);
+                                jQuery('.delArticle-' + article_id).remove();
+                            }
+                        }).catch(function () {
+                            self.success_message = 'Something went wrong.';
+                            messageVue.$emit('showAlert');
+                        });
+                    } else {
+                        swal("Cancelled");
+                    }
+                });
             }
         }
     });

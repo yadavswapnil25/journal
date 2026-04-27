@@ -15,7 +15,6 @@
             @endforeach
         </div>
     @endif
-    @include('partials.figma-header')
     @include('partials.admin-back-button')
     @php $counter = 0; @endphp
     <div class="container">

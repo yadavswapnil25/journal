@@ -221,6 +221,30 @@ Breadcrumbs::for(
 );
 
 Breadcrumbs::for(
+    'manageAnnouncements',
+    function ($trail) {
+        $trail->parent('home');
+        $trail->push(trans('prs.marquee_announcements'), route('manageAnnouncements'));
+    }
+);
+
+Breadcrumbs::for(
+    'createAnnouncement',
+    function ($trail) {
+        $trail->parent('manageAnnouncements');
+        $trail->push(trans('prs.announcement_add'), route('createAnnouncement'));
+    }
+);
+
+Breadcrumbs::for(
+    'editAnnouncement',
+    function ($trail, $id) {
+        $trail->parent('manageAnnouncements');
+        $trail->push(trans('prs.announcement_edit'), route('editAnnouncement', ['id' => $id]));
+    }
+);
+
+Breadcrumbs::for(
     'editEdition',
     function ($trail, $id) {
         $trail->parent('editionSetting');

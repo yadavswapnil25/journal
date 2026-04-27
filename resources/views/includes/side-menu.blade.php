@@ -137,6 +137,11 @@
                                 <i class="lnr lnr-envelope"></i><span>{{trans('prs.email_templates')}}</span>
                             </a>
                         </li>
+                        <li class="{{ in_array(\Request::route()->getName(), ['manageAnnouncements', 'createAnnouncement', 'editAnnouncement'], true) ? 'sj-active' : '' }}">
+                            <a href="{{ route('manageAnnouncements') }}">
+                                <i class="lnr lnr-bullhorn"></i><span>{{ trans('prs.marquee_announcements') }}</span>
+                            </a>
+                        </li>
                     @endif
                     <li>
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-sidebarform').submit();">
