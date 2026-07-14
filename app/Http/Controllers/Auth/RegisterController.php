@@ -60,6 +60,18 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showRegistrationForm()
+    {
+        session(['registration_form_started_at' => time()]);
+
+        return view('auth.register');
+    }
+
     public function register(Request $request)
     {
         $server_verification = Helper::journal_is_demo_site();
@@ -67,6 +79,21 @@ class RegisterController extends Controller
             Session::flash('error', $server_verification);
             return redirect()->back();
         }
+
+        // Honeypot: bots fill hidden fields; humans leave them empty.
+        if (!empty($request->input('website'))) {
+            Session::flash('error', trans('prs.register_spam_blocked'));
+            return redirect()->back()->withInput($request->except(['password', 'password_confirmation', 'website']));
+        }
+
+        // Reject instant robotic submissions (form opened too briefly).
+        $startedAt = (int) session('registration_form_started_at', 0);
+        if ($startedAt === 0 || (time() - $startedAt) < 3) {
+            Session::flash('error', trans('prs.register_too_fast'));
+            session(['registration_form_started_at' => time()]);
+            return redirect()->back()->withInput($request->except(['password', 'password_confirmation', 'website']));
+        }
+
         $validator = $this->validator($request->all());
         if ($validator->fails()) {
             return redirect()
@@ -75,6 +102,7 @@ class RegisterController extends Controller
                 ->withErrors($validator, 'register');
         } else {
             event(new Registered($user = $this->create($request->all())));
+            session()->forget('registration_form_started_at');
             return redirect($this->redirectPath())->with('message', trans('prs.register_success'));
         }
     }

@@ -491,3 +491,17 @@
 #reviewer_feedback .reviewer-recommendation-select-wrap {
     display: none !important;
 }
+
+/* Registration honeypot: hide from humans, keep in DOM for bots */
+.sj-hp-wrap,
+.figma-form .sj-hp-wrap,
+#register_form .sj-hp-wrap {
+    position: absolute !important;
+    left: -10000px !important;
+    top: auto !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}

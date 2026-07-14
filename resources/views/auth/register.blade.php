@@ -88,6 +88,11 @@
                 <div class="figma-register-main">
                     <div class="figma-register-card">
                         <h2>{{trans('prs.reg_now')}}</h2>
+                        @if (Session::has('error'))
+                            <div class="figma-alert figma-alert-error">
+                                {{ Session::get('error') }}
+                            </div>
+                        @endif
                         <div class="provider-site-wrap" v-show="loading" v-cloak>
                             <div class="provider-loader">
                                 <div class="bounce1"></div>
@@ -97,6 +102,11 @@
                         </div>
                         <form method="POST" action="{{ route('register') }}" class="figma-form" id="register_form" @submit="showloading()">
                             @csrf
+                            {{-- Honeypot field: leave empty. Hidden from real users, filled by many bots. --}}
+                            <div class="sj-hp-wrap" aria-hidden="true" style="position:absolute !important;left:-10000px !important;top:auto !important;width:1px !important;height:1px !important;overflow:hidden !important;opacity:0 !important;pointer-events:none !important;">
+                                <label for="website_url_hp">Website</label>
+                                <input type="text" name="website" id="website_url_hp" value="" tabindex="-1" autocomplete="off">
+                            </div>
                             <div class="figma-form-row">
                                 <div class="figma-form-group">
                                     <input id="name" type="text" 
